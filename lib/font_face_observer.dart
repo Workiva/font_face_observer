@@ -206,7 +206,8 @@ class FontFaceObserver {
       _styleElement = document.getElementById(_FONT_FACE_CSS_ID);
       if (_styleElement == null) {
         _styleElement = new StyleElement()..id = _FONT_FACE_CSS_ID;
-        _styleElement.text = '<!-- font_face_observer loads fonts using this element -->';
+        _styleElement.text =
+            '<!-- font_face_observer loads fonts using this element -->';
         document.head.append(_styleElement);
       }
     }
