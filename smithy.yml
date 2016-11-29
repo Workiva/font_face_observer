@@ -17,9 +17,8 @@ script:
   # - pub run dart_dev docs --no-open
   # - tar czvf api.tar.gz -C doc/api .
 
-  # Build assets to push to the CDN
+  # Build assets
   - pub build
-  - ./tool/stage_for_cdn.sh
 
   # Package up static assets for functional testing
   - tar -hcf build.tar.gz build/web/
