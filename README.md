@@ -13,16 +13,16 @@ await new FontFaceObserver('Arial', weight: 'bold').load('/url/to/arial.ttf');
 # Public API
 
 ```dart
-// Constructing a new FontFaceObserver
+// Constructing a new FontFaceObserver (with default values)
 FontFaceObserver(
-    String this.family,
+    String family,
     {
-        String this.style: 'normal',
-        String this.weight: 'normal',
-        String this.stretch: 'normal',
-        String this.testString: 'BESbswy',
-        int this.timeout: 3000,
-        bool this.useSimulatedLoadEvents: false
+        String style: 'normal',
+        String weight: 'normal',
+        String stretch: 'normal',
+        String testString: 'BESbswy',
+        int timeout: 3000,
+        bool useSimulatedLoadEvents: false
     }
 );
 
@@ -33,3 +33,12 @@ Future<bool> isLoaded() async
 // returns the same Future<bool> from isLoaded()
 Future<bool> load(String url) async
 ```
+
+# Notes
+Font Face Observer will use the FontFace API
+https://developer.mozilla.org/en-US/docs/Web/API/FontFace if available to detect
+when a font has loaded. If the browser does not support that API it will
+fallback to the method used in https://github.com/bramstein/fontfaceobserver which
+relies on scroll events when the font loads and is quite efficient. If you want
+to force the use of the fallback mode, you can set
+`useSimulatedLoadEvents: true` when constructing your FontFaceObserver.
