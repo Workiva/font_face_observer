@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:html';
-import 'dart:convert';
 import 'package:font_face_observer/support.dart';
 import 'package:font_face_observer/ruler.dart';
 
@@ -222,16 +221,5 @@ class FontFaceObserver {
 
   _removeElementWhenComplete(Future f, HtmlElement el) async {
     f.whenComplete(() => el.remove());
-  }
-
-  static String getFontObjectUrlFrom(String data) {
-    // Blob blob = new Blob([data, "application/octect-stream"]);
-    // String objecturl = Url.createObjectUrl(blob);
-    // return 'url($objecturl)';
-
-    data = BASE64.encode(UTF8.encode(data));
-    // data = BASE64.encode(data);
-    String dataUri = 'data:application/octect-stream;base64,${data}';
-    return dataUri;
   }
 }
