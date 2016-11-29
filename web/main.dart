@@ -4,11 +4,8 @@ import 'package:font_face_observer/font_face_observer.dart';
 import 'package:font_face_observer/support.dart';
 
 const String _successMessage = 'Pack my box with five dozen liquor jugs';
-// const String _fontUrl = '/Shrikhand-b64.txt';
-// const String _fontUrl = '/Shrikhand-Regular.ttf';
 const String _fontUrl = '/Garamond.ttf';
 const String _fontName = 'Garamond';
-// const String _fontName = 'Arial';
 const bool _USE_NATIVE_FONT_API = false;
 
 drawText(String text, fontName) {
@@ -37,16 +34,8 @@ hasWebKitFallbackBug: $HAS_WEBKIT_FALLBACK_BUG
 loadFont([ev]) async {
   print('Loading $_fontName... with native FontApi $_USE_NATIVE_FONT_API');
   drawText('Loading $_fontName ...', _fontName);
-  // HttpRequest req = await HttpRequest.request(_fontUrl);
-  // String fontData = req.response;
-
-  // String fontObjectUrl = FontFaceObserver.getFontObjectUrlFrom(fontData);
-  // print(fontObjectUrl);
   var ffo = new FontFaceObserver(_fontName, useSimulatedLoadEvents: !_USE_NATIVE_FONT_API);
   var loaded = await ffo.load(_fontUrl);
-  // var loaded = await ffo.load(fontObjectUrl);
-
-  // Url.revokeObjectUrl(fontObjectUrl);
   print('loaded: $loaded');
   drawText(loaded == true ? _successMessage : 'Font not loaded', _fontName);
 }
