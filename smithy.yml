@@ -19,6 +19,7 @@ script:
 
   # Build assets
   - pub build
+  - ./tool/stage_for_cdn.sh
 
   # Package up static assets for functional testing
   - tar -hcf build.tar.gz build/web/
