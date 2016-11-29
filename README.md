@@ -12,7 +12,7 @@ await new FontFaceObserver('Arial', weight: 'bold').load('/url/to/arial.ttf');
 
 # Public API
 
-```
+```dart
 // Constructing a new FontFaceObserver
 FontFaceObserver(
     String this.family,
