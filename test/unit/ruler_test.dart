@@ -1,4 +1,5 @@
 import 'dart:html';
+import 'dart:async';
 import 'package:test/test.dart';
 import 'package:font_face_observer/ruler.dart';
 
@@ -20,18 +21,31 @@ main() {
     ruler = null;
   });
 
-  testTwoResizes(width1, width2) async {
+  Future testResize(width1) async {
+    Completer c = new Completer();
+    ruler.onResize((width) {
+      expect(width, equals(width1));
+      c.complete();
+    });
+    ruler.setWidth(width1);
+    return c.future;
+  }
+
+  Future testTwoResizes(width1, width2) async {
+    Completer c = new Completer();
     var first = true;
-    ruler.onResize( (width) {
+    ruler.onResize((width) {
       if (first) {
         expect(width, equals(width1));
         first = false;
         ruler.setWidth(width2);
       } else {
         expect(width, equals(width2));
+        c.complete();
       }
     });
     ruler.setWidth(width1);
+    return c.future;
   }
 
   group('Ruler', () {
@@ -40,46 +54,37 @@ main() {
       expect(ruler.element, isNotNull);
       expect(ruler.getWidth(), equals(START_WIDTH));
     });
-    
+
     test('should detect expansion', () async {
-      var new_width = 200;
-      ruler.onResize((width) {
-        expect(width, equals(new_width));
-      });
-      ruler.setWidth(new_width);
+      testResize(START_WIDTH + 100);
     });
 
     test('should detect collapse', () async {
-      var new_width = 50;
-      ruler.onResize((width) {
-        expect(width, equals(new_width));
-      });
-      ruler.setWidth(new_width);
+      testResize(START_WIDTH - 50);
     });
 
     test('should detect multiple expansions', () async {
-      testTwoResizes(START_WIDTH + 100, START_WIDTH + 200);
+      return testTwoResizes(START_WIDTH + 100, START_WIDTH + 200);
     });
-    
+
     test('should detect multiple collapses', () async {
-      testTwoResizes(START_WIDTH - 30, START_WIDTH - 50);
+      return testTwoResizes(START_WIDTH - 30, START_WIDTH - 50);
     });
 
     test('should detect an expansion and a collapse', () async {
-      testTwoResizes(START_WIDTH + 100, START_WIDTH);
+      return testTwoResizes(START_WIDTH + 100, START_WIDTH);
     });
 
     test('should detect a collapse and an expansion', () async {
-      testTwoResizes(START_WIDTH - 30, START_WIDTH);
+      return testTwoResizes(START_WIDTH - 30, START_WIDTH);
     });
-    
+
     test('should detect single pixel collapses', () async {
-      testTwoResizes(START_WIDTH - 1, START_WIDTH - 2);
+      return testTwoResizes(START_WIDTH - 1, START_WIDTH - 2);
     });
 
     test('should detect single pixel expansions', () async {
-      testTwoResizes(START_WIDTH + 1, START_WIDTH + 2);
+      return testTwoResizes(START_WIDTH + 1, START_WIDTH + 2);
     });
-
   });
 }

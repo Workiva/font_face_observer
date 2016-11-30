@@ -118,7 +118,4 @@ class Ruler {
     });
     reset();
   }
-
-  // TODO ? Do we need to remove scroll listeners?
-
 }
