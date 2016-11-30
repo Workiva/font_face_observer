@@ -1,5 +1,8 @@
 import 'dart:html';
 import 'dart:async';
+import 'dart:convert';
+import 'dart:js';
+import 'dart:typed_data';
 import 'package:font_face_observer/font_face_observer.dart';
 import 'package:font_face_observer/support.dart';
 
@@ -43,5 +46,29 @@ loadFont([ev]) async {
 main() {
   writeSupport();
   drawText('Waiting ...', _fontName);
-  new Timer(new Duration(milliseconds: 1000), loadFont);
+
+  document.getElementById('b64').onClick.listen( (ev) async {
+    HttpRequest req = await HttpRequest.request(_fontUrl, responseType: 'arraybuffer');
+    ByteBuffer fontData = req.response;
+    String base64fontData = BASE64.encode(fontData.asUint8List().toList());
+    base64fontData = 'data:application/octet-stream;base64,${base64fontData}';
+    var loaded = await new FontFaceObserver('base64font').load(base64fontData);
+    print('Loaded b64 $loaded');
+    drawText(loaded == true ? _successMessage : 'Font not loaded', 'base64font');
+  });
+  
+  document.getElementById('blob').onClick.listen( (ev) async {
+    HttpRequest req = await HttpRequest.request(_fontUrl, responseType: 'blob');
+    Blob blob = req.response;
+    String blobUrl = Url.createObjectUrl(blob);
+    var loaded = await new FontFaceObserver('blobfont').load(blobUrl);
+    Url.revokeObjectUrl(blobUrl);
+    print('Loaded blob font $loaded');
+    drawText(loaded == true ? _successMessage : 'Font not loaded', 'blobfont');
+  });
+
+  document.getElementById('btn').onClick.listen( (ev) {
+    loadFont();
+  });
+  //new Timer(new Duration(milliseconds: 1000), loadFont);
 }

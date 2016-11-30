@@ -1,8 +1,8 @@
 import 'dart:html';
-import 'dart:async';
+import 'dart:convert';
+import 'dart:typed_data';
 import 'package:test/test.dart';
 import 'package:font_face_observer/font_face_observer.dart';
-import 'package:font_face_observer/ruler.dart';
 
 @TestOn('browser')
 main() {
@@ -96,5 +96,44 @@ main() {
       expect(loaded, isTrue);
     });
 
+    test('should find a font with a custom unicode range within ASCII with simulated events', () async {
+      var loaded = await new FontFaceObserver('unicode1', testString: '\u0021', useSimulatedLoadEvents: true).load('subset.ttf');
+      expect(loaded, isTrue);
+    });
+
+    test('should find a font with a custom unicode range outside ASCII (but within BMP) with simulated events', () async {
+      var loaded = await new FontFaceObserver('unicode2', testString: '\u4e2d\u56fd', useSimulatedLoadEvents: true).load('subset.ttf');
+      expect(loaded, isTrue);
+    });
+
+    test('should find a font with a custom unicode range outside the BMP with simulated events', () async {
+      var loaded = await new FontFaceObserver('unicode3', testString: '\udbff\udfff', useSimulatedLoadEvents: true).load('subset.ttf');
+      expect(loaded, isTrue);
+    });
+
+    test('should load and detect a base64 data URL font successfully', () async {
+      HttpRequest req = await HttpRequest.request('Garamond.ttf', responseType: 'arraybuffer');
+      ByteBuffer buf = req.response;
+      String dataUrl = 'data:application/octet-stream;base64,' + BASE64.encode(buf.asUint8List().toList());
+      var loaded = await new FontFaceObserver('base64font').load(dataUrl);
+      expect(loaded, isTrue);
+    });
+
+    test('should load and detect a base64 data URL font successfully with simulated events', () async {
+      HttpRequest req = await HttpRequest.request('Garamond.ttf', responseType: 'arraybuffer');
+      ByteBuffer buf = req.response;
+      String dataUrl = 'data:application/octet-stream;base64,' + BASE64.encode(buf.asUint8List().toList());
+      var loaded = await new FontFaceObserver('base64font', useSimulatedLoadEvents: true).load(dataUrl);
+      expect(loaded, isTrue);
+    });
+
+    test('should load and detect a object URL font successfully', () async {
+      HttpRequest req = await HttpRequest.request('Garamond.ttf', responseType: 'blob');
+      Blob blob = req.response;
+      String blobUrl = Url.createObjectUrl(blob);
+      var loaded = await new FontFaceObserver('blobfont').load(blobUrl);
+      Url.revokeObjectUrl(blobUrl);
+      expect(loaded, isTrue);
+    });
   });
 }
