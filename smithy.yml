@@ -11,7 +11,7 @@ script:
   - pub run dart_dev analyze
   - pub run dart_dev format --check
   - xvfb-run -s '-screen 0 1024x768x24' pub run dart_dev test -p content-shell
-  # - xvfb-run -s '-screen 0 1024x768x24' pub run dart_dev coverage --no-html
+  - xvfb-run -s '-screen 0 1024x768x24' pub run dart_dev coverage --no-html
 
   # Create docs
   # - pub run dart_dev docs --no-open

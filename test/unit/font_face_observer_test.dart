@@ -49,19 +49,33 @@ main() {
       expect(loaded, isFalse);
     });
 
+    test('should timeout and fail for a bogus font with simulated events', () async {
+      var loaded = await new FontFaceObserver('bogus2', timeout: 100, useSimulatedLoadEvents: true).load('/bogus.ttf');
+      expect(loaded, isFalse);
+    });
+
     test('should load a real font', () async {
-      var loaded = await new FontFaceObserver('Garamond1', timeout: 500).load('Garamond.ttf');
+      var loaded = await new FontFaceObserver('test1').load('Garamond.ttf');
+      expect(loaded, isTrue);
+    });
+
+    test('should load a real font using simulated events', () async {
+      var ffo = new FontFaceObserver('test2', useSimulatedLoadEvents: true);
+      var loaded = await ffo.load('Garamond.ttf');
+      expect(loaded, isTrue);
+      loaded = false;
+      loaded = await ffo.isLoaded();
       expect(loaded, isTrue);
     });
 
     test('should find the font if it is already loaded', () async {
-      await new FontFaceObserver('Garamond2', timeout: 500).load('Garamond.ttf');
-      var loaded = await new FontFaceObserver('Garamond2', timeout: 500).isLoaded();
+      await new FontFaceObserver('test3').load('Garamond.ttf');
+      var loaded = await new FontFaceObserver('test3').isLoaded();
       expect(loaded, isTrue);
     });
 
     test('should handle spaces and numbers in font family', () async {
-      var loaded = await new FontFaceObserver('G a ramond_-77', timeout: 500).load('Garamond.ttf');
+      var loaded = await new FontFaceObserver('Ga ramond_-77').load('Garamond.ttf');
       expect(loaded, isTrue);
     });
 
