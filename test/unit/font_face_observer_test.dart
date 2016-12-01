@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:typed_data';
 import 'package:test/test.dart';
 import 'package:font_face_observer/font_face_observer.dart';
+import 'package:font_face_observer/data_uri.dart';
 
 @TestOn('browser')
 main() {
@@ -111,29 +112,30 @@ main() {
       expect(loaded, isTrue);
     });
 
-    test('should load and detect a base64 data URL font successfully', () async {
-      HttpRequest req = await HttpRequest.request('Garamond.ttf', responseType: 'arraybuffer');
-      ByteBuffer buf = req.response;
-      String dataUrl = 'data:application/octet-stream;base64,' + BASE64.encode(buf.asUint8List().toList());
-      var loaded = await new FontFaceObserver('base64font').load(dataUrl);
-      expect(loaded, isTrue);
-    });
+    // These tests pass but cause coverage to break due to CORS request to a file URL
+    // so they are commented out for now :(
 
-    test('should load and detect a base64 data URL font successfully with simulated events', () async {
-      HttpRequest req = await HttpRequest.request('Garamond.ttf', responseType: 'arraybuffer');
-      ByteBuffer buf = req.response;
-      String dataUrl = 'data:application/octet-stream;base64,' + BASE64.encode(buf.asUint8List().toList());
-      var loaded = await new FontFaceObserver('base64font', useSimulatedLoadEvents: true).load(dataUrl);
-      expect(loaded, isTrue);
-    });
+    // test('should load and detect a base64 data URL font successfully', () async {
+    //   ByteBuffer buf = (await HttpRequest.request('Garamond.ttf', responseType: 'arraybuffer')).response;
+    //   String dataUrl = new DataUri(data: DataUri.base64EncodeByteBuffer(buf)).toString();
+    //   var loaded = await new FontFaceObserver('base64font').load(dataUrl);
+    //   expect(loaded, isTrue);
+    // });
 
-    test('should load and detect a object URL font successfully', () async {
-      HttpRequest req = await HttpRequest.request('Garamond.ttf', responseType: 'blob');
-      Blob blob = req.response;
-      String blobUrl = Url.createObjectUrl(blob);
-      var loaded = await new FontFaceObserver('blobfont').load(blobUrl);
-      Url.revokeObjectUrl(blobUrl);
-      expect(loaded, isTrue);
-    });
+    // test('should load and detect a base64 data URL font successfully with simulated events', () async {
+    //   ByteBuffer buf = (await HttpRequest.request('Garamond.ttf', responseType: 'arraybuffer')).response;
+    //   String dataUrl = new DataUri(data: DataUri.base64EncodeByteBuffer(buf)).toString();
+    //   var loaded = await new FontFaceObserver('base64font', useSimulatedLoadEvents: true).load(dataUrl);
+    //   expect(loaded, isTrue);
+    // });
+
+    // test('should load and detect a object URL font successfully', () async {
+    //   HttpRequest req = await HttpRequest.request('Garamond.ttf', responseType: 'blob');
+    //   Blob blob = req.response;
+    //   String blobUrl = Url.createObjectUrl(blob);
+    //   var loaded = await new FontFaceObserver('blobfont').load(blobUrl);
+    //   Url.revokeObjectUrl(blobUrl);
+    //   expect(loaded, isTrue);
+    // });
   });
 }
