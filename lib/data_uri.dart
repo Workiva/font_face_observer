@@ -12,16 +12,17 @@ class DataUri {
   String data;
   bool base64;
 
-  DataUri({
-      String this.mimeType: 'application/octet-stream',
+  DataUri(
+      {String this.mimeType: 'application/octet-stream',
       String this.encoding,
       String this.data,
-      bool this.base64: true
-  });
+      bool this.base64: true});
 
   @override
-  String toString() => 'data:${mimeType != null && mimeType.length > 0 ? mimeType : ""}${encoding != null && encoding.length > 0 ? ";charset=" + encoding : ""}${base64 ? ";base64" : ""},${data != null ? data : ""}';
+  String toString() =>
+      'data:${mimeType != null && mimeType.length > 0 ? mimeType : ""}${encoding != null && encoding.length > 0 ? ";charset=" + encoding : ""}${base64 ? ";base64" : ""},${data != null ? data : ""}';
 
   static base64EncodeString(String string) => window.btoa(string);
-  static base64EncodeByteBuffer(ByteBuffer buf) => BASE64.encode(buf.asUint8List().toList());
+  static base64EncodeByteBuffer(ByteBuffer buf) =>
+      BASE64.encode(buf.asUint8List().toList());
 }

@@ -224,12 +224,12 @@ class FontFaceObserver {
 
     sheet.insertRule(rule, 0);
 
-    // We need to create this span to force the font to be loaded into memory
+    // We add this span to trigger the browser to load the font when used
     SpanElement dummy = new SpanElement()
       ..setAttribute('style', 'font-family: "${family}"; visibility: hidden;')
       ..text = testString;
 
-    document.body.append(dummy); // TODO clean up dummy element from DOM
+    document.body.append(dummy);
     var isLoadedFuture = isLoaded();
     _removeElementWhenComplete(isLoadedFuture, dummy);
     return isLoadedFuture;
