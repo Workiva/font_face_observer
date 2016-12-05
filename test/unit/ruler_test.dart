@@ -1,11 +1,12 @@
+@TestOn('browser')
+
 import 'dart:html';
 import 'dart:async';
 import 'package:test/test.dart';
-import 'package:font_face_observer/ruler.dart';
+import 'package:font_face_observer/src/ruler.dart';
 
 const int START_WIDTH = 100;
 
-@TestOn('browser')
 main() {
   Ruler ruler;
 

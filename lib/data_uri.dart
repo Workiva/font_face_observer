@@ -10,19 +10,19 @@ class DataUri {
   String mimeType;
   String encoding;
   String data;
-  bool base64;
+  bool isDataBase64Encoded;
 
   DataUri(
       {String this.mimeType: 'application/octet-stream',
       String this.encoding,
       String this.data,
-      bool this.base64: true});
+      bool this.isDataBase64Encoded: true});
 
   @override
   String toString() =>
-      'data:${mimeType != null && mimeType.length > 0 ? mimeType : ""}${encoding != null && encoding.length > 0 ? ";charset=" + encoding : ""}${base64 ? ";base64" : ""},${data != null ? data : ""}';
+      'data:${mimeType != null && mimeType.length > 0 ? mimeType : ""}${encoding != null && encoding.length > 0 ? ";charset=" + encoding : ""}${isDataBase64Encoded ? ";base64" : ""},${data != null ? data : ""}';
 
-  static base64EncodeString(String string) => window.btoa(string);
-  static base64EncodeByteBuffer(ByteBuffer buf) =>
+  static String base64EncodeString(String string) => window.btoa(string);
+  static String base64EncodeByteBuffer(ByteBuffer buf) =>
       BASE64.encode(buf.asUint8List().toList());
 }

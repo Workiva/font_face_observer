@@ -16,13 +16,26 @@ limitations under the License.
 import 'dart:async';
 import 'dart:html';
 import 'package:font_face_observer/support.dart';
-import 'package:font_face_observer/ruler.dart';
+import 'package:font_face_observer/src/ruler.dart';
 
 const int DEFAULT_TIMEOUT = 3000;
 const String DEFAULT_TEST_STRING = 'BESbswy';
 const String _NORMAL = 'normal';
 const int _NATIVE_FONT_LOADING_POLL_INTERVAL = 50;
 const String _FONT_FACE_CSS_ID = 'FONT_FACE_CSS';
+
+/// Simple container object for result data
+class FontLoadResult {
+  final bool isLoaded;
+  final bool didTimeout;
+  final String errorMessage;
+  FontLoadResult(
+      {this.isLoaded: true, this.didTimeout: false, this.errorMessage});
+
+  @override
+  String toString() =>
+      'FontLoadResult {isLoaded: $isLoaded, didTimeout: $didTimeout}';
+}
 
 class FontFaceObserver {
   final String family;
@@ -33,7 +46,7 @@ class FontFaceObserver {
   final int timeout;
   final bool useSimulatedLoadEvents;
 
-  Completer _loaded = new Completer();
+  Completer _result = new Completer();
   StyleElement _styleElement;
 
   FontFaceObserver(String this.family,
@@ -49,26 +62,29 @@ class FontFaceObserver {
     return '$style $weight $_stretch 100px $family';
   }
 
-  void _timeoutFunction(Timer t) {
+  /// This gets called when the timeout has been reached.
+  /// It will cancel the passed in Timer if it is still active and
+  /// complete the result with a timed out FontLoadResult
+  void _onTimeout(Timer t) {
     if (t != null && t.isActive) {
       t.cancel();
     }
-    if (!_loaded.isCompleted) {
-      _loaded.complete(false);
+    if (!_result.isCompleted) {
+      _result.complete(new FontLoadResult(isLoaded: false, didTimeout: true));
     }
   }
 
   _periodicFunction(Timer t) {
     if (document.fonts.check(_getStyle('$family'), testString)) {
       t.cancel();
-      _loaded.complete(true);
+      _result.complete(new FontLoadResult(isLoaded: true, didTimeout: false));
     }
   }
 
-  Future<bool> isLoaded() async {
+  Future<FontLoadResult> isLoaded() async {
     Timer t;
-    if (_loaded.isCompleted) {
-      return _loaded.future;
+    if (_result.isCompleted) {
+      return _result.future;
     }
     // if the browser supports FontFace API set up an interval to check if
     // the font is loaded
@@ -82,9 +98,9 @@ class FontFaceObserver {
 
     // Start a timeout timer that will cancel everything and complete
     // our _loaded future with false if it isn't already completed
-    new Timer(new Duration(milliseconds: timeout), () => _timeoutFunction(t));
+    new Timer(new Duration(milliseconds: timeout), () => _onTimeout(t));
 
-    return _loaded.future;
+    return _result.future;
   }
 
   Timer _simulateFontLoadEvents() {
@@ -141,8 +157,9 @@ class FontFaceObserver {
           if (container != null) {
             container.remove();
           }
-          if (!_loaded.isCompleted) {
-            _loaded.complete(true);
+          if (!_result.isCompleted) {
+            _result.complete(
+                new FontLoadResult(isLoaded: true, didTimeout: false));
           }
         }
       }
@@ -198,9 +215,9 @@ class FontFaceObserver {
 
   /// Load the font into the browser given a url that could be a network url
   /// or a pre-built data or blob url.
-  Future<bool> load(String url) async {
-    if (_loaded.isCompleted) {
-      return _loaded.future;
+  Future<FontLoadResult> load(String url) async {
+    if (_result.isCompleted) {
+      return _result.future;
     }
     if (_styleElement == null) {
       _styleElement = document.getElementById(_FONT_FACE_CSS_ID);

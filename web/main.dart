@@ -38,9 +38,9 @@ loadFont([ev]) async {
   print('Loading $_fontName... with native FontApi $_USE_NATIVE_FONT_API');
   drawText('Loading $_fontName ...', _fontName);
   var ffo = new FontFaceObserver(_fontName, useSimulatedLoadEvents: !_USE_NATIVE_FONT_API);
-  var loaded = await ffo.load(_fontUrl);
-  print('loaded: $loaded');
-  drawText(loaded == true ? _successMessage : 'Font not loaded', _fontName);
+  var result = await ffo.load(_fontUrl);
+  print('loaded: $result');
+  drawText(result.isLoaded ? _successMessage : 'Font not loaded', _fontName);
 }
 
 main() {
@@ -52,19 +52,19 @@ main() {
     ByteBuffer fontData = req.response;
     String base64fontData = BASE64.encode(fontData.asUint8List().toList());
     base64fontData = 'data:application/octet-stream;base64,${base64fontData}';
-    var loaded = await new FontFaceObserver('base64font').load(base64fontData);
-    print('Loaded b64 $loaded');
-    drawText(loaded == true ? _successMessage : 'Font not loaded', 'base64font');
+    var result = await new FontFaceObserver('base64font').load(base64fontData);
+    print('Loaded b64 $result');
+    drawText(result.isLoaded ? _successMessage : 'Font not loaded', 'base64font');
   });
   
   document.getElementById('blob').onClick.listen( (ev) async {
     HttpRequest req = await HttpRequest.request(_fontUrl, responseType: 'blob');
     Blob blob = req.response;
     String blobUrl = Url.createObjectUrl(blob);
-    var loaded = await new FontFaceObserver('blobfont').load(blobUrl);
+    var result = await new FontFaceObserver('blobfont').load(blobUrl);
     Url.revokeObjectUrl(blobUrl);
-    print('Loaded blob font $loaded');
-    drawText(loaded == true ? _successMessage : 'Font not loaded', 'blobfont');
+    print('Loaded blob font $result');
+    drawText(result.isLoaded ? _successMessage : 'Font not loaded', 'blobfont');
   });
 
   document.getElementById('btn').onClick.listen( (ev) {

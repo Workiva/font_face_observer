@@ -19,11 +19,11 @@ typedef void _OnScrollCallback(num width);
 
 class Ruler {
   DivElement element;
-  SpanElement collapsible;
-  SpanElement expandable;
-  SpanElement collapsibleInner;
-  SpanElement expandableInner;
-  int lastOffsetWidth = -1;
+  SpanElement _collapsible;
+  SpanElement _expandable;
+  SpanElement _collapsibleInner;
+  SpanElement _expandableInner;
+  int _lastOffsetWidth = -1;
   String text;
 
   Ruler(String this.text) {
@@ -31,25 +31,25 @@ class Ruler {
     element.setAttribute('aria-hidden', 'true');
     element.text = text;
 
-    collapsible = new SpanElement();
-    expandable = new SpanElement();
-    collapsibleInner = new SpanElement();
-    expandableInner = new SpanElement();
+    _collapsible = new SpanElement();
+    _expandable = new SpanElement();
+    _collapsibleInner = new SpanElement();
+    _expandableInner = new SpanElement();
 
-    _styleElement(collapsible);
-    _styleElement(expandable);
-    _styleElement(expandableInner);
-    collapsibleInner.style
+    _styleElement(_collapsible);
+    _styleElement(_expandable);
+    _styleElement(_expandableInner);
+    _collapsibleInner.style
       ..display = 'inline-block'
       ..width = '200%'
       ..height = '200%'
       ..fontSize = '16px'
       ..maxWidth = 'none';
 
-    collapsible.append(collapsibleInner);
-    expandable.append(expandableInner);
-    element.append(collapsible);
-    element.append(expandable);
+    _collapsible.append(_collapsibleInner);
+    _expandable.append(_expandableInner);
+    element.append(_collapsible);
+    element.append(_expandable);
   }
 
   _styleElement(HtmlElement element) {
@@ -91,12 +91,12 @@ class Ruler {
     var offsetWidth = element.offsetWidth;
     var width = offsetWidth + 100;
 
-    expandableInner.style.width = '${width}px';
-    expandable.scrollLeft = width;
-    collapsible.scrollLeft = collapsible.scrollWidth + 100;
+    _expandableInner.style.width = '${width}px';
+    _expandable.scrollLeft = width;
+    _collapsible.scrollLeft = _collapsible.scrollWidth + 100;
 
-    if (lastOffsetWidth != offsetWidth) {
-      lastOffsetWidth = offsetWidth;
+    if (_lastOffsetWidth != offsetWidth) {
+      _lastOffsetWidth = offsetWidth;
       return true;
     } else {
       return false;
@@ -105,15 +105,15 @@ class Ruler {
 
   onScroll(_OnScrollCallback callback) {
     if (reset() && element.parentNode != null) {
-      callback(lastOffsetWidth);
+      callback(_lastOffsetWidth);
     }
   }
 
   onResize(_OnScrollCallback callback) {
-    collapsible.onScroll.listen((ev) {
+    _collapsible.onScroll.listen((ev) {
       onScroll(callback);
     });
-    expandable.onScroll.listen((ev) {
+    _expandable.onScroll.listen((ev) {
       onScroll(callback);
     });
     reset();

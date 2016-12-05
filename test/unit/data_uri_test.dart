@@ -1,10 +1,10 @@
+@TestOn('browser')
+
 import 'dart:typed_data';
 import 'package:test/test.dart';
 import 'package:font_face_observer/data_uri.dart';
 
-@TestOn('browser')
 main() {
-
   group('DataUri', () {
     test('should build data uri correctly', () {
       DataUri di = new DataUri();
@@ -20,7 +20,7 @@ main() {
 
       di.data = null;
       di.encoding = null;
-      di.base64 = false;
+      di.isDataBase64Encoded = false;
       di.mimeType = null;
       expect(di.toString(), equals('data:,'));
 
@@ -29,6 +29,5 @@ main() {
       di.mimeType = '';
       expect(di.toString(), equals('data:,'));
     });
-
   });
 }
