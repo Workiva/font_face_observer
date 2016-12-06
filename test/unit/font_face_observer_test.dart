@@ -8,15 +8,10 @@ import 'package:font_face_observer/data_uri.dart';
 
 main() {
   group('FontFaceObserver', () {
-    test('should init correctly with defaults', () {
-      var ffo = new FontFaceObserver('my family');
-      expect(ffo, isNotNull);
-      expect(ffo.style, equals('normal'));
-      expect(ffo.weight, equals('normal'));
-      expect(ffo.stretch, equals('normal'));
-      expect(ffo.testString, equals('BESbswy'));
-      expect(ffo.timeout, equals(3000));
-      expect(ffo.useSimulatedLoadEvents, equals(false));
+    test('should handle quoted family name', () {
+      expect(new FontFaceObserver('"my family"').family, equals('my family'));
+      expect(new FontFaceObserver("'my family'").family, equals('my family'));
+      expect(new FontFaceObserver("my family").family, equals('my family'));
     });
 
     test('should init correctly with passed in values', () {
@@ -65,13 +60,13 @@ main() {
       var ffo = new FontFaceObserver('test2', useSimulatedLoadEvents: true);
       var result = await ffo.load('Garamond.ttf');
       expect(result.isLoaded, isTrue);
-      result = await ffo.isLoaded();
+      result = await ffo.check();
       expect(result.isLoaded, isTrue);
     });
 
     test('should find the font if it is already loaded', () async {
       await new FontFaceObserver('test3').load('Garamond.ttf');
-      var result = await new FontFaceObserver('test3').isLoaded();
+      var result = await new FontFaceObserver('test3').check();
       expect(result.isLoaded, isTrue);
     });
 

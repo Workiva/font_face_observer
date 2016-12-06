@@ -22,7 +22,11 @@ class DataUri {
   String toString() =>
       'data:${mimeType != null && mimeType.length > 0 ? mimeType : ""}${encoding != null && encoding.length > 0 ? ";charset=" + encoding : ""}${isDataBase64Encoded ? ";base64" : ""},${data != null ? data : ""}';
 
+  // Static method to encode a string to base64
   static String base64EncodeString(String string) => window.btoa(string);
+
+  // Static method to encode a ByteBuffer (which you get back from an
+  // HttpRequest) to base64 String
   static String base64EncodeByteBuffer(ByteBuffer buf) =>
       BASE64.encode(buf.asUint8List().toList());
 }

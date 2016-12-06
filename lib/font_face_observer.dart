@@ -21,7 +21,7 @@ import 'package:font_face_observer/src/ruler.dart';
 const int DEFAULT_TIMEOUT = 3000;
 const String DEFAULT_TEST_STRING = 'BESbswy';
 const String _NORMAL = 'normal';
-const int _NATIVE_FONT_LOADING_POLL_INTERVAL = 50;
+const int _NATIVE_FONT_LOADING_CHECK_INTERVAL = 50;
 const String _FONT_FACE_CSS_ID = 'FONT_FACE_CSS';
 
 /// Simple container object for result data
@@ -38,13 +38,13 @@ class FontLoadResult {
 }
 
 class FontFaceObserver {
-  final String family;
-  final String style;
-  final String weight;
-  final String stretch;
-  final String testString;
-  final int timeout;
-  final bool useSimulatedLoadEvents;
+  String family;
+  String style;
+  String weight;
+  String stretch;
+  String testString;
+  int timeout;
+  bool useSimulatedLoadEvents;
 
   Completer _result = new Completer();
   StyleElement _styleElement;
@@ -55,7 +55,16 @@ class FontFaceObserver {
       String this.stretch: _NORMAL,
       String this.testString: DEFAULT_TEST_STRING,
       int this.timeout: DEFAULT_TIMEOUT,
-      bool this.useSimulatedLoadEvents: false});
+      bool this.useSimulatedLoadEvents: false}) {
+    if (family != null) {
+      family = family.trim();
+      bool hasStartQuote = family.startsWith('"') || family.startsWith("'");
+      bool hasEndQuote = family.endsWith('"') || family.endsWith("'");
+      if (hasStartQuote && hasEndQuote) {
+        family = family.substring(1, family.length - 1);
+      }
+    }
+  }
 
   String _getStyle(String family) {
     var _stretch = SUPPORTS_STRETCH ? stretch : '';
@@ -74,14 +83,18 @@ class FontFaceObserver {
     }
   }
 
-  _periodicFunction(Timer t) {
+  _periodiclyCheckDocumentFonts(Timer t) {
     if (document.fonts.check(_getStyle('$family'), testString)) {
       t.cancel();
       _result.complete(new FontLoadResult(isLoaded: true, didTimeout: false));
     }
   }
 
-  Future<FontLoadResult> isLoaded() async {
+  /// Wait for the font face represented by this FontFaceObserver to become
+  /// available in the browser. It will asynchronously return a FontLoadResult
+  /// with the result of whether or not the font is loaded or the timeout was
+  /// reached while waiting for it to become available.
+  Future<FontLoadResult> check() async {
     Timer t;
     if (_result.isCompleted) {
       return _result.future;
@@ -90,8 +103,8 @@ class FontFaceObserver {
     // the font is loaded
     if (SUPPORTS_NATIVE_FONT_LOADING && !useSimulatedLoadEvents) {
       t = new Timer.periodic(
-          new Duration(milliseconds: _NATIVE_FONT_LOADING_POLL_INTERVAL),
-          _periodicFunction);
+          new Duration(milliseconds: _NATIVE_FONT_LOADING_CHECK_INTERVAL),
+          _periodiclyCheckDocumentFonts);
     } else {
       t = _simulateFontLoadEvents();
     }
@@ -131,7 +144,7 @@ class FontFaceObserver {
     // 3) WebKit bug: both a, b and c are called and have the same value, but the
     //    values are equal to one of the last resort fonts, we ignore this and
     //    continue waiting until we get new values (or a timeout).
-    check() {
+    _checkWidths() {
       if ((widthA != -1 && widthB != -1) ||
           (widthA != -1 && widthC != -1) ||
           (widthB != -1 && widthC != -1)) {
@@ -184,31 +197,34 @@ class FontFaceObserver {
 
     _rulerA.onResize((width) {
       widthA = width;
-      check();
+      _checkWidths();
     });
 
     _rulerA.setFont(_getStyle('"$family",sans-serif'));
 
     _rulerB.onResize((width) {
       widthB = width;
-      check();
+      _checkWidths();
     });
 
     _rulerB.setFont(_getStyle('"$family",serif'));
 
     _rulerC.onResize((width) {
       widthC = width;
-      check();
+      _checkWidths();
     });
 
     _rulerC.setFont(_getStyle('"$family",monospace'));
 
+    // The above code will trigger a scroll event when the font loads
+    // but if the document is hidden, it may not, so we will periodically
+    // check for changes in the rulers if the document is hidden
     return new Timer.periodic(new Duration(milliseconds: 50), (Timer t) {
       if (document.hidden) {
         widthA = _rulerA.getWidth();
         widthB = _rulerB.getWidth();
         widthC = _rulerC.getWidth();
-        check();
+        _checkWidths();
       }
     });
   }
@@ -219,6 +235,7 @@ class FontFaceObserver {
     if (_result.isCompleted) {
       return _result.future;
     }
+    // Add a single <style> tag to the DOM to insert font-face rules
     if (_styleElement == null) {
       _styleElement = document.getElementById(_FONT_FACE_CSS_ID);
       if (_styleElement == null) {
@@ -241,13 +258,14 @@ class FontFaceObserver {
 
     sheet.insertRule(rule, 0);
 
+    // Since browsers may not load a font until it is actually used
     // We add this span to trigger the browser to load the font when used
     SpanElement dummy = new SpanElement()
       ..setAttribute('style', 'font-family: "${family}"; visibility: hidden;')
       ..text = testString;
 
     document.body.append(dummy);
-    var isLoadedFuture = isLoaded();
+    var isLoadedFuture = check();
     _removeElementWhenComplete(isLoadedFuture, dummy);
     return isLoadedFuture;
   }
