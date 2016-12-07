@@ -83,7 +83,7 @@ class FontFaceObserver {
     }
   }
 
-  _periodiclyCheckDocumentFonts(Timer t) {
+  _periodicallyCheckDocumentFonts(Timer t) {
     if (document.fonts.check(_getStyle('$family'), testString)) {
       t.cancel();
       _result.complete(new FontLoadResult(isLoaded: true, didTimeout: false));
@@ -104,7 +104,7 @@ class FontFaceObserver {
     if (SUPPORTS_NATIVE_FONT_LOADING && !useSimulatedLoadEvents) {
       t = new Timer.periodic(
           new Duration(milliseconds: _NATIVE_FONT_LOADING_CHECK_INTERVAL),
-          _periodiclyCheckDocumentFonts);
+          _periodicallyCheckDocumentFonts);
     } else {
       t = _simulateFontLoadEvents();
     }
@@ -117,17 +117,17 @@ class FontFaceObserver {
   }
 
   Timer _simulateFontLoadEvents() {
-    var _rulerA = new Ruler(testString);
-    var _rulerB = new Ruler(testString);
-    var _rulerC = new Ruler(testString);
+    var _rulerSansSerif = new Ruler(testString);
+    var _rulerSerif = new Ruler(testString);
+    var _rulerMonospace = new Ruler(testString);
 
-    var widthA = -1;
-    var widthB = -1;
-    var widthC = -1;
+    var widthSansSerif = -1;
+    var widthSerif = -1;
+    var widthMonospace = -1;
 
-    var fallbackWidthA = -1;
-    var fallbackWidthB = -1;
-    var fallbackWidthC = -1;
+    var fallbackWidthSansSerif = -1;
+    var fallbackWidthSerif = -1;
+    var fallbackWidthMonospace = -1;
 
     var container = document.createElement('div');
 
@@ -145,24 +145,24 @@ class FontFaceObserver {
     //    values are equal to one of the last resort fonts, we ignore this and
     //    continue waiting until we get new values (or a timeout).
     _checkWidths() {
-      if ((widthA != -1 && widthB != -1) ||
-          (widthA != -1 && widthC != -1) ||
-          (widthB != -1 && widthC != -1)) {
-        if (widthA == widthB || widthA == widthC || widthB == widthC) {
+      if ((widthSansSerif != -1 && widthSerif != -1) ||
+          (widthSansSerif != -1 && widthMonospace != -1) ||
+          (widthSerif != -1 && widthMonospace != -1)) {
+        if (widthSansSerif == widthSerif || widthSansSerif == widthMonospace || widthSerif == widthMonospace) {
           // All values are the same, so the browser has most likely loaded the web font
           if (HAS_WEBKIT_FALLBACK_BUG) {
             // Except if the browser has the WebKit fallback bug, in which case we check to see if all
             // values are set to one of the last resort fonts.
 
-            if (((widthA == fallbackWidthA &&
-                    widthB == fallbackWidthA &&
-                    widthC == fallbackWidthA) ||
-                (widthA == fallbackWidthB &&
-                    widthB == fallbackWidthB &&
-                    widthC == fallbackWidthB) ||
-                (widthA == fallbackWidthC &&
-                    widthB == fallbackWidthC &&
-                    widthC == fallbackWidthC))) {
+            if (((widthSansSerif == fallbackWidthSansSerif &&
+                    widthSerif == fallbackWidthSansSerif &&
+                    widthMonospace == fallbackWidthSansSerif) ||
+                (widthSansSerif == fallbackWidthSerif &&
+                    widthSerif == fallbackWidthSerif &&
+                    widthMonospace == fallbackWidthSerif) ||
+                (widthSansSerif == fallbackWidthMonospace &&
+                    widthSerif == fallbackWidthMonospace &&
+                    widthMonospace == fallbackWidthMonospace))) {
               // The width we got matches some of the known last resort fonts, so let's assume we're dealing with the last resort font.
               return;
             }
@@ -181,49 +181,49 @@ class FontFaceObserver {
     // This ensures the scroll direction is correct.
     container.dir = 'ltr';
 
-    _rulerA.setFont(_getStyle('sans-serif'));
-    _rulerB.setFont(_getStyle('serif'));
-    _rulerC.setFont(_getStyle('monospace'));
+    _rulerSansSerif.setFont(_getStyle('sans-serif'));
+    _rulerSerif.setFont(_getStyle('serif'));
+    _rulerMonospace.setFont(_getStyle('monospace'));
 
-    container.append(_rulerA.element);
-    container.append(_rulerB.element);
-    container.append(_rulerC.element);
+    container.append(_rulerSansSerif.element);
+    container.append(_rulerSerif.element);
+    container.append(_rulerMonospace.element);
 
     document.body.append(container);
 
-    fallbackWidthA = _rulerA.getWidth();
-    fallbackWidthB = _rulerB.getWidth();
-    fallbackWidthC = _rulerC.getWidth();
+    fallbackWidthSansSerif = _rulerSansSerif.getWidth();
+    fallbackWidthSerif = _rulerSerif.getWidth();
+    fallbackWidthMonospace = _rulerMonospace.getWidth();
 
-    _rulerA.onResize((width) {
-      widthA = width;
+    _rulerSansSerif.onResize((width) {
+      widthSansSerif = width;
       _checkWidths();
     });
 
-    _rulerA.setFont(_getStyle('"$family",sans-serif'));
+    _rulerSansSerif.setFont(_getStyle('"$family",sans-serif'));
 
-    _rulerB.onResize((width) {
-      widthB = width;
+    _rulerSerif.onResize((width) {
+      widthSerif = width;
       _checkWidths();
     });
 
-    _rulerB.setFont(_getStyle('"$family",serif'));
+    _rulerSerif.setFont(_getStyle('"$family",serif'));
 
-    _rulerC.onResize((width) {
-      widthC = width;
+    _rulerMonospace.onResize((width) {
+      widthMonospace = width;
       _checkWidths();
     });
 
-    _rulerC.setFont(_getStyle('"$family",monospace'));
+    _rulerMonospace.setFont(_getStyle('"$family",monospace'));
 
     // The above code will trigger a scroll event when the font loads
     // but if the document is hidden, it may not, so we will periodically
     // check for changes in the rulers if the document is hidden
     return new Timer.periodic(new Duration(milliseconds: 50), (Timer t) {
       if (document.hidden) {
-        widthA = _rulerA.getWidth();
-        widthB = _rulerB.getWidth();
-        widthC = _rulerC.getWidth();
+        widthSansSerif = _rulerSansSerif.getWidth();
+        widthSerif = _rulerSerif.getWidth();
+        widthMonospace = _rulerMonospace.getWidth();
         _checkWidths();
       }
     });
