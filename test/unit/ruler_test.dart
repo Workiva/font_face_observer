@@ -63,14 +63,19 @@ main() {
       return testResize(START_WIDTH - 50);
     });
 
-    test('should not detect a set to the same width', () {
+    test('should not detect a set to the same width', () async {
       bool failed = false;
       ruler.onResize((width) {
         failed = true;
       });
       ruler.setWidth(START_WIDTH);
-      expect(failed, isFalse);
-      expect(ruler.getWidth(), equals(START_WIDTH));
+      Completer c = new Completer();
+      new Timer(new Duration(milliseconds: 20), () {
+        expect(failed, isFalse);
+        expect(ruler.getWidth(), equals(START_WIDTH));
+        c.complete();
+      });
+      return c.future;
     });
 
     test('should detect multiple expansions', () async {
