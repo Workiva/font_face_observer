@@ -28,8 +28,7 @@ const String _FONT_FACE_CSS_ID = 'FONT_FACE_CSS';
 class FontLoadResult {
   final bool isLoaded;
   final bool didTimeout;
-  FontLoadResult(
-      {this.isLoaded: true, this.didTimeout: false});
+  FontLoadResult({this.isLoaded: true, this.didTimeout: false});
 
   @override
   String toString() =>
@@ -55,7 +54,6 @@ class FontFaceObserver {
       String testString: DEFAULT_TEST_STRING,
       int this.timeout: DEFAULT_TIMEOUT,
       bool this.useSimulatedLoadEvents: false}) {
-
     this.testString = testString;
     if (family != null) {
       family = family.trim();
@@ -65,7 +63,6 @@ class FontFaceObserver {
         family = family.substring(1, family.length - 1);
       }
     }
-
   }
 
   get testString => _testString;
@@ -79,7 +76,6 @@ class FontFaceObserver {
       _testString = DEFAULT_TEST_STRING;
     }
   }
-  
 
   String _getStyle(String family) {
     var _stretch = SUPPORTS_STRETCH ? stretch : '';
