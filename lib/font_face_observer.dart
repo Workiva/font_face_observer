@@ -28,9 +28,8 @@ const String _FONT_FACE_CSS_ID = 'FONT_FACE_CSS';
 class FontLoadResult {
   final bool isLoaded;
   final bool didTimeout;
-  final String errorMessage;
   FontLoadResult(
-      {this.isLoaded: true, this.didTimeout: false, this.errorMessage});
+      {this.isLoaded: true, this.didTimeout: false});
 
   @override
   String toString() =>
@@ -42,7 +41,7 @@ class FontFaceObserver {
   String style;
   String weight;
   String stretch;
-  String testString;
+  String _testString;
   int timeout;
   bool useSimulatedLoadEvents;
 
@@ -53,9 +52,11 @@ class FontFaceObserver {
       {String this.style: _NORMAL,
       String this.weight: _NORMAL,
       String this.stretch: _NORMAL,
-      String this.testString: DEFAULT_TEST_STRING,
+      String testString: DEFAULT_TEST_STRING,
       int this.timeout: DEFAULT_TIMEOUT,
       bool this.useSimulatedLoadEvents: false}) {
+
+    this.testString = testString;
     if (family != null) {
       family = family.trim();
       bool hasStartQuote = family.startsWith('"') || family.startsWith("'");
@@ -64,7 +65,21 @@ class FontFaceObserver {
         family = family.substring(1, family.length - 1);
       }
     }
+
   }
+
+  get testString => _testString;
+  set testString(String newTestString) {
+    this._testString = newTestString;
+    if (_testString == null) {
+      _testString = DEFAULT_TEST_STRING;
+    }
+    _testString = _testString.trim();
+    if (_testString.length == 0) {
+      _testString = DEFAULT_TEST_STRING;
+    }
+  }
+  
 
   String _getStyle(String family) {
     var _stretch = SUPPORTS_STRETCH ? stretch : '';
@@ -148,7 +163,9 @@ class FontFaceObserver {
       if ((widthSansSerif != -1 && widthSerif != -1) ||
           (widthSansSerif != -1 && widthMonospace != -1) ||
           (widthSerif != -1 && widthMonospace != -1)) {
-        if (widthSansSerif == widthSerif || widthSansSerif == widthMonospace || widthSerif == widthMonospace) {
+        if (widthSansSerif == widthSerif ||
+            widthSansSerif == widthMonospace ||
+            widthSerif == widthMonospace) {
           // All values are the same, so the browser has most likely loaded the web font
           if (HAS_WEBKIT_FALLBACK_BUG) {
             // Except if the browser has the WebKit fallback bug, in which case we check to see if all

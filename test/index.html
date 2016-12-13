@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <!-- MUST BE THE FIRST META TAG WITHIN <HEAD> -->
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta charset="UTF-8">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title>Font Loading Example</title>
+  <style>
+      [bordered],.bordered {
+        border: solid 1px #ccc;
+      }
+      #w {
+        font-family: W, Arial;  
+      }
+  </style>
+</head>
+<body>
+  <table>
+    <tr>
+      <th>Type</th>
+      <th>Output</th>
+    </tr>
+    <tr>
+      <td>div/DOM</td>
+      <td><div id="sentence" style="font-size: 18px; margin-left:5px;">...</div></td>
+    </tr>
+    <tr>
+      <td>SVG</td>
+      <td>
+        <svg xmlns="http://www.w3.org/2000/svg" width="400" height="35" viewBox="0 0 400 35" bordered>
+          <text id="svgsentence" x="5" y="20" font-family="W" font-size="18"></text>
+        </svg>
+      </td>
+    </tr>
+    <tr>
+      <td>canvas</td>
+      <td><canvas id="canvas" width="400" height="35" bordered></canvas></td>
+    </tr>
+    <tr>
+      <td colspan="2">
+        <button id="btn">Load Font</button>
+        <button id="b64">Load B64 Font</button>
+        <button id="blob">Load Blob URL Font</button>
+        <button id="wbtn">Load W Font</button>
+      </td>
+    </tr>
+    <tr>
+      <td colspan="2">
+        <pre id="supports">
+        detecting Font Face API support...
+        </pre>
+      </td>
+    </tr>
+  </table>
+  <script type="application/dart" src="main.dart"></script>
+  <script src="../packages/browser/dart.js"></script>
+</body>
+</html>

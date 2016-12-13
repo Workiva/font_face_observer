@@ -7,21 +7,27 @@ import 'package:font_face_observer/font_face_observer.dart';
 import 'package:font_face_observer/support.dart';
 
 const String _successMessage = 'Pack my box with five dozen liquor jugs';
-const String _fontUrl = '/Garamond.ttf';
+const String _fontUrl = '/fonts/Garamond.ttf';
 const String _fontName = 'Garamond';
-const bool _USE_NATIVE_FONT_API = false;
+const bool _USE_NATIVE_FONT_API = true;
 
-drawText(String text, fontName) {
-  CanvasElement canvas = document.getElementById('canvas');
-  HtmlElement sentence = document.getElementById('sentence');
+drawText(String text, fontName, {canvasId: 'canvas', updateSentence: true}) {
+  CanvasElement canvas = document.getElementById(canvasId);
+  
   CanvasRenderingContext2D ctx = canvas.getContext('2d');
   ctx.setFillColorRgb(255, 255, 255);
   ctx.fillRect(0,0, canvas.width, canvas.height);
   ctx.setFillColorRgb(0, 0, 0);
   ctx.font = '18px $fontName';
   ctx.fillText(text, 5, 20);
-  sentence.text = text;
-  sentence.style.fontFamily = fontName;
+  if (updateSentence) {
+    HtmlElement sentence = document.getElementById('sentence');
+    sentence.text = text;
+    sentence.style.fontFamily = fontName;
+    sentence = document.getElementById('svgsentence');
+    sentence.text = text;
+    sentence.style.fontFamily = fontName;
+  }
 }
 
 writeSupport() {
@@ -34,16 +40,20 @@ hasWebKitFallbackBug: $HAS_WEBKIT_FALLBACK_BUG
   print(supportString);
 }
 
-loadFont([ev]) async {
-  print('Loading $_fontName... with native FontApi $_USE_NATIVE_FONT_API');
-  drawText('Loading $_fontName ...', _fontName);
-  var ffo = new FontFaceObserver(_fontName, useSimulatedLoadEvents: !_USE_NATIVE_FONT_API);
-  var result = await ffo.load(_fontUrl);
+loadFont(String fontFamily, String url, String message) async {
+  print('Loading $fontFamily... with native FontApi $_USE_NATIVE_FONT_API');
+  drawText('Loading $fontFamily ...', fontFamily);
+  var ffo = new FontFaceObserver(fontFamily, useSimulatedLoadEvents: !_USE_NATIVE_FONT_API);
+  var result = await ffo.load(url);
   print('loaded: $result');
-  drawText(result.isLoaded ? _successMessage : 'Font not loaded', _fontName);
+  if (result.isLoaded) {
+    drawText(message, fontFamily);
+  } else {
+    drawText(result.toString(), 'serif');
+  }
 }
 
-main() {
+main() async {
   writeSupport();
   drawText('Waiting ...', _fontName);
 
@@ -68,7 +78,10 @@ main() {
   });
 
   document.getElementById('btn').onClick.listen( (ev) {
-    loadFont();
+    loadFont('Garamond', 'fonts/Garamond.ttf', _successMessage);
   });
-  //new Timer(new Duration(milliseconds: 1000), loadFont);
+  
+  document.getElementById('wbtn').onClick.listen( (ev) {
+    loadFont('W', 'fonts/W.ttf', 'show me a Workiva W here:  \uE0FF');
+  });
 }

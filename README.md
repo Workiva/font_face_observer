@@ -12,11 +12,11 @@ await new FontFaceObserver('Arial', weight: 'bold').load('/url/to/arial.ttf');
 
 # Run the demo
 
-To run the demo, just install dependencies and run pub serve. 
+To run the demo, just install dependencies and run `pub serve test`. 
 Then open http://localhost:8080 
 ```
 pub get
-pub serve
+pub serve test
 ``
 
 # Public API
