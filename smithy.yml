@@ -18,7 +18,7 @@ script:
   # - tar czvf api.tar.gz -C doc/api .
 
   # Build assets
-  - pub build
+  - pub build test
   - ./tool/stage_for_cdn.sh
 
   # Package up static assets for functional testing
