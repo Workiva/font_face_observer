@@ -22,7 +22,7 @@ script:
   - ./tool/stage_for_cdn.sh
 
   # Package up static assets for functional testing
-  - tar -hcf build.tar.gz build/web/
+  - tar -hcf build.tar.gz build/test/
 
   # Tar up lib for pushing to the pub repository
   - tar czvf font_face_observer.pub.tgz LICENSE README.md pubspec.yaml lib/

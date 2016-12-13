@@ -12,7 +12,7 @@ rm -rf static
 mkdir static/
 
 # stage dart packages
-cp -RL build/web/packages static/
+cp -RL build/test/packages static/
 
 # stage compiled Dart parts and source maps
-cp build/web/*dart*.+(js|js.map) static/
+cp build/test/*dart*.+(js|js.map) static/
