@@ -25,7 +25,8 @@ const String _NORMAL = 'normal';
 const int _NATIVE_FONT_LOADING_CHECK_INTERVAL = 50;
 const String _FONT_FACE_CSS_ID = 'FONT_FACE_CSS';
 
-final Future<FontLoadResult> _adobeBlankLoadedFuture = (new FontFaceObserver(AdobeBlankFamily)).load(AdobeBlankFontBase64Url);
+final Future<FontLoadResult> _adobeBlankLoadedFuture =
+    (new FontFaceObserver(AdobeBlankFamily)).load(AdobeBlankFontBase64Url);
 
 /// Simple container object for result data
 class FontLoadResult {
@@ -113,7 +114,7 @@ class FontFaceObserver {
     if (_result.isCompleted) {
       return _result.future;
     }
-    
+
     if (family != AdobeBlankFamily) {
       await _adobeBlankLoadedFuture;
     }
