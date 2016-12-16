@@ -3,7 +3,7 @@ import 'package:test/test.dart';
 import 'package:font_face_observer/font_face_observer.dart';
 
 class _FontUrls {
-  static const String Garamond = 'fonts/Garamond.ttf';
+  static const String Roboto = 'fonts/Roboto.ttf';
   static const String W = 'fonts/W.ttf';
   static const String Empty = 'fonts/empty.ttf';
   static const String Subset = 'fonts/subset.ttf';
@@ -45,26 +45,26 @@ main() {
       expect(ffo.testString, equals('BESbswy'));
     });
     
-    test('should timeout and fail for a bogus font', () async {
+    test('should timeout and fail for a bogus font when using FontFace API', () async {
       var result = await new FontFaceObserver('bogus', timeout: 500).load(_FontUrls.FontNotFound);
       expect(result.isLoaded, isFalse);
       expect(result.didTimeout, isTrue);
     });
 
-    test('should timeout and fail for a bogus font with simulated events', () async {
+    test('should detect a bogus font with simulated events', () async {
       var result = await new FontFaceObserver('bogus2', timeout: 100, useSimulatedLoadEvents: true).load(_FontUrls.FontNotFound);
-      expect(result.isLoaded, isFalse);
-      expect(result.didTimeout, isTrue);
+      expect(result.isLoaded, isTrue);
+      expect(result.didTimeout, isFalse);
     });
 
     test('should load a real font', () async {
-      var result = await new FontFaceObserver('test1').load(_FontUrls.Garamond);
+      var result = await new FontFaceObserver('test1').load(_FontUrls.Roboto);
       expect(result.isLoaded, isTrue);
     });
 
     test('should load a real font using simulated events', () async {
       var ffo = new FontFaceObserver('test2', useSimulatedLoadEvents: true);
-      var result = await ffo.load(_FontUrls.Garamond);
+      var result = await ffo.load(_FontUrls.Roboto);
       expect(result.isLoaded, isTrue);
       result = await ffo.check();
       expect(result.isLoaded, isTrue);
@@ -76,10 +76,10 @@ main() {
       expect(result.didTimeout, isTrue);
     });
 
-    test('should timeout on an empty font, not throw an exception with simulated events', () async {
+    test('should detect an empty font, not throw an exception with simulated events', () async {
       var result = await new FontFaceObserver('empty2', timeout: 100, useSimulatedLoadEvents: true).load(_FontUrls.Empty);
-      expect(result.isLoaded, isFalse);
-      expect(result.didTimeout, isTrue);
+      expect(result.isLoaded, isTrue);
+      expect(result.didTimeout, isFalse);
     });
 
     test('should load user-region-only font', () async {
@@ -89,13 +89,13 @@ main() {
     });
 
     test('should find the font if it is already loaded', () async {
-      await new FontFaceObserver('test3').load(_FontUrls.Garamond);
+      await new FontFaceObserver('test3').load(_FontUrls.Roboto);
       var result = await new FontFaceObserver('test3').check();
       expect(result.isLoaded, isTrue);
     });
 
     test('should handle spaces and numbers in font family', () async {
-      var result = await new FontFaceObserver('Ga ramond_-77').load(_FontUrls.Garamond);
+      var result = await new FontFaceObserver('Ga ramond_-77').load(_FontUrls.Roboto);
       expect(result.isLoaded, isTrue);
     });
 
