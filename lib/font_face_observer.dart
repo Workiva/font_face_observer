@@ -17,12 +17,15 @@ import 'dart:async';
 import 'dart:html';
 import 'package:font_face_observer/support.dart';
 import 'package:font_face_observer/src/ruler.dart';
+import 'package:font_face_observer/src/adobe_blank.dart';
 
 const int DEFAULT_TIMEOUT = 3000;
 const String DEFAULT_TEST_STRING = 'BESbswy';
 const String _NORMAL = 'normal';
 const int _NATIVE_FONT_LOADING_CHECK_INTERVAL = 50;
 const String _FONT_FACE_CSS_ID = 'FONT_FACE_CSS';
+
+final Future<FontLoadResult> _adobeBlankLoadedFuture = (new FontFaceObserver(AdobeBlankFamily)).load(AdobeBlankFontBase64Url);
 
 /// Simple container object for result data
 class FontLoadResult {
@@ -110,6 +113,11 @@ class FontFaceObserver {
     if (_result.isCompleted) {
       return _result.future;
     }
+    
+    if (family != AdobeBlankFamily) {
+      await _adobeBlankLoadedFuture;
+    }
+
     // if the browser supports FontFace API set up an interval to check if
     // the font is loaded
     if (SUPPORTS_NATIVE_FONT_LOADING && !useSimulatedLoadEvents) {
@@ -213,21 +221,21 @@ class FontFaceObserver {
       _checkWidths();
     });
 
-    _rulerSansSerif.setFont(_getStyle('"$family",sans-serif'));
+    _rulerSansSerif.setFont(_getStyle('"$family",AdobeBlank,sans-serif'));
 
     _rulerSerif.onResize((width) {
       widthSerif = width;
       _checkWidths();
     });
 
-    _rulerSerif.setFont(_getStyle('"$family",serif'));
+    _rulerSerif.setFont(_getStyle('"$family",AdobeBlank,serif'));
 
     _rulerMonospace.onResize((width) {
       widthMonospace = width;
       _checkWidths();
     });
 
-    _rulerMonospace.setFont(_getStyle('"$family",monospace'));
+    _rulerMonospace.setFont(_getStyle('"$family",AdobeBlank,monospace'));
 
     // The above code will trigger a scroll event when the font loads
     // but if the document is hidden, it may not, so we will periodically
