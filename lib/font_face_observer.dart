@@ -69,7 +69,7 @@ class FontFaceObserver {
     }
   }
 
-  get testString => _testString;
+  String get testString => _testString;
   set testString(String newTestString) {
     this._testString = newTestString;
     if (_testString == null) {
@@ -81,9 +81,9 @@ class FontFaceObserver {
     }
   }
 
-  String _getStyle(String family) {
+  String _getStyle(String family, {cssSize: '100px'}) {
     var _stretch = SUPPORTS_STRETCH ? stretch : '';
-    return '$style $weight $_stretch 100px $family';
+    return '$style $weight $_stretch $cssSize $family';
   }
 
   /// This gets called when the timeout has been reached.
