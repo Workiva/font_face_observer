@@ -10,6 +10,15 @@ await new FontFaceObserver('Arial', weight: 'bold').load('/url/to/arial.ttf');
 // at this point we're absolutely sure that the font has loaded
 ```
 
+# Run the demo
+
+To run the demo, just install dependencies and run `pub serve test`. 
+Then open http://localhost:8080 
+```
+pub get
+pub serve test
+``
+
 # Public API
 
 ```dart

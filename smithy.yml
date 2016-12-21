@@ -7,22 +7,22 @@ env:
   - CODECOV_TOKEN='bQ4MgjJ0G2Y73v8JNX6L7yMK9679nbYB'
 
 script:
-  - pub get
+  - pub get --packages-dir
   - pub run dart_dev analyze
   - pub run dart_dev format --check
-  - xvfb-run -s '-screen 0 1024x768x24' pub run dart_dev test
+  - xvfb-run -s '-screen 0 1024x768x24' pub run dart_dev test -p content-shell
   - xvfb-run -s '-screen 0 1024x768x24' pub run dart_dev coverage --no-html
 
   # Create docs
-  - pub run dart_dev docs --no-open
-  - tar czvf api.tar.gz -C doc/api .
+  # - pub run dart_dev docs --no-open
+  # - tar czvf api.tar.gz -C doc/api .
 
-  # Build assets to push to the CDN
-  - pub build
+  # Build assets
+  - pub build test
   - ./tool/stage_for_cdn.sh
 
   # Package up static assets for functional testing
-  - tar -hcf build.tar.gz build/web/
+  - tar -hcf build.tar.gz build/test/
 
   # Tar up lib for pushing to the pub repository
   - tar czvf font_face_observer.pub.tgz LICENSE README.md pubspec.yaml lib/
@@ -37,5 +37,5 @@ artifacts:
     - ./font_face_observer.pub.tgz
   dart-dependencies: # For RM dependency tracking
     - ./pubspec.lock
-  documentation:
-    - api.tar.gz
+  # documentation:
+  #   - api.tar.gz
