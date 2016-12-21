@@ -17,7 +17,7 @@ Then open http://localhost:8080
 ```
 pub get
 pub serve test
-``
+```
 
 # Public API
 
