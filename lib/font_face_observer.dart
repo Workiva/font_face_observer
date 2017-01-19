@@ -99,7 +99,7 @@ class FontFaceObserver {
   }
 
   _periodicallyCheckDocumentFonts(Timer t) {
-    if (document.fonts.check(_getStyle('$family'), testString)) {
+    if (document.fonts.check(_getStyle('"$family"'), testString)) {
       t.cancel();
       _result.complete(new FontLoadResult(isLoaded: true, didTimeout: false));
     }

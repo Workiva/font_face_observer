@@ -95,7 +95,7 @@ main() {
     });
 
     test('should handle spaces and numbers in font family', () async {
-      var result = await new FontFaceObserver('Ga ramond_-77').load(_FontUrls.Roboto);
+      var result = await new FontFaceObserver('Garamond 7').load(_FontUrls.Roboto);
       expect(result.isLoaded, isTrue);
     });
 
