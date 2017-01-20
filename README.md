@@ -1,13 +1,20 @@
 # Overview
 
-Font load events, simple, small and efficient.
-Dart port of https://github.com/bramstein/fontfaceobserver
+Font load events, simple, small and efficient. 
+It wil use the FontFace api if available, otherwise it falls back to a Dart port of https://github.com/bramstein/fontfaceobserver
 
 # Usage Example
 
 ```dart
-await new FontFaceObserver('Arial', weight: 'bold').load('/url/to/arial.ttf');
-// at this point we're absolutely sure that the font has loaded
+FontFaceObserver ffo = new FontFaceObserver('Arial', weight: 'bold');
+FontLoadResult result = await ffo.load('/url/to/arial.ttf');
+if (result.isLoaded) {
+    // at this point we're absolutely sure that the font has loaded
+}
+if (result.didTimeout) {
+    // We've timed out and are not sure if the font has loaded.
+    // You can reissue a ffo.check() call to check again if you want
+}
 ```
 
 # Run the demo
@@ -36,11 +43,11 @@ FontFaceObserver(
 );
 
 // Check if the font face is loaded successfully
-Future<bool> isLoaded() async
+Future<FontLoadResult> check() async
 
 // Load a font from the given URL by adding a font-face rule
 // returns the same Future<bool> from isLoaded()
-Future<bool> load(String url) async
+Future<FontLoadResult> load(String url) async
 ```
 
 # Notes
