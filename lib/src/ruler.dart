@@ -28,6 +28,7 @@ class Ruler {
 
   Ruler(String this.text) {
     element = document.createElement('div');
+    element.className = 'font_face_ruler_div';
     element.setAttribute('aria-hidden', 'true');
     element.text = text;
 
@@ -35,6 +36,10 @@ class Ruler {
     _expandable = new SpanElement();
     _collapsibleInner = new SpanElement();
     _expandableInner = new SpanElement();
+    _collapsible.className = 'font_face_ruler_span_collapsible';
+    _collapsibleInner.className = 'font_face_ruler_span_collapsibleInner';
+    _expandable.className = 'font_face_ruler_span_expandable';
+    _expandableInner.className = 'font_face_ruler_span_expandableInner';
 
     _styleElement(_collapsible);
     _styleElement(_expandable);

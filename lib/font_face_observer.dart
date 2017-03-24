@@ -23,7 +23,6 @@ const int DEFAULT_TIMEOUT = 3000;
 const String DEFAULT_TEST_STRING = 'BESbswy';
 const String _NORMAL = 'normal';
 const int _NATIVE_FONT_LOADING_CHECK_INTERVAL = 50;
-const String _FONT_FACE_CSS_ID = 'FONT_FACE_CSS';
 
 final Future<FontLoadResult> _adobeBlankLoadedFuture =
     (new FontFaceObserver(AdobeBlankFamily)).load(AdobeBlankFontBase64Url);
@@ -35,8 +34,20 @@ class FontLoadResult {
   FontLoadResult({this.isLoaded: true, this.didTimeout: false});
 
   @override
-  String toString() =>
-      'FontLoadResult {isLoaded: $isLoaded, didTimeout: $didTimeout}';
+  String toString() => 'FontLoadResult {isLoaded: $isLoaded, didTimeout: $didTimeout}';
+}
+
+class _LoadedFont {
+  final StyleElement element;
+  final String group;
+  int _uses = 0;
+  _LoadedFont(this.element, {this.group: ""});
+
+  int get uses => _uses;
+  void set uses(int new_uses) {
+    _uses = new_uses;
+    element.attributes['uses'] = _uses.toString();
+  }
 }
 
 class FontFaceObserver {
@@ -47,9 +58,11 @@ class FontFaceObserver {
   String _testString;
   int timeout;
   bool useSimulatedLoadEvents;
-
+  String group;
   Completer _result = new Completer();
-  StyleElement _styleElement;
+
+  /// A map of font key String to _LoadedFont
+  static Map<String, _LoadedFont> _loadedFonts = new Map<String, _LoadedFont>();
 
   FontFaceObserver(String this.family,
       {String this.style: _NORMAL,
@@ -57,7 +70,8 @@ class FontFaceObserver {
       String this.stretch: _NORMAL,
       String testString: DEFAULT_TEST_STRING,
       int this.timeout: DEFAULT_TIMEOUT,
-      bool this.useSimulatedLoadEvents: false}) {
+      bool this.useSimulatedLoadEvents: false,
+      String this.group: ""}) {
     this.testString = testString;
     if (family != null) {
       family = family.trim();
@@ -66,10 +80,43 @@ class FontFaceObserver {
       if (hasStartQuote && hasEndQuote) {
         family = family.substring(1, family.length - 1);
       }
+      if (group == null) {
+        group = "";
+      }
     }
   }
 
+  String get key => '${family}_${style}_${weight}_${stretch}';
+
   String get testString => _testString;
+
+  _LoadedFont _getLoadedFont(String url) {
+    var styleElement;
+    String _key = key;
+    _LoadedFont loadedFont;
+    if (_loadedFonts.containsKey(_key)) {
+      loadedFont = _loadedFonts[_key];
+    } else {
+      var rule = '''
+      @font-face {
+        font-family: "${family}";
+        font-style: ${style};
+        font-weight: ${weight};
+        src: url(${url});
+      }''';
+      styleElement = new StyleElement();
+      styleElement.text = rule;
+      styleElement.attributes['key'] = _key;
+      if (group != null && group.length > 0) {
+        styleElement.attributes['group'] = group;
+      }
+      loadedFont = new _LoadedFont(styleElement, group: group);
+      _loadedFonts[_key] = loadedFont;
+      document.head.append(styleElement);
+    }
+    return loadedFont;
+  }
+
   set testString(String newTestString) {
     this._testString = newTestString;
     if (_testString == null) {
@@ -123,8 +170,7 @@ class FontFaceObserver {
     // the font is loaded
     if (SUPPORTS_NATIVE_FONT_LOADING && !useSimulatedLoadEvents) {
       t = new Timer.periodic(
-          new Duration(milliseconds: _NATIVE_FONT_LOADING_CHECK_INTERVAL),
-          _periodicallyCheckDocumentFonts);
+          new Duration(milliseconds: _NATIVE_FONT_LOADING_CHECK_INTERVAL), _periodicallyCheckDocumentFonts);
     } else {
       t = _simulateFontLoadEvents();
     }
@@ -168,9 +214,7 @@ class FontFaceObserver {
       if ((widthSansSerif != -1 && widthSerif != -1) ||
           (widthSansSerif != -1 && widthMonospace != -1) ||
           (widthSerif != -1 && widthMonospace != -1)) {
-        if (widthSansSerif == widthSerif ||
-            widthSansSerif == widthMonospace ||
-            widthSerif == widthMonospace) {
+        if (widthSansSerif == widthSerif || widthSansSerif == widthMonospace || widthSerif == widthMonospace) {
           // All values are the same, so the browser has most likely loaded the web font
           if (HAS_WEBKIT_FALLBACK_BUG) {
             // Except if the browser has the WebKit fallback bug, in which case we check to see if all
@@ -193,8 +237,7 @@ class FontFaceObserver {
             container.remove();
           }
           if (!_result.isCompleted) {
-            _result.complete(
-                new FontLoadResult(isLoaded: true, didTimeout: false));
+            _result.complete(new FontLoadResult(isLoaded: true, didTimeout: false));
           }
         }
       }
@@ -202,7 +245,7 @@ class FontFaceObserver {
 
     // This ensures the scroll direction is correct.
     container.dir = 'ltr';
-
+    container.className = 'font_face_container';
     _rulerSansSerif.setFont(_getStyle('sans-serif'));
     _rulerSerif.setFont(_getStyle('serif'));
     _rulerMonospace.setFont(_getStyle('monospace'));
@@ -255,34 +298,16 @@ class FontFaceObserver {
   /// or a pre-built data or blob url.
   Future<FontLoadResult> load(String url) async {
     if (_result.isCompleted) {
+      // TODO increment uses count here?
       return _result.future;
     }
-    // Add a single <style> tag to the DOM to insert font-face rules
-    if (_styleElement == null) {
-      _styleElement = document.getElementById(_FONT_FACE_CSS_ID);
-      if (_styleElement == null) {
-        _styleElement = new StyleElement()..id = _FONT_FACE_CSS_ID;
-        _styleElement.text =
-            '<!-- font_face_observer loads fonts using this element -->';
-        document.head.append(_styleElement);
-      }
-    }
-
-    var rule = '''
-      @font-face {
-        font-family: "${family}";
-        font-style: ${style};
-        font-weight: ${weight};
-        src: url(${url});
-      }''';
-
-    CssStyleSheet sheet = _styleElement.sheet;
-
-    sheet.insertRule(rule, 0);
+    _LoadedFont loadedFont = _getLoadedFont(url);
+    loadedFont.uses++;
 
     // Since browsers may not load a font until it is actually used
     // We add this span to trigger the browser to load the font when used
     SpanElement dummy = new SpanElement()
+      ..className = 'font_face_dummy_element'
       ..setAttribute('style', 'font-family: "${family}"; visibility: hidden;')
       ..text = testString;
 
@@ -294,5 +319,39 @@ class FontFaceObserver {
 
   _removeElementWhenComplete(Future f, HtmlElement el) async {
     f.whenComplete(() => el.remove());
+  }
+
+  bool get isLoaded {
+    var loadedFont = _loadedFonts[key];
+    return loadedFont != null && loadedFont.uses > 0;
+  }
+
+  static int unloadGroup(String group) {
+    if (group == null) {
+      group = "";
+    }
+    var keysToRemove = [];
+    _loadedFonts.keys.forEach((k) {
+      var loadedFont = _loadedFonts[k];
+      if (loadedFont.group == group || (group == "" && loadedFont.group == null)) {
+        keysToRemove.add(k);
+      }
+    });
+    keysToRemove.forEach(FontFaceObserver.unload);
+    return keysToRemove.length;
+  }
+
+  static bool unload(String key) {
+    if (_loadedFonts.containsKey(key)) {
+      var loadedFont = _loadedFonts[key];
+      if (loadedFont.uses <= 1) {
+        loadedFont.element.remove();
+        _loadedFonts.remove(key);
+      } else {
+        loadedFont.uses--;
+      }
+      return true;
+    }
+    return false;
   }
 }
