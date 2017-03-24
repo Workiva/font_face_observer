@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title>Font Load / Unload</title>
+  
+</head>
+<body>
+  <h1>Memory / Perf Analysis</h1>
+  <li>Force garbage collection
+  <li>Take an initial snapshot
+  <li>Click <button id="loadBtn">Load</button>
+  <li>Force garbage collection
+  <li>Take 2nd snapshot (to see what was added)
+  <li>Click <button id="unloadBtn">Unload</button> or <button id="unloadGroupBtn">Unload Group</button>
+  <li>Force garbage collection
+  <li>Snapshot, should unload everything!
+  <li><span id="ffo_elements"></span> font faces loaded
+  <li><span id="ffo_temp_elements"></span> font face observer temp DOM nodes.
+  <script type="application/dart" src="unload.dart"></script>
+  <script src="../packages/browser/dart.js"></script>
+</body>
+</html>

@@ -37,6 +37,7 @@ class FontLoadResult {
   String toString() => 'FontLoadResult {isLoaded: $isLoaded, didTimeout: $didTimeout}';
 }
 
+// holds data about each loaded font
 class _LoadedFont {
   final StyleElement element;
   final String group;
@@ -104,9 +105,10 @@ class FontFaceObserver {
         font-weight: ${weight};
         src: url(${url});
       }''';
-      styleElement = new StyleElement();
-      styleElement.text = rule;
-      styleElement.attributes['key'] = _key;
+      styleElement = new StyleElement()
+        ..className = '_ffo'
+        ..text = rule
+        ..attributes['key'] = _key;
       if (group != null && group.length > 0) {
         styleElement.attributes['group'] = group;
       }
@@ -307,7 +309,7 @@ class FontFaceObserver {
     // Since browsers may not load a font until it is actually used
     // We add this span to trigger the browser to load the font when used
     SpanElement dummy = new SpanElement()
-      ..className = 'font_face_dummy_element'
+      ..className = '$fontFaceObserverTempClassname ffo_dummy'
       ..setAttribute('style', 'font-family: "${family}"; visibility: hidden;')
       ..text = testString;
 

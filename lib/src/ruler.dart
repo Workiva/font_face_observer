@@ -17,6 +17,8 @@ import 'dart:html';
 
 typedef void _OnScrollCallback(num width);
 
+const String fontFaceObserverTempClassname = '_ffo_temp';
+
 class Ruler {
   DivElement element;
   SpanElement _collapsible;
@@ -36,10 +38,10 @@ class Ruler {
     _expandable = new SpanElement();
     _collapsibleInner = new SpanElement();
     _expandableInner = new SpanElement();
-    _collapsible.className = 'font_face_ruler_span_collapsible';
-    _collapsibleInner.className = 'font_face_ruler_span_collapsibleInner';
-    _expandable.className = 'font_face_ruler_span_expandable';
-    _expandableInner.className = 'font_face_ruler_span_expandableInner';
+    _collapsible.className = '$fontFaceObserverTempClassname ffo_ruler_span_collapsible';
+    _collapsibleInner.className = '$fontFaceObserverTempClassname ffo_ruler_span_collapsibleInner';
+    _expandable.className = '$fontFaceObserverTempClassname ffo_ruler_span_expandable';
+    _expandableInner.className = '$fontFaceObserverTempClassname ffo_ruler_span_expandableInner';
 
     _styleElement(_collapsible);
     _styleElement(_expandable);
