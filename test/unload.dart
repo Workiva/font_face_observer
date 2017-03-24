@@ -25,6 +25,7 @@ loadFont(FontConfig cfg) async {
   var ffo = new FontFaceObserver(cfg.family, useSimulatedLoadEvents: cfg.useSimulatedLoadEvents, timeout: 500, group: cfg.group);
   cfg.key = ffo.key;
   await ffo.load(cfg.url);
+  await ffo.load(cfg.url);
 }
 
 bool unloadFont(FontConfig cfg) {

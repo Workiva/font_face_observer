@@ -300,7 +300,11 @@ class FontFaceObserver {
   /// or a pre-built data or blob url.
   Future<FontLoadResult> load(String url) async {
     if (_result.isCompleted) {
-      // TODO increment uses count here?
+      FontLoadResult r = await _result.future;
+      if (r.isLoaded) {
+        _LoadedFont loadedFont = _getLoadedFont(url);
+        loadedFont.uses++;
+      }
       return _result.future;
     }
     _LoadedFont loadedFont = _getLoadedFont(url);
