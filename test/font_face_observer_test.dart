@@ -1,4 +1,5 @@
 @TestOn('browser')
+import 'dart:html';
 import 'package:test/test.dart';
 import 'package:font_face_observer/font_face_observer.dart';
 
@@ -68,6 +69,55 @@ main() {
       expect(result.isLoaded, isTrue);
       result = await ffo.check();
       expect(result.isLoaded, isTrue);
+    });
+
+    test('should not leave temp DOM nodes after detecting', () async {
+      var ffo = new FontFaceObserver('no_dom_leakrs', useSimulatedLoadEvents: true);
+      var result = await ffo.load(_FontUrls.Roboto);
+      expect(result.isLoaded, isTrue);
+      var elements = querySelectorAll('._ffo_temp');
+      if (elements.length > 0) {
+        elements.forEach( (el) => print('${el.tagName}.${el.className}'));
+      }
+      expect(elements.length, isZero);
+    });
+
+    test('should unload a font by key', () async {
+      var ffo = new FontFaceObserver('unload_by_key');
+      String key = ffo.key;
+      var result = await ffo.load(_FontUrls.Roboto);
+      expect(result.isLoaded, isTrue);
+      FontFaceObserver.unload(key);
+      var styleElement = querySelector('style[key="${key}"]');
+      expect(styleElement,isNull);
+    });
+
+    test('should unload a font by group', () async {
+      var group = 'somegroup';
+      await new FontFaceObserver('unload_by_group1', group: group).load(_FontUrls.Roboto);
+      await new FontFaceObserver('unload_by_group2', group: group).load(_FontUrls.Roboto);
+      FontFaceObserver.unloadGroup(group);
+      expect(querySelectorAll('style[group="${group}"]').length, isZero);
+    });
+
+    test('should keep uses attribute up to date', () async {
+      var ffo = new FontFaceObserver('uses_test');
+      String key = ffo.key;
+      var result = await ffo.load(_FontUrls.Roboto);
+      expect(result.isLoaded, isTrue);
+      var styleElement = querySelector('style[key="${key}"]');
+      expect(styleElement.getAttribute('uses'),'1');
+
+      // load it again, uses should be 2
+      result = await ffo.load(_FontUrls.Roboto);
+      expect(result.isLoaded, isTrue);
+      expect(styleElement.getAttribute('uses'),'2');
+
+      // unload it once
+      FontFaceObserver.unload(key);
+      expect(styleElement.getAttribute('uses'),'1');
+
+
     });
 
     test('should timeout on an empty font, not throw an exception', () async {

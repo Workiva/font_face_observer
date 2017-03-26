@@ -247,7 +247,7 @@ class FontFaceObserver {
 
     // This ensures the scroll direction is correct.
     container.dir = 'ltr';
-    container.className = 'font_face_container';
+    container.className = '$fontFaceObserverTempClassname _ffo_container';
     _rulerSansSerif.setFont(_getStyle('sans-serif'));
     _rulerSerif.setFont(_getStyle('serif'));
     _rulerMonospace.setFont(_getStyle('monospace'));
@@ -319,12 +319,10 @@ class FontFaceObserver {
 
     document.body.append(dummy);
     var isLoadedFuture = check();
-    _removeElementWhenComplete(isLoadedFuture, dummy);
-    return isLoadedFuture;
-  }
-
-  _removeElementWhenComplete(Future f, HtmlElement el) async {
-    f.whenComplete(() => el.remove());
+    return isLoadedFuture.then((FontLoadResult flr){
+      dummy.remove(); 
+      return flr;
+    });
   }
 
   bool get isLoaded {
