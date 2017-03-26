@@ -38,10 +38,14 @@ class Ruler {
     _expandable = new SpanElement();
     _collapsibleInner = new SpanElement();
     _expandableInner = new SpanElement();
-    _collapsible.className = '$fontFaceObserverTempClassname ffo_ruler_span_collapsible';
-    _collapsibleInner.className = '$fontFaceObserverTempClassname ffo_ruler_span_collapsibleInner';
-    _expandable.className = '$fontFaceObserverTempClassname ffo_ruler_span_expandable';
-    _expandableInner.className = '$fontFaceObserverTempClassname ffo_ruler_span_expandableInner';
+    _collapsible.className =
+        '$fontFaceObserverTempClassname ffo_ruler_span_collapsible';
+    _collapsibleInner.className =
+        '$fontFaceObserverTempClassname ffo_ruler_span_collapsibleInner';
+    _expandable.className =
+        '$fontFaceObserverTempClassname ffo_ruler_span_expandable';
+    _expandableInner.className =
+        '$fontFaceObserverTempClassname ffo_ruler_span_expandableInner';
 
     _styleElement(_collapsible);
     _styleElement(_expandable);

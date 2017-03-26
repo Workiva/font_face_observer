@@ -34,7 +34,8 @@ class FontLoadResult {
   FontLoadResult({this.isLoaded: true, this.didTimeout: false});
 
   @override
-  String toString() => 'FontLoadResult {isLoaded: $isLoaded, didTimeout: $didTimeout}';
+  String toString() =>
+      'FontLoadResult {isLoaded: $isLoaded, didTimeout: $didTimeout}';
 }
 
 // holds data about each loaded font
@@ -172,7 +173,8 @@ class FontFaceObserver {
     // the font is loaded
     if (SUPPORTS_NATIVE_FONT_LOADING && !useSimulatedLoadEvents) {
       t = new Timer.periodic(
-          new Duration(milliseconds: _NATIVE_FONT_LOADING_CHECK_INTERVAL), _periodicallyCheckDocumentFonts);
+          new Duration(milliseconds: _NATIVE_FONT_LOADING_CHECK_INTERVAL),
+          _periodicallyCheckDocumentFonts);
     } else {
       t = _simulateFontLoadEvents();
     }
@@ -216,7 +218,9 @@ class FontFaceObserver {
       if ((widthSansSerif != -1 && widthSerif != -1) ||
           (widthSansSerif != -1 && widthMonospace != -1) ||
           (widthSerif != -1 && widthMonospace != -1)) {
-        if (widthSansSerif == widthSerif || widthSansSerif == widthMonospace || widthSerif == widthMonospace) {
+        if (widthSansSerif == widthSerif ||
+            widthSansSerif == widthMonospace ||
+            widthSerif == widthMonospace) {
           // All values are the same, so the browser has most likely loaded the web font
           if (HAS_WEBKIT_FALLBACK_BUG) {
             // Except if the browser has the WebKit fallback bug, in which case we check to see if all
@@ -239,7 +243,8 @@ class FontFaceObserver {
             container.remove();
           }
           if (!_result.isCompleted) {
-            _result.complete(new FontLoadResult(isLoaded: true, didTimeout: false));
+            _result.complete(
+                new FontLoadResult(isLoaded: true, didTimeout: false));
           }
         }
       }
@@ -319,8 +324,8 @@ class FontFaceObserver {
 
     document.body.append(dummy);
     var isLoadedFuture = check();
-    return isLoadedFuture.then((FontLoadResult flr){
-      dummy.remove(); 
+    return isLoadedFuture.then((FontLoadResult flr) {
+      dummy.remove();
       return flr;
     });
   }
@@ -337,7 +342,8 @@ class FontFaceObserver {
     var keysToRemove = [];
     _loadedFonts.keys.forEach((k) {
       var loadedFont = _loadedFonts[k];
-      if (loadedFont.group == group || (group == "" && loadedFont.group == null)) {
+      if (loadedFont.group == group ||
+          (group == "" && loadedFont.group == null)) {
         keysToRemove.add(k);
       }
     });
