@@ -103,6 +103,14 @@ main() {
       expect(() => ffo.group = '   ', throws);
     });
 
+    test('should update group in the loaded font map when updating group on an ffo instance', () async {
+      var ffo = new FontFaceObserver('update_group', group:'initial_group');
+      await ffo.load(_FontUrls.Roboto);
+      String newGroup = 'new group';
+      ffo.group = newGroup;
+      expect(FontFaceObserver.unloadGroup(newGroup), equals(1));
+    });
+
     test('should unload a font by group', () async {
       var group = 'somegroup';
       await new FontFaceObserver('unload_by_group1', group: group).load(_FontUrls.Roboto);

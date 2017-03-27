@@ -41,9 +41,9 @@ class FontLoadResult {
 // holds data about each loaded font
 class _LoadedFont {
   final StyleElement element;
-  final String group;
+  String group;
   int _uses = 0;
-  _LoadedFont(this.element, {this.group: ""});
+  _LoadedFont(this.element, {this.group: FontFaceObserver.defaultGroup});
 
   int get uses => _uses;
   void set uses(int new_uses) {
@@ -96,6 +96,12 @@ class FontFaceObserver {
           'FontFaceObserver group cannot be null or whitespace only');
     }
     this._group = group;
+
+    // update a loaded font to the new group if there is one
+    var _key = key;
+    if (_loadedFonts.containsKey(_key)) {
+      _loadedFonts[_key].group = group;
+    }
   }
 
   String get testString => _testString;
@@ -351,8 +357,7 @@ class FontFaceObserver {
     var keysToRemove = [];
     _loadedFonts.keys.forEach((k) {
       var loadedFont = _loadedFonts[k];
-      if (loadedFont.group == group ||
-          (group == "" && loadedFont.group == null)) {
+      if (loadedFont.group == group) {
         keysToRemove.add(k);
       }
     });
