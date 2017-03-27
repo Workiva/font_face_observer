@@ -357,14 +357,14 @@ class FontFaceObserver {
   }
 
   /// A list of font keys for all currently loaded fonts
-  static List<String> get loadedFontKeys {
-    return _loadedFonts.keys.toList(growable: false);
+  static Iterable<String> get loadedFontKeys {
+    return _loadedFonts.keys;
   }
 
   /// A list of groups that the currently loaded fonts are in
   /// There will not be duplicate group entries if there are multiple fonts
   /// in the same group.
-  static List<String> get loadedGroups {
+  static Iterable<String> get loadedGroups {
     List<String> loadedGroups = [];
     _loadedFonts.keys.forEach((k) {
       var loadedFont = _loadedFonts[k];
