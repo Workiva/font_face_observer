@@ -24,8 +24,11 @@ const String DEFAULT_TEST_STRING = 'BESbswy';
 const String _NORMAL = 'normal';
 const int _NATIVE_FONT_LOADING_CHECK_INTERVAL = 50;
 
-final Future<FontLoadResult> _adobeBlankLoadedFuture =
-    (new FontFaceObserver(AdobeBlankFamily)).load(AdobeBlankFontBase64Url);
+Future<FontLoadResult> _adobeBlankLoadedFuture = _loadAdobeBlank();
+
+Future<FontLoadResult> _loadAdobeBlank() {
+  return (new FontFaceObserver(AdobeBlankFamily, group: AdobeBlankFamily)).load(AdobeBlankFontBase64Url);
+}
 
 /// Simple container object for result data
 class FontLoadResult {
@@ -34,11 +37,10 @@ class FontLoadResult {
   FontLoadResult({this.isLoaded: true, this.didTimeout: false});
 
   @override
-  String toString() =>
-      'FontLoadResult {isLoaded: $isLoaded, didTimeout: $didTimeout}';
+  String toString() => 'FontLoadResult {isLoaded: $isLoaded, didTimeout: $didTimeout}';
 }
 
-// holds data about each loaded font
+/// holds data about each loaded font
 class _LoadedFont {
   final StyleElement element;
   String group;
@@ -75,6 +77,9 @@ class FontFaceObserver {
       int this.timeout: DEFAULT_TIMEOUT,
       bool this.useSimulatedLoadEvents: false,
       String group: defaultGroup}) {
+    if (key != AdobeBlankKey && !_loadedFonts.containsKey(AdobeBlankKey)) {
+      _adobeBlankLoadedFuture = _loadAdobeBlank();
+    }
     this.testString = testString;
     this.group = group;
     if (family != null) {
@@ -92,8 +97,7 @@ class FontFaceObserver {
   String get group => _group;
   void set group(String group) {
     if (group == null || group == '' || group.trim() == '') {
-      throw new Exception(
-          'FontFaceObserver group cannot be null or whitespace only');
+      throw new Exception('FontFaceObserver group cannot be null or whitespace only');
     }
     this._group = group;
 
@@ -118,7 +122,7 @@ class FontFaceObserver {
   }
 
   _LoadedFont _getLoadedFont(String url) {
-    var styleElement;
+    StyleElement styleElement;
     String _key = key;
     _LoadedFont loadedFont;
     if (_loadedFonts.containsKey(_key)) {
@@ -135,6 +139,7 @@ class FontFaceObserver {
         ..className = '_ffo'
         ..text = rule
         ..dataset['key'] = _key;
+
       if (group != null && group.length > 0) {
         styleElement.dataset['group'] = group;
       }
@@ -187,8 +192,7 @@ class FontFaceObserver {
     // the font is loaded
     if (SUPPORTS_NATIVE_FONT_LOADING && !useSimulatedLoadEvents) {
       t = new Timer.periodic(
-          new Duration(milliseconds: _NATIVE_FONT_LOADING_CHECK_INTERVAL),
-          _periodicallyCheckDocumentFonts);
+          new Duration(milliseconds: _NATIVE_FONT_LOADING_CHECK_INTERVAL), _periodicallyCheckDocumentFonts);
     } else {
       t = _simulateFontLoadEvents();
     }
@@ -232,9 +236,7 @@ class FontFaceObserver {
       if ((widthSansSerif != -1 && widthSerif != -1) ||
           (widthSansSerif != -1 && widthMonospace != -1) ||
           (widthSerif != -1 && widthMonospace != -1)) {
-        if (widthSansSerif == widthSerif ||
-            widthSansSerif == widthMonospace ||
-            widthSerif == widthMonospace) {
+        if (widthSansSerif == widthSerif || widthSansSerif == widthMonospace || widthSerif == widthMonospace) {
           // All values are the same, so the browser has most likely loaded the web font
           if (HAS_WEBKIT_FALLBACK_BUG) {
             // Except if the browser has the WebKit fallback bug, in which case we check to see if all
@@ -257,8 +259,7 @@ class FontFaceObserver {
             container.remove();
           }
           if (!_result.isCompleted) {
-            _result.complete(
-                new FontLoadResult(isLoaded: true, didTimeout: false));
+            _result.complete(new FontLoadResult(isLoaded: true, didTimeout: false));
           }
         }
       }
@@ -319,16 +320,12 @@ class FontFaceObserver {
   /// Load the font into the browser given a url that could be a network url
   /// or a pre-built data or blob url.
   Future<FontLoadResult> load(String url) async {
-    if (_result.isCompleted) {
-      FontLoadResult r = await _result.future;
-      if (r.isLoaded) {
-        _LoadedFont loadedFont = _getLoadedFont(url);
-        loadedFont.uses++;
-      }
-      return _result.future;
-    }
     _LoadedFont loadedFont = _getLoadedFont(url);
     loadedFont.uses++;
+
+    if (_result.isCompleted) {
+      return _result.future;
+    }
 
     // Since browsers may not load a font until it is actually used
     // We add this span to trigger the browser to load the font when used
@@ -345,11 +342,33 @@ class FontFaceObserver {
     });
   }
 
+  /// A synchronous option for checking if the font that this FontFaceObserver
+  /// instance represents is loaded
   bool get isLoaded {
     var loadedFont = _loadedFonts[key];
     return loadedFont != null && loadedFont.uses > 0;
   }
 
+  /// A list of font keys for all currently loaded fonts
+  static List<String> get loadedFontKeys {
+    return _loadedFonts.keys.toList(growable: false);
+  }
+
+  /// A list of groups that the currently loaded fonts are in
+  /// There will not be duplicate group entries if there are multiple fonts
+  /// in the same group.
+  static List<String> get loadedGroups {
+    List<String> loadedGroups = [];
+    _loadedFonts.keys.forEach((k) {
+      var loadedFont = _loadedFonts[k];
+      if (!loadedGroups.contains(loadedFont.group)) {
+        loadedGroups.add(loadedFont.group);
+      }
+    });
+    return loadedGroups;
+  }
+
+  /// Removes all fonts that are in the given [group]
   static int unloadGroup(String group) {
     if (group == null || group == "") {
       return 0;
@@ -365,15 +384,16 @@ class FontFaceObserver {
     return keysToRemove.length;
   }
 
+  /// Unloads a font by unique key from the browser by removing the style 
+  /// element and removing the internal tracking of the font
   static bool unload(String key) {
     if (_loadedFonts.containsKey(key)) {
       var loadedFont = _loadedFonts[key];
       if (loadedFont.uses <= 1) {
         loadedFont.element.remove();
         _loadedFonts.remove(key);
-      } else {
-        loadedFont.uses--;
       }
+      loadedFont.uses--;
       return true;
     }
     return false;
