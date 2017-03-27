@@ -38,6 +38,7 @@ class Ruler {
     _expandable = new SpanElement();
     _collapsibleInner = new SpanElement();
     _expandableInner = new SpanElement();
+    // add class names for tracking nodes if they leak (and for testing)
     _collapsible.className =
         '$fontFaceObserverTempClassname _ffo_ruler_span_collapsible';
     _collapsibleInner.className =

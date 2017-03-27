@@ -252,6 +252,7 @@ class FontFaceObserver {
 
     // This ensures the scroll direction is correct.
     container.dir = 'ltr';
+    // add class names for tracking nodes if they leak (and for testing)
     container.className = '$fontFaceObserverTempClassname _ffo_container';
     _rulerSansSerif.setFont(_getStyle('sans-serif'));
     _rulerSerif.setFont(_getStyle('serif'));

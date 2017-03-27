@@ -72,7 +72,7 @@ main() {
     });
 
     test('should not leave temp DOM nodes after detecting', () async {
-      var ffo = new FontFaceObserver('no_dom_leakrs', useSimulatedLoadEvents: true);
+      var ffo = new FontFaceObserver('no_dom_leaks', useSimulatedLoadEvents: true);
       var result = await ffo.load(_FontUrls.Roboto);
       expect(result.isLoaded, isTrue);
       var elements = querySelectorAll('._ffo_temp');
