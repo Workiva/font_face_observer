@@ -92,6 +92,17 @@ main() {
       expect(styleElement,isNull);
     });
 
+    test('should use the default group if no group specified', () async {
+      var ffo = new FontFaceObserver('default_group1');
+      expect(ffo.group, equals(FontFaceObserver.defaultGroup));
+    });
+
+    test('should throw if group is null or whitespace', () async {
+      var ffo = new FontFaceObserver('default_group2');
+      expect(() => ffo.group = null, throws);
+      expect(() => ffo.group = '   ', throws);
+    });
+
     test('should unload a font by group', () async {
       var group = 'somegroup';
       await new FontFaceObserver('unload_by_group1', group: group).load(_FontUrls.Roboto);

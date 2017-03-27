@@ -17,7 +17,7 @@ class FontConfig {
   String group;
   bool useSimulatedLoadEvents;
   bool expectLoad;
-  FontConfig({this.family, this.url, this.useSimulatedLoadEvents: false, this.group});
+  FontConfig({this.family, this.url, this.useSimulatedLoadEvents: false, this.group: FontFaceObserver.defaultGroup});
   String key;
 }
 

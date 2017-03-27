@@ -53,6 +53,7 @@ class _LoadedFont {
 }
 
 class FontFaceObserver {
+  static const String defaultGroup = "default";
   String family;
   String style;
   String weight;
@@ -60,7 +61,7 @@ class FontFaceObserver {
   String _testString;
   int timeout;
   bool useSimulatedLoadEvents;
-  String group;
+  String _group;
   Completer _result = new Completer();
 
   /// A map of font key String to _LoadedFont
@@ -73,8 +74,9 @@ class FontFaceObserver {
       String testString: DEFAULT_TEST_STRING,
       int this.timeout: DEFAULT_TIMEOUT,
       bool this.useSimulatedLoadEvents: false,
-      String this.group: ""}) {
+      String group: defaultGroup}) {
     this.testString = testString;
+    this.group = group;
     if (family != null) {
       family = family.trim();
       bool hasStartQuote = family.startsWith('"') || family.startsWith("'");
@@ -82,15 +84,32 @@ class FontFaceObserver {
       if (hasStartQuote && hasEndQuote) {
         family = family.substring(1, family.length - 1);
       }
-      if (group == null) {
-        group = "";
-      }
     }
   }
 
   String get key => '${family}_${style}_${weight}_${stretch}';
 
+  String get group => _group;
+  void set group(String group) {
+    if (group == null || group == '' || group.trim() == '') {
+      throw new Exception(
+          'FontFaceObserver group cannot be null or whitespace only');
+    }
+    this._group = group;
+  }
+
   String get testString => _testString;
+
+  set testString(String newTestString) {
+    this._testString = newTestString;
+    if (_testString == null) {
+      _testString = DEFAULT_TEST_STRING;
+    }
+    _testString = _testString.trim();
+    if (_testString.length == 0) {
+      _testString = DEFAULT_TEST_STRING;
+    }
+  }
 
   _LoadedFont _getLoadedFont(String url) {
     var styleElement;
@@ -118,17 +137,6 @@ class FontFaceObserver {
       document.head.append(styleElement);
     }
     return loadedFont;
-  }
-
-  set testString(String newTestString) {
-    this._testString = newTestString;
-    if (_testString == null) {
-      _testString = DEFAULT_TEST_STRING;
-    }
-    _testString = _testString.trim();
-    if (_testString.length == 0) {
-      _testString = DEFAULT_TEST_STRING;
-    }
   }
 
   String _getStyle(String family, {cssSize: '100px'}) {
@@ -337,8 +345,8 @@ class FontFaceObserver {
   }
 
   static int unloadGroup(String group) {
-    if (group == null) {
-      group = "";
+    if (group == null || group == "") {
+      return 0;
     }
     var keysToRemove = [];
     _loadedFonts.keys.forEach((k) {
