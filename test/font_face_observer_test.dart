@@ -88,7 +88,7 @@ main() {
       var result = await ffo.load(_FontUrls.Roboto);
       expect(result.isLoaded, isTrue);
       FontFaceObserver.unload(key);
-      var styleElement = querySelector('style[key="${key}"]');
+      var styleElement = querySelector('style[data-key="${key}"]');
       expect(styleElement,isNull);
     });
 
@@ -97,25 +97,25 @@ main() {
       await new FontFaceObserver('unload_by_group1', group: group).load(_FontUrls.Roboto);
       await new FontFaceObserver('unload_by_group2', group: group).load(_FontUrls.Roboto);
       FontFaceObserver.unloadGroup(group);
-      expect(querySelectorAll('style[group="${group}"]').length, isZero);
+      expect(querySelectorAll('style[data-group="${group}"]').length, isZero);
     });
 
-    test('should keep uses attribute up to date', () async {
+    test('should keep data-uses attribute up to date', () async {
       var ffo = new FontFaceObserver('uses_test');
       String key = ffo.key;
       var result = await ffo.load(_FontUrls.Roboto);
       expect(result.isLoaded, isTrue);
-      var styleElement = querySelector('style[key="${key}"]');
-      expect(styleElement.getAttribute('uses'),'1');
+      var styleElement = querySelector('style[data-key="${key}"]');
+      expect(styleElement.dataset['uses'],'1');
 
       // load it again, uses should be 2
       result = await ffo.load(_FontUrls.Roboto);
       expect(result.isLoaded, isTrue);
-      expect(styleElement.getAttribute('uses'),'2');
+      expect(styleElement.dataset['uses'],'2');
 
       // unload it once
       FontFaceObserver.unload(key);
-      expect(styleElement.getAttribute('uses'),'1');
+      expect(styleElement.dataset['uses'],'1');
 
 
     });

@@ -48,7 +48,7 @@ class _LoadedFont {
   int get uses => _uses;
   void set uses(int new_uses) {
     _uses = new_uses;
-    element.attributes['uses'] = _uses.toString();
+    element.dataset['uses'] = _uses.toString();
   }
 }
 
@@ -109,9 +109,9 @@ class FontFaceObserver {
       styleElement = new StyleElement()
         ..className = '_ffo'
         ..text = rule
-        ..attributes['key'] = _key;
+        ..dataset['key'] = _key;
       if (group != null && group.length > 0) {
-        styleElement.attributes['group'] = group;
+        styleElement.dataset['group'] = group;
       }
       loadedFont = new _LoadedFont(styleElement, group: group);
       _loadedFonts[_key] = loadedFont;
