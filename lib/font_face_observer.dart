@@ -27,7 +27,8 @@ const int _NATIVE_FONT_LOADING_CHECK_INTERVAL = 50;
 Future<FontLoadResult> _adobeBlankLoadedFuture = _loadAdobeBlank();
 
 Future<FontLoadResult> _loadAdobeBlank() {
-  return (new FontFaceObserver(AdobeBlankFamily, group: AdobeBlankFamily)).load(AdobeBlankFontBase64Url);
+  return (new FontFaceObserver(AdobeBlankFamily, group: AdobeBlankFamily))
+      .load(AdobeBlankFontBase64Url);
 }
 
 /// Simple container object for result data
@@ -37,7 +38,8 @@ class FontLoadResult {
   FontLoadResult({this.isLoaded: true, this.didTimeout: false});
 
   @override
-  String toString() => 'FontLoadResult {isLoaded: $isLoaded, didTimeout: $didTimeout}';
+  String toString() =>
+      'FontLoadResult {isLoaded: $isLoaded, didTimeout: $didTimeout}';
 }
 
 /// holds data about each loaded font
@@ -97,7 +99,8 @@ class FontFaceObserver {
   String get group => _group;
   void set group(String group) {
     if (group == null || group == '' || group.trim() == '') {
-      throw new Exception('FontFaceObserver group cannot be null or whitespace only');
+      throw new Exception(
+          'FontFaceObserver group cannot be null or whitespace only');
     }
     this._group = group;
 
@@ -192,7 +195,8 @@ class FontFaceObserver {
     // the font is loaded
     if (SUPPORTS_NATIVE_FONT_LOADING && !useSimulatedLoadEvents) {
       t = new Timer.periodic(
-          new Duration(milliseconds: _NATIVE_FONT_LOADING_CHECK_INTERVAL), _periodicallyCheckDocumentFonts);
+          new Duration(milliseconds: _NATIVE_FONT_LOADING_CHECK_INTERVAL),
+          _periodicallyCheckDocumentFonts);
     } else {
       t = _simulateFontLoadEvents();
     }
@@ -236,7 +240,9 @@ class FontFaceObserver {
       if ((widthSansSerif != -1 && widthSerif != -1) ||
           (widthSansSerif != -1 && widthMonospace != -1) ||
           (widthSerif != -1 && widthMonospace != -1)) {
-        if (widthSansSerif == widthSerif || widthSansSerif == widthMonospace || widthSerif == widthMonospace) {
+        if (widthSansSerif == widthSerif ||
+            widthSansSerif == widthMonospace ||
+            widthSerif == widthMonospace) {
           // All values are the same, so the browser has most likely loaded the web font
           if (HAS_WEBKIT_FALLBACK_BUG) {
             // Except if the browser has the WebKit fallback bug, in which case we check to see if all
@@ -259,7 +265,8 @@ class FontFaceObserver {
             container.remove();
           }
           if (!_result.isCompleted) {
-            _result.complete(new FontLoadResult(isLoaded: true, didTimeout: false));
+            _result.complete(
+                new FontLoadResult(isLoaded: true, didTimeout: false));
           }
         }
       }
@@ -384,7 +391,7 @@ class FontFaceObserver {
     return keysToRemove.length;
   }
 
-  /// Unloads a font by unique key from the browser by removing the style 
+  /// Unloads a font by unique key from the browser by removing the style
   /// element and removing the internal tracking of the font
   static bool unload(String key) {
     if (_loadedFonts.containsKey(key)) {
