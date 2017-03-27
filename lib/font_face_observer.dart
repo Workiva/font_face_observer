@@ -318,7 +318,7 @@ class FontFaceObserver {
     // Since browsers may not load a font until it is actually used
     // We add this span to trigger the browser to load the font when used
     SpanElement dummy = new SpanElement()
-      ..className = '$fontFaceObserverTempClassname ffo_dummy'
+      ..className = '$fontFaceObserverTempClassname _ffo_dummy'
       ..setAttribute('style', 'font-family: "${family}"; visibility: hidden;')
       ..text = testString;
 
