@@ -58,7 +58,7 @@ updateCounts() {
   n = querySelectorAll('style._ffo').length;
   document.getElementById('ffo_elements').innerHtml = n.toString();
 
-  document.getElementById('ffo_groups').innerHtml = FontFaceObserver.loadedGroups.toString();
+  document.getElementById('ffo_groups').innerHtml = FontFaceObserver.getLoadedGroups().toString();
 }
 
 main() async {

@@ -15,7 +15,7 @@ class _FontUrls {
 main() {
   group('FontFaceObserver', () {
     tearDown(() {
-      FontFaceObserver.loadedFontKeys.forEach(FontFaceObserver.unload);
+      FontFaceObserver.getLoadedFontKeys().forEach(FontFaceObserver.unload);
     });
 
     test('should handle quoted family name', () {
@@ -83,19 +83,21 @@ main() {
       await new FontFaceObserver('font_keys4', group: 'group_2').load(_FontUrls.Roboto);
 
       // AdobeBlank is always loaded, so expect that too
-      expect(FontFaceObserver.loadedFontKeys.length, equals(5));
-      expect(FontFaceObserver.loadedFontKeys.contains('font_keys1_normal_normal_normal'), isTrue);
-      expect(FontFaceObserver.loadedFontKeys.contains('font_keys2_normal_normal_normal'), isTrue);
-      expect(FontFaceObserver.loadedFontKeys.contains('font_keys3_normal_normal_normal'), isTrue);
-      expect(FontFaceObserver.loadedFontKeys.contains('font_keys4_normal_normal_normal'), isTrue);
-      expect(FontFaceObserver.loadedFontKeys.contains(AdobeBlankKey), isTrue);
+      var keys = FontFaceObserver.getLoadedFontKeys();
+      expect(keys.length, equals(5));
+      expect(keys.contains('font_keys1_normal_normal_normal'), isTrue);
+      expect(keys.contains('font_keys2_normal_normal_normal'), isTrue);
+      expect(keys.contains('font_keys3_normal_normal_normal'), isTrue);
+      expect(keys.contains('font_keys4_normal_normal_normal'), isTrue);
+      expect(keys.contains(AdobeBlankKey), isTrue);
 
       // expect the default group too
-      expect(FontFaceObserver.loadedGroups.length, equals(4));
-      expect(FontFaceObserver.loadedGroups.contains(FontFaceObserver.defaultGroup), isTrue);
-      expect(FontFaceObserver.loadedGroups.contains('group_1'), isTrue);
-      expect(FontFaceObserver.loadedGroups.contains('group_2'), isTrue);
-      expect(FontFaceObserver.loadedGroups.contains(AdobeBlankFamily), isTrue);
+      var groups = FontFaceObserver.getLoadedGroups();
+      expect(groups.length, equals(4));
+      expect(groups.contains(FontFaceObserver.defaultGroup), isTrue);
+      expect(groups.contains('group_1'), isTrue);
+      expect(groups.contains('group_2'), isTrue);
+      expect(groups.contains(AdobeBlankFamily), isTrue);
     });
 
     test('should not leave temp DOM nodes after detecting', () async {
