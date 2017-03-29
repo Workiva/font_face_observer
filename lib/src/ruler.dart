@@ -17,6 +17,8 @@ import 'dart:html';
 
 typedef void _OnScrollCallback(num width);
 
+const String fontFaceObserverTempClassname = '_ffo_temp';
+
 class Ruler {
   DivElement element;
   SpanElement _collapsible;
@@ -28,6 +30,7 @@ class Ruler {
 
   Ruler(String this.text) {
     element = document.createElement('div');
+    element.className = 'font_face_ruler_div';
     element.setAttribute('aria-hidden', 'true');
     element.text = text;
 
@@ -35,6 +38,15 @@ class Ruler {
     _expandable = new SpanElement();
     _collapsibleInner = new SpanElement();
     _expandableInner = new SpanElement();
+    // add class names for tracking nodes if they leak (and for testing)
+    _collapsible.className =
+        '$fontFaceObserverTempClassname _ffo_ruler_span_collapsible';
+    _collapsibleInner.className =
+        '$fontFaceObserverTempClassname _ffo_ruler_span_collapsibleInner';
+    _expandable.className =
+        '$fontFaceObserverTempClassname _ffo_ruler_span_expandable';
+    _expandableInner.className =
+        '$fontFaceObserverTempClassname _ffo_ruler_span_expandableInner';
 
     _styleElement(_collapsible);
     _styleElement(_expandable);

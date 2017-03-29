@@ -1,6 +1,8 @@
 @TestOn('browser')
+import 'dart:html';
 import 'package:test/test.dart';
 import 'package:font_face_observer/font_face_observer.dart';
+import 'package:font_face_observer/src/adobe_blank.dart';
 
 class _FontUrls {
   static const String Roboto = 'fonts/Roboto.ttf';
@@ -12,6 +14,10 @@ class _FontUrls {
 
 main() {
   group('FontFaceObserver', () {
+    tearDown(() {
+      FontFaceObserver.getLoadedFontKeys().forEach(FontFaceObserver.unload);
+    });
+
     test('should handle quoted family name', () {
       expect(new FontFaceObserver('"my family"').family, equals('my family'));
       expect(new FontFaceObserver("'my family'").family, equals('my family'));
@@ -68,6 +74,107 @@ main() {
       expect(result.isLoaded, isTrue);
       result = await ffo.check();
       expect(result.isLoaded, isTrue);
+    });
+
+    test('should track the font keys and groups correctly', () async {
+      await new FontFaceObserver('font_keys1').load(_FontUrls.Roboto);
+      await new FontFaceObserver('font_keys2').load(_FontUrls.Roboto);
+      await new FontFaceObserver('font_keys3', group: 'group_1').load(_FontUrls.Roboto);
+      await new FontFaceObserver('font_keys4', group: 'group_2').load(_FontUrls.Roboto);
+
+      // AdobeBlank is always loaded, so expect that too
+      var keys = FontFaceObserver.getLoadedFontKeys();
+      expect(keys.length, equals(5));
+      expect(keys.contains('font_keys1_normal_normal_normal'), isTrue);
+      expect(keys.contains('font_keys2_normal_normal_normal'), isTrue);
+      expect(keys.contains('font_keys3_normal_normal_normal'), isTrue);
+      expect(keys.contains('font_keys4_normal_normal_normal'), isTrue);
+      expect(keys.contains(AdobeBlankKey), isTrue);
+
+      // expect the default group too
+      var groups = FontFaceObserver.getLoadedGroups();
+      expect(groups.length, equals(4));
+      expect(groups.contains(FontFaceObserver.defaultGroup), isTrue);
+      expect(groups.contains('group_1'), isTrue);
+      expect(groups.contains('group_2'), isTrue);
+      expect(groups.contains(AdobeBlankFamily), isTrue);
+    });
+
+    test('should not leave temp DOM nodes after detecting', () async {
+      var ffo = new FontFaceObserver('no_dom_leaks', useSimulatedLoadEvents: true);
+      var result = await ffo.load(_FontUrls.Roboto);
+      expect(result.isLoaded, isTrue);
+      var elements = querySelectorAll('._ffo_temp');
+      if (elements.length > 0) {
+        elements.forEach( (el) => print('${el.tagName}.${el.className}'));
+      }
+      expect(elements.length, isZero);
+    });
+
+    test('should unload a font by key', () async {
+      var ffo = new FontFaceObserver('unload_by_key');
+      String key = ffo.key;
+      var result = await ffo.load(_FontUrls.Roboto);
+      expect(result.isLoaded, isTrue);
+      FontFaceObserver.unload(key);
+      var styleElement = querySelector('style[data-key="${key}"]');
+      expect(styleElement,isNull);
+    });
+
+    test('should use the default group if no group specified', () async {
+      var ffo = new FontFaceObserver('default_group1');
+      expect(ffo.group, equals(FontFaceObserver.defaultGroup));
+    });
+
+    test('should throw if group is null or whitespace', () async {
+      var ffo = new FontFaceObserver('default_group2');
+      expect(() => ffo.group = null, throws);
+      expect(() => ffo.group = '   ', throws);
+    });
+
+    test('should update group in the loaded font map when updating group on an ffo instance', () async {
+      var ffo = new FontFaceObserver('update_group', group:'initial_group');
+      await ffo.load(_FontUrls.Roboto);
+      String newGroup = 'new group';
+      ffo.group = newGroup;
+      expect(FontFaceObserver.unloadGroup(newGroup), equals(1));
+    });
+
+    test('should unload a font by group', () async {
+      var group = 'somegroup';
+      await new FontFaceObserver('unload_by_group1', group: group).load(_FontUrls.Roboto);
+      await new FontFaceObserver('unload_by_group2', group: group).load(_FontUrls.Roboto);
+      FontFaceObserver.unloadGroup(group);
+      expect(querySelectorAll('style[data-group="${group}"]').length, isZero);
+    });
+
+
+    test('should keep data-uses attribute up to date', () async {
+      var ffo = new FontFaceObserver('uses_test');
+      String key = ffo.key;
+      var result = await ffo.load(_FontUrls.Roboto);
+      expect(result.isLoaded, isTrue);
+      var styleElement = querySelector('style[data-key="${key}"]');
+      expect(styleElement.dataset['uses'],'1');
+
+      // load it again, uses should be 2
+      result = await ffo.load(_FontUrls.Roboto);
+      expect(result.isLoaded, isTrue);
+      expect(styleElement.dataset['uses'],'2');
+
+      // unload it once
+      expect(FontFaceObserver.unload(key), isTrue);
+      expect(styleElement.dataset['uses'],'1');
+
+      // unload it again
+      expect(FontFaceObserver.unload(key), isTrue);
+      expect(querySelector('style[data-key="${key}"]'), isNull);
+      expect(styleElement.dataset['uses'],'0');
+
+      // unload it again, should not go negative
+      expect(FontFaceObserver.unload(key), isFalse);
+      expect(querySelector('style[data-key="${key}"]'), isNull);
+      expect(styleElement.dataset['uses'],'0');
     });
 
     test('should timeout on an empty font, not throw an exception', () async {
