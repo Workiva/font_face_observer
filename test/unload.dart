@@ -58,7 +58,6 @@ updateCounts() {
 }
 
 main() async {
-  FontFaceObserver.loadAdobeBlank();
   loadButton.onClick.listen(load);
   unloadButton.onClick.listen(unload);
   unloadGroupButton.onClick.listen(unloadGroup);

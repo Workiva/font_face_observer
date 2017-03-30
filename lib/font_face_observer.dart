@@ -153,8 +153,8 @@ class FontFaceObserver {
       // We leave this element in the DOM to keep the font loaded and ready in
       // the browser
       SpanElement dummy = new SpanElement()
-        ..className = '_ffo_dummy'
-        ..setAttribute('style', 'font-family: "${family}"; visibility: hidden; display: none; position: absolute; top: -200px; left: -200px;')
+        ..className = '_ffo'
+        ..setAttribute('style', 'font-family: "${family}"; visibility: hidden;')
         ..text = testString
         ..dataset['key'] = key;
 
@@ -408,7 +408,13 @@ class FontFaceObserver {
     });
     for (String k in keysToRemove) {
       await FontFaceObserver.unload(k);
+      var orphanedNodesToRemove = querySelectorAll('._ffo[data-group=$group]');
+      if (orphanedNodesToRemove.length > 0) {
+        print('(rob) missed removing ${orphanedNodesToRemove.length} group nodes');
+        orphanedNodesToRemove.forEach((el) => el.remove());
+      }
     }
+    
     return keysToRemove.length;
   }
 
@@ -423,6 +429,9 @@ class FontFaceObserver {
         _unloadFont(key, record);
       }
       record.uses--;
+
+      
+
       return true;
     }
     return false;
@@ -432,5 +441,10 @@ class FontFaceObserver {
     record.styleElement.remove();
     record.dummy.remove();
     _loadedFonts.remove(key);
+    var orphanedNodesToRemove = querySelectorAll('._ffo[data-key=$key]');
+    if (orphanedNodesToRemove.length > 0) {
+      print('(rob) missed removing ${orphanedNodesToRemove.length} key nodes');
+      orphanedNodesToRemove.forEach((el) => el.remove());
+    }
   }
 }
