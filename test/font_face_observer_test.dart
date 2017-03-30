@@ -14,9 +14,19 @@ class _FontUrls {
 
 main() {
   group('FontFaceObserver', () {
-    tearDown(() {
-      FontFaceObserver.getLoadedFontKeys().forEach(FontFaceObserver.unload);
+    tearDown(() async {
+      FontFaceObserver.getLoadedFontKeys().forEach((key) async => await FontFaceObserver.unload(key));
     });
+
+    expectKeyNotLoaded(String key) {
+      expect(querySelector('style[data-key="${key}"]'), isNull);
+      expect(querySelector('span[data-key="${key}"]'), isNull);
+      expect(FontFaceObserver.getLoadedFontKeys().contains(key), isFalse);
+    }
+
+    expectGroupNotLoaded(String group) {
+      expect(FontFaceObserver.getLoadedGroups().contains(group), isFalse);
+    }
 
     test('should handle quoted family name', () {
       expect(new FontFaceObserver('"my family"').family, equals('my family'));
@@ -116,7 +126,7 @@ main() {
       String key = ffo.key;
       var result = await ffo.load(_FontUrls.Roboto);
       expect(result.isLoaded, isTrue);
-      FontFaceObserver.unload(key);
+      await FontFaceObserver.unload(key);
       var styleElement = querySelector('style[data-key="${key}"]');
       expect(styleElement,isNull);
     });
@@ -137,14 +147,15 @@ main() {
       await ffo.load(_FontUrls.Roboto);
       String newGroup = 'new group';
       ffo.group = newGroup;
-      expect(FontFaceObserver.unloadGroup(newGroup), equals(1));
+      int num = await FontFaceObserver.unloadGroup(newGroup);
+      expect(num, equals(1));
     });
 
     test('should unload a font by group', () async {
       var group = 'somegroup';
       await new FontFaceObserver('unload_by_group1', group: group).load(_FontUrls.Roboto);
       await new FontFaceObserver('unload_by_group2', group: group).load(_FontUrls.Roboto);
-      FontFaceObserver.unloadGroup(group);
+      await FontFaceObserver.unloadGroup(group);
       expect(querySelectorAll('style[data-group="${group}"]').length, isZero);
     });
 
@@ -163,17 +174,18 @@ main() {
       expect(styleElement.dataset['uses'],'2');
 
       // unload it once
-      expect(FontFaceObserver.unload(key), isTrue);
+      expect(await FontFaceObserver.unload(key), isTrue);
       expect(styleElement.dataset['uses'],'1');
 
       // unload it again
-      expect(FontFaceObserver.unload(key), isTrue);
+      expect(await FontFaceObserver.unload(key), isTrue);
       expect(querySelector('style[data-key="${key}"]'), isNull);
       expect(styleElement.dataset['uses'],'0');
 
       // unload it again, should not go negative
-      expect(FontFaceObserver.unload(key), isFalse);
+      expect(await FontFaceObserver.unload(key), isFalse);
       expect(querySelector('style[data-key="${key}"]'), isNull);
+      expect(querySelector('span[data-key="${key}"]'), isNull);
       expect(styleElement.dataset['uses'],'0');
     });
 
@@ -199,6 +211,46 @@ main() {
       await new FontFaceObserver('test3').load(_FontUrls.Roboto);
       var result = await new FontFaceObserver('test3').check();
       expect(result.isLoaded, isTrue);
+    });
+
+    test('should cleanup when not successful', () async {
+      var ffo1 = new FontFaceObserver('cleanup1', timeout: 100, group: 'group1');
+      var ffo2 = new FontFaceObserver('cleanup2', timeout: 100, group: 'group2');
+
+      var result1 = await ffo1.load(_FontUrls.Empty);
+      var result2 = await ffo2.load(_FontUrls.FontNotFound);
+    
+      expect(result1.isLoaded, isFalse);
+      expect(result2.isLoaded, isFalse);
+      expectKeyNotLoaded(ffo1.key);
+      expectKeyNotLoaded(ffo2.key);
+      expectGroupNotLoaded(ffo1.group);
+      expectGroupNotLoaded(ffo2.group);
+    });
+
+    test('should handle async interleaved load and unload calls', () async {
+      var ffo1 = new FontFaceObserver('complex1', group: 'group1');
+      var ffo2 = new FontFaceObserver('complex2', group: 'group2');
+      var ffo3 = new FontFaceObserver('complex3', group: 'group1');
+      
+      // fire this off async
+      var f1 = ffo1.load(_FontUrls.Roboto);
+      await FontFaceObserver.unload('group1');
+      await f1;
+      expectKeyNotLoaded(ffo1.key);
+      expectGroupNotLoaded(ffo1.group);
+      /*
+      construct 3 different FFOs, same key, different group
+      make load take 1 second
+      call load on FFO1
+      call load on FFO2
+      wait 200ms
+      call await unload group 1
+      it should wait until load finishes, then decrement uses for group 1
+      unload group 2 and it should be removed from the DOM and from the internal map
+      */
+      // fail intentionally until the test is written
+      expect(1, equals(false));
     });
 
     test('should handle spaces and numbers in font family', () async {

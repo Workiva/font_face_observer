@@ -11,15 +11,21 @@
   <h1>Memory / Perf Analysis</h1>
   <li>Force garbage collection
   <li>Take an initial snapshot
-  <li>Click <button id="loadBtn">Load</button>
+  <li>Click <button id="loadBtn">Load All Fonts</button>
   <li>Force garbage collection
   <li>Take 2nd snapshot (to see what was added)
-  <li>Click <button id="unloadBtn">Unload</button> or <button id="unloadGroupBtn">Unload Group</button>
+  <li>Click <button id="unloadBtn">Unload Roboto_1</button> or <button id="unloadGroupBtn">Unload group_A</button>
   <li>Force garbage collection
   <li>Snapshot, should unload everything!
   <li><span id="ffo_elements"></span> font faces loaded
   <li><span id="ffo_temp_elements"></span> font face observer temp DOM nodes.
   <li>font groups loaded: <span id="ffo_groups"></span>
+
+  <br><br>
+  <div>The text below will update as fonts are loaded / unloaded</div>
+  <div style="font-family: Roboto_1, Times New Roman">Roboto_1 default group</div>
+  <div style="font-family: Roboto_2, Times New Roman">Roboto_2 group_A</div>
+  <div style="font-family: Roboto_3, Times New Roman">Roboto_3 group_A</div>
   <script type="application/dart" src="unload.dart"></script>
   <script src="../packages/browser/dart.js"></script>
 </body>

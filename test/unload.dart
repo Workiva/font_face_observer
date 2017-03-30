@@ -21,33 +21,29 @@ class FontConfig {
   String key;
 }
 
-loadFont(FontConfig cfg) async {
-  var ffo = new FontFaceObserver(cfg.family, useSimulatedLoadEvents: cfg.useSimulatedLoadEvents, timeout: 500, group: cfg.group);
+Future loadFont(FontConfig cfg) async {
+  var ffo = new FontFaceObserver(cfg.family, useSimulatedLoadEvents: cfg.useSimulatedLoadEvents, group: cfg.group);
   cfg.key = ffo.key;
-  await ffo.load(cfg.url);
-  await ffo.load(cfg.url);
+  return ffo.load(cfg.url);
 }
 
-bool unloadFont(FontConfig cfg) {
-  return FontFaceObserver.unload(cfg.key);
-}
-
-unload(_) {
-  FontFaceObserver.unload(cfg.key);
+unload(_) async {
+  await FontFaceObserver.unload(cfg.key);
   updateCounts();
 }
 
-unloadGroup(_) {
-  FontFaceObserver.unloadGroup(groupName);
+unloadGroup(_) async {
+  await FontFaceObserver.unloadGroup(groupName);
   updateCounts();
 }
 
 load(_) async {
-  await loadFont(cfg);
-  updateCounts();
-  await loadFont(cfg2);
-  updateCounts();
-  await loadFont(cfg3);
+  await Future.wait([loadFont(cfg), loadFont(cfg2), loadFont(cfg3)]);
+  // await loadFont(cfg);
+  // updateCounts();
+  // await loadFont(cfg2);
+  // updateCounts();
+  // await loadFont(cfg3);
   updateCounts();
 }
 
@@ -62,6 +58,7 @@ updateCounts() {
 }
 
 main() async {
+  FontFaceObserver.loadAdobeBlank();
   loadButton.onClick.listen(load);
   unloadButton.onClick.listen(unload);
   unloadGroupButton.onClick.listen(unloadGroup);
