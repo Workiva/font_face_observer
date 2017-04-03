@@ -411,6 +411,7 @@ class FontFaceObserver {
       var orphanedNodesToRemove = querySelectorAll('._ffo[data-group=$group]');
       if (orphanedNodesToRemove.length > 0) {
         print('(rob) missed removing ${orphanedNodesToRemove.length} group nodes');
+        orphanedNodesToRemove.forEach(_printEl);
         orphanedNodesToRemove.forEach((el) => el.remove());
       }
     }
@@ -429,9 +430,6 @@ class FontFaceObserver {
         _unloadFont(key, record);
       }
       record.uses--;
-
-      
-
       return true;
     }
     return false;
@@ -444,7 +442,12 @@ class FontFaceObserver {
     var orphanedNodesToRemove = querySelectorAll('._ffo[data-key=$key]');
     if (orphanedNodesToRemove.length > 0) {
       print('(rob) missed removing ${orphanedNodesToRemove.length} key nodes');
+      orphanedNodesToRemove.forEach(_printEl);
       orphanedNodesToRemove.forEach((el) => el.remove());
     }
+  }
+
+  static void _printEl(Element el) {
+    print('${el.tagName} ${el.className} ${el.dataset.keys} ${el.dataset.values}');
   }
 }
