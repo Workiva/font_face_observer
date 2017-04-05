@@ -219,9 +219,9 @@ class FontFaceObserver {
     new Timer(new Duration(milliseconds: timeout), () => _onTimeout(t));
 
     return _result.future.then((FontLoadResult flr) {
-        dummy.remove();
-        return flr;
-      });
+      dummy.remove();
+      return flr;
+    });
   }
 
   Timer _simulateFontLoadEvents() {
