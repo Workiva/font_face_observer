@@ -197,7 +197,7 @@ class FontFaceObserver {
     SpanElement dummy = document.getElementById(_key);
     if (dummy == null) {
       dummy = new SpanElement()
-        ..className = '$fontFaceObserverTempClassname  _ffo_dummy'
+        ..className = '$fontFaceObserverTempClassname _ffo_dummy'
         ..id = _key
         ..setAttribute('style', 'font-family: "${family}"; visibility: hidden;')
         ..text = testString;
