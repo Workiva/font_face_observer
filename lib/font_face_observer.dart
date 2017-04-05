@@ -191,6 +191,19 @@ class FontFaceObserver {
       await _adobeBlankLoadedFuture;
     }
 
+    // Since browsers may not load a font until it is actually used
+    // We add this span to trigger the browser to load the font when used
+    String _key = '_ffo_dummy_${key}';
+    SpanElement dummy = document.getElementById(_key);
+    if (dummy == null) {
+      dummy = new SpanElement()
+        ..className = '$fontFaceObserverTempClassname _ffo_dummy'
+        ..id = _key
+        ..setAttribute('style', 'font-family: "${family}"; visibility: hidden;')
+        ..text = testString;
+      document.body.append(dummy);
+    }
+
     // if the browser supports FontFace API set up an interval to check if
     // the font is loaded
     if (SUPPORTS_NATIVE_FONT_LOADING && !useSimulatedLoadEvents) {
@@ -205,7 +218,10 @@ class FontFaceObserver {
     // our _loaded future with false if it isn't already completed
     new Timer(new Duration(milliseconds: timeout), () => _onTimeout(t));
 
-    return _result.future;
+    return _result.future.then((FontLoadResult flr) {
+      dummy.remove();
+      return flr;
+    });
   }
 
   Timer _simulateFontLoadEvents() {
@@ -334,19 +350,7 @@ class FontFaceObserver {
       return _result.future;
     }
 
-    // Since browsers may not load a font until it is actually used
-    // We add this span to trigger the browser to load the font when used
-    SpanElement dummy = new SpanElement()
-      ..className = '$fontFaceObserverTempClassname _ffo_dummy'
-      ..setAttribute('style', 'font-family: "${family}"; visibility: hidden;')
-      ..text = testString;
-
-    document.body.append(dummy);
-    var isLoadedFuture = check();
-    return isLoadedFuture.then((FontLoadResult flr) {
-      dummy.remove();
-      return flr;
-    });
+    return check();
   }
 
   /// A synchronous option for checking if the font that this FontFaceObserver
