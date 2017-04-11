@@ -36,10 +36,10 @@ class FontLoadResult {
 }
 
 /// holds data about each loaded font
+/// each font will have 1 _FontRecord in a map with the key pointing to it
 class _FontRecord {
   StyleElement styleElement;
-  SpanElement dummy;
-  String group;
+  Map<String, int> groupUses = new Map<String, int>();
   int _uses = 0;
   
   Future<FontLoadResult> futureLoadResult;
@@ -48,6 +48,64 @@ class _FontRecord {
   void set uses(int new_uses) {
     _uses = new_uses;
     styleElement.dataset['uses'] = _uses.toString();
+  }
+
+  void _recalc() {
+    if (groupUses.length > 0) {
+      uses = groupUses.values.reduce((a,b) => a + b);
+    } else {
+      uses = 0;
+      groupUses.clear();
+    }
+    String groupData = '';
+    for (String group in groupUses.keys) {
+      groupData += '$group(${groupUses[group]}) ';
+    }
+    styleElement.dataset['groups'] = groupData;
+  }
+
+  int incrementGroupCount(String group) {
+    if (group == null || group.trim().isEmpty) {
+      return groupUses[group];  
+    }
+    if (groupUses.containsKey(group)) {
+      groupUses[group]++;
+    } else {
+      groupUses[group] = 1;
+    }
+    _recalc();
+    return groupUses[group];
+  }
+
+  int decrememntGroupCount(String group) {
+    if (group == null || group.trim().isEmpty) {
+      return groupUses[group];  
+    }
+    if (groupUses.containsKey(group)) {
+      groupUses[group]--;
+      if (groupUses[group] <= 0) {
+        groupUses.remove(group);
+      }
+    } else {
+      groupUses.remove(group);
+    }
+    _recalc();
+    return groupUses[group];
+  }
+
+  bool isInGroup(String group) {
+    if (group == null || group.trim().isEmpty) {
+      return false;
+    }
+    if (groupUses.containsKey(group)) {
+      return groupUses[group] > 0;
+    }
+    return false;
+  }
+
+  @override
+  String toString() {
+    return '_uses: $_uses groupUses: $groupUses';
   }
 }
 
@@ -103,13 +161,19 @@ class FontFaceObserver {
       throw new Exception(
           'FontFaceObserver group cannot be null or whitespace only');
     }
-    this._group = group;
+    
+    if (this._group == group) {
+      return;
+    }
 
     // update a loaded font to the new group if there is one
     var _key = key;
     if (_loadedFonts.containsKey(_key)) {
-      _loadedFonts[_key].group = group;
+      _loadedFonts[_key].incrementGroupCount(group);
+      _loadedFonts[_key].decrememntGroupCount(this._group);
     }
+
+    this._group = group;
   }
 
   String get testString => _testString;
@@ -144,30 +208,12 @@ class FontFaceObserver {
         ..text = rule
         ..dataset['key'] = _key;
 
-      if (group != null && group.length > 0) {
-        styleElement.dataset['group'] = group;
-      }
-
-      // Since browsers may not load a font until it is actually used (lazily loaded)
-      // We add this span to trigger the browser to load the font when used
-      // We leave this element in the DOM to keep the font loaded and ready in
-      // the browser
-      SpanElement dummy = new SpanElement()
-        ..className = '_ffo'
-        ..setAttribute('style', 'font-family: "${family}"; visibility: hidden;')
-        ..text = testString
-        ..dataset['key'] = key;
-
-      document.body.append(dummy);
       record = new _FontRecord()
         ..styleElement = styleElement
-        ..group = group
-        ..dummy = dummy
         ..futureLoadResult = _result.future;
-
+      record.incrementGroupCount(group);
       _loadedFonts[_key] = record;
       document.head.append(styleElement);
-
     }
     return record;
   }
@@ -210,7 +256,7 @@ class FontFaceObserver {
       await _adobeBlankLoadedFuture;
     }
 
-    // Since browsers may not load a font until it is actually used
+    // Since browsers may not load a font until it is actually used (lazily loaded)
     // We add this span to trigger the browser to load the font when used
     String _key = '_ffo_dummy_${key}';
     SpanElement dummy = document.getElementById(_key);
@@ -362,17 +408,14 @@ class FontFaceObserver {
   /// Load the font into the browser given a url that could be a network url
   /// or a pre-built data or blob url.
   Future<FontLoadResult> load(String url) async {
+    _FontRecord record = _load(url);
     if (_result.isCompleted) {
-      _FontRecord record = _load(url);
-      record.uses++;
       return _result.future;
     }
-    _FontRecord record = _load(url);
     
     try {
       FontLoadResult flr = await check();
       if (flr.isLoaded) {
-        record.uses++;
         return _result.future;
       }
     } catch (x) {
@@ -382,7 +425,7 @@ class FontFaceObserver {
     // if we get here, the font load has timed out or errored out
     // we clean up by removing the font record and DOM nodes
     _unloadFont(key, record);
-
+    // TODO return a failed future
     return _result.future;
   }
 
@@ -404,32 +447,40 @@ class FontFaceObserver {
   static Iterable<String> getLoadedGroups() {
     Set<String> loadedGroups = new Set<String>();
     _loadedFonts.keys.forEach((k) {
-      var loadedFont = _loadedFonts[k];
-      loadedGroups.add(loadedFont.group);
+      var record = _loadedFonts[k];
+      loadedGroups.addAll(record.groupUses.keys);
     });
     return loadedGroups;
   }
 
   /// Removes all fonts that are in the given [group]
   static Future<int> unloadGroup(String group) async {
+    // do nothing if no group is passed in
     if (group == null || group == "") {
       return 0;
     }
+
+    // parallel arrays of keys and groups that go along with the keys at the
+    // same indexes.
     var keysToRemove = [];
-    _loadedFonts.keys.forEach((k) {
-      var loadedFont = _loadedFonts[k];
-      if (loadedFont.group == group) {
-        keysToRemove.add(k);
+    var records = [];
+    for (String k in _loadedFonts.keys.toList()) {
+    // _loadedFonts.keys.forEach(await (k) async {
+      var record = _loadedFonts[k];
+      // wait for the load future to complete
+      await record.futureLoadResult;
+
+      if (record.isInGroup(group)) {
+        record.groupUses.remove(group);
+        record._recalc();
+        if (record.uses <= 0) {
+          keysToRemove.add(k);
+          records.add(record);
+        }
       }
-    });
-    for (String k in keysToRemove) {
-      await FontFaceObserver.unload(k);
-      var orphanedNodesToRemove = querySelectorAll('._ffo[data-group=$group]');
-      if (orphanedNodesToRemove.length > 0) {
-        print('(rob) missed removing ${orphanedNodesToRemove.length} group nodes');
-        orphanedNodesToRemove.forEach(_printEl);
-        orphanedNodesToRemove.forEach((el) => el.remove());
-      }
+    }
+    for (int k = 0; k < keysToRemove.length; k++) {
+      _unloadFont(keysToRemove[k], records[k]);
     }
     
     return keysToRemove.length;
@@ -437,33 +488,28 @@ class FontFaceObserver {
 
   /// Unloads a font by unique key from the browser by removing the style
   /// element and removing the internal tracking of the font
-  static Future<bool> unload(String key) async {
+  static Future<bool> unload(String key, String group) async {
     if (_loadedFonts.containsKey(key)) {
       var record = _loadedFonts[key];
+      // wait for the load future to complete
       await record.futureLoadResult;
-      // TODO reconfigure uses per group here too
-      if (record.uses <= 1) {
+      
+      record.decrememntGroupCount(group);
+
+      if (record.uses <= 0) {
         _unloadFont(key, record);
       }
-      record.uses--;
+      
       return true;
     }
     return false;
   }
 
+
+  // internal method to forcibly remove the font. It removes all DOM references
+  // and removes the font from internal tracking.
   static void _unloadFont(String key, _FontRecord record) {
     record.styleElement.remove();
-    record.dummy.remove();
     _loadedFonts.remove(key);
-    var orphanedNodesToRemove = querySelectorAll('._ffo[data-key=$key]');
-    if (orphanedNodesToRemove.length > 0) {
-      print('(rob) missed removing ${orphanedNodesToRemove.length} key nodes');
-      orphanedNodesToRemove.forEach(_printEl);
-      orphanedNodesToRemove.forEach((el) => el.remove());
-    }
-  }
-
-  static void _printEl(Element el) {
-    print('${el.tagName} ${el.className} ${el.dataset.keys} ${el.dataset.values}');
   }
 }

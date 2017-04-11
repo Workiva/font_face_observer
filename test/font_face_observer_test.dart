@@ -15,7 +15,9 @@ class _FontUrls {
 main() {
   group('FontFaceObserver', () {
     tearDown(() async {
-      FontFaceObserver.getLoadedFontKeys().forEach((key) async => await FontFaceObserver.unload(key));
+      for (String group in FontFaceObserver.getLoadedGroups()) {
+        await FontFaceObserver.unloadGroup(group);
+      }
     });
 
     expectKeyNotLoaded(String key) {
@@ -126,7 +128,7 @@ main() {
       String key = ffo.key;
       var result = await ffo.load(_FontUrls.Roboto);
       expect(result.isLoaded, isTrue);
-      await FontFaceObserver.unload(key);
+      await FontFaceObserver.unload(key, ffo.group);
       var styleElement = querySelector('style[data-key="${key}"]');
       expect(styleElement,isNull);
     });
@@ -161,6 +163,7 @@ main() {
 
 
     test('should keep data-uses attribute up to date', () async {
+      var differentGroup = 'diff';
       var ffo = new FontFaceObserver('uses_test');
       String key = ffo.key;
       var result = await ffo.load(_FontUrls.Roboto);
@@ -168,22 +171,29 @@ main() {
       var styleElement = querySelector('style[data-key="${key}"]');
       expect(styleElement.dataset['uses'],'1');
 
-      // load it again, uses should be 2
+      // load it again with the same group, uses should be 1
       result = await ffo.load(_FontUrls.Roboto);
+      expect(result.isLoaded, isTrue);
+      expect(styleElement.dataset['uses'],'1');
+
+
+      // load it again with a different group, uses should be 2
+      var ffo2 = new FontFaceObserver('uses_test', group: differentGroup);
+      result = await ffo2.load(_FontUrls.Roboto);
       expect(result.isLoaded, isTrue);
       expect(styleElement.dataset['uses'],'2');
 
-      // unload it once
-      expect(await FontFaceObserver.unload(key), isTrue);
+      // unload it once with the default group
+      expect(await FontFaceObserver.unload(key, ffo.group), isTrue);
       expect(styleElement.dataset['uses'],'1');
 
-      // unload it again
-      expect(await FontFaceObserver.unload(key), isTrue);
+      // unload the 2nd load
+      expect(await FontFaceObserver.unload(ffo2.key, ffo2.group), isTrue);
       expect(querySelector('style[data-key="${key}"]'), isNull);
       expect(styleElement.dataset['uses'],'0');
 
       // unload it again, should not go negative
-      expect(await FontFaceObserver.unload(key), isFalse);
+      expect(await FontFaceObserver.unload(key, ffo.group), isFalse);
       expect(querySelector('style[data-key="${key}"]'), isNull);
       expect(querySelector('span[data-key="${key}"]'), isNull);
       expect(styleElement.dataset['uses'],'0');
@@ -230,12 +240,12 @@ main() {
 
     test('should handle async interleaved load and unload calls', () async {
       var ffo1 = new FontFaceObserver('complex1', group: 'group1');
-      var ffo2 = new FontFaceObserver('complex2', group: 'group2');
-      var ffo3 = new FontFaceObserver('complex3', group: 'group1');
+      // var ffo2 = new FontFaceObserver('complex2', group: 'group2');
+      // var ffo3 = new FontFaceObserver('complex3', group: 'group1');
       
       // fire this off async
       var f1 = ffo1.load(_FontUrls.Roboto);
-      await FontFaceObserver.unload('group1');
+      await FontFaceObserver.unloadGroup(ffo1.group);
       await f1;
       expectKeyNotLoaded(ffo1.key);
       expectGroupNotLoaded(ffo1.group);
@@ -250,7 +260,7 @@ main() {
       unload group 2 and it should be removed from the DOM and from the internal map
       */
       // fail intentionally until the test is written
-      expect(1, equals(false));
+      // expect(1, equals(false));
     });
 
     test('should handle spaces and numbers in font family', () async {

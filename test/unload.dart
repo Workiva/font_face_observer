@@ -13,6 +13,7 @@ ButtonElement unloadButton = document.getElementById('unloadBtn');
 ButtonElement unloadGroupButton = document.getElementById('unloadGroupBtn');
 ButtonElement unloadGroupButtonB = document.getElementById('unloadGroupBtnB');
 ButtonElement loadButton = document.getElementById('loadBtn');
+ButtonElement asyncBtn = document.getElementById('asyncBtn');
 
 class FontConfig {
   String url;
@@ -31,7 +32,7 @@ Future loadFont(FontConfig cfg) async {
 }
 
 unload(_) async {
-  await FontFaceObserver.unload(cfg.key);
+  await FontFaceObserver.unload(cfg.key, cfg.group);
   updateCounts();
 }
 
@@ -41,12 +42,14 @@ unloadGroup(group) async {
 }
 
 load(_) async {
-  await Future.wait([loadFont(cfg), loadFont(cfg2), loadFont(cfg3), loadFont(cfg4)]);
-  // await loadFont(cfg);
-  // updateCounts();
-  // await loadFont(cfg2);
-  // updateCounts();
-  // await loadFont(cfg3);
+  // await Future.wait([loadFont(cfg), loadFont(cfg2), loadFont(cfg3), loadFont(cfg4)]);
+  await loadFont(cfg);
+  updateCounts();
+  await loadFont(cfg2);
+  updateCounts();
+  await loadFont(cfg3);
+  updateCounts();
+  await loadFont(cfg4);
   updateCounts();
 }
 
@@ -60,11 +63,21 @@ updateCounts() {
   document.getElementById('ffo_keys').innerHtml = FontFaceObserver.getLoadedFontKeys().toString();
   document.getElementById('ffo_groups').innerHtml = FontFaceObserver.getLoadedGroups().toString();
 }
+asyncLoadUnload() async {
+  var ffo1 = new FontFaceObserver(cfg2.family, useSimulatedLoadEvents: cfg2.useSimulatedLoadEvents, group: cfg2.group);
+  var ffo2 = new FontFaceObserver(cfg3.family, useSimulatedLoadEvents: cfg3.useSimulatedLoadEvents, group: cfg3.group);
+  var ffo3 = new FontFaceObserver(cfg4.family, useSimulatedLoadEvents: cfg4.useSimulatedLoadEvents, group: cfg4.group);
 
+  // fire this off async
+  var f1 = ffo1.load(cfg2.url);
+  await FontFaceObserver.unloadGroup(ffo1.group);
+  await f1;
+}
 main() async {
   loadButton.onClick.listen(load);
   unloadButton.onClick.listen(unload);
   unloadGroupButton.onClick.listen((_) => unloadGroup(groupA));
   unloadGroupButtonB.onClick.listen((_) => unloadGroup(groupB));
+  asyncBtn.onClick.listen((_) => asyncLoadUnload());
   updateCounts();
 }
