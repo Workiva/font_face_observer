@@ -111,8 +111,8 @@ class _FontRecord {
 
 class FontFaceObserver {
   static const String defaultGroup = "default";
-  static Future<FontLoadResult> _adobeBlankLoadedFuture = loadAdobeBlank();
-  static Future<FontLoadResult> loadAdobeBlank() {
+  static Future<FontLoadResult> _adobeBlankLoadedFuture = _loadAdobeBlank();
+  static Future<FontLoadResult> _loadAdobeBlank() {
     return (new FontFaceObserver(AdobeBlankFamily, group: AdobeBlankFamily))
         .load(AdobeBlankFontBase64Url);
   }
@@ -139,7 +139,7 @@ class FontFaceObserver {
       String group: defaultGroup}) {
     
     if (key != AdobeBlankKey && !_loadedFonts.containsKey(AdobeBlankKey)) {
-      _adobeBlankLoadedFuture = loadAdobeBlank();
+      _adobeBlankLoadedFuture = _loadAdobeBlank();
     }
     this.testString = testString;
     this.group = group;
@@ -410,6 +410,7 @@ class FontFaceObserver {
   Future<FontLoadResult> load(String url) async {
     _FontRecord record = _load(url);
     if (_result.isCompleted) {
+      record.incrementGroupCount(group);
       return _result.future;
     }
     
