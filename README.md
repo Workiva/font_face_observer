@@ -49,11 +49,11 @@ Future<FontLoadResult> check() async
 // returns the same Future<FontLoadResult> from check()
 Future<FontLoadResult> load(String url) async
 
-// Unload a group of fonts
-TODO
+// Unload a group of fonts (static call)
+Future<int> FontFaceObserver.unloadGroup(String group);
 
 // Unload a specific font by key and group
-TODO
+Future<bool> FontFaceObserver.unload(String key, String group);
 ```
 
 # Notes
