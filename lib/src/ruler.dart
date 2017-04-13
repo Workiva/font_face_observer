@@ -17,18 +17,26 @@ import 'dart:html';
 
 typedef void _OnScrollCallback(num width);
 
+/// The CSS class name to add to temporary DOM nodes used when detecting
+/// font load.
 const String fontFaceObserverTempClassname = '_ffo_temp';
 
+/// A Ruler measures text and then observes for when the size changes due to
+/// a font being loaded.
 class Ruler {
+  /// The element in the DOM that this ruler is using to measure
   DivElement element;
   SpanElement _collapsible;
   SpanElement _expandable;
   SpanElement _collapsibleInner;
   SpanElement _expandableInner;
   int _lastOffsetWidth = -1;
+
+  /// The test string to use when measuring
   String text;
 
-  Ruler(String this.text) {
+  /// Construct a Ruler with a given test string [text]
+  Ruler(this.text) {
     element = document.createElement('div');
     element.className = 'font_face_ruler_div';
     element.setAttribute('aria-hidden', 'true');
@@ -64,7 +72,7 @@ class Ruler {
     element.append(_expandable);
   }
 
-  _styleElement(HtmlElement element) {
+  void _styleElement(HtmlElement element) {
     element.style
       ..maxWidth = 'none'
       ..display = 'inline-block'
@@ -75,7 +83,8 @@ class Ruler {
       ..fontSize = '16px';
   }
 
-  setFont(String font) {
+  /// Sets the font to use for this ruler
+  void setFont(String font) {
     element.style
       ..maxWidth = 'none'
       ..minWidth = '20px'
@@ -91,17 +100,19 @@ class Ruler {
       ..font = font;
   }
 
+  /// queries the DOM to get the width of [element]
   int getWidth() {
     return element.offsetWidth;
   }
 
-  setWidth(width) {
+  /// Set the width of [element] using an inline style
+  void setWidth(num width) {
     element.style.width = '${width}px';
   }
 
-  bool reset() {
-    var offsetWidth = element.offsetWidth;
-    var width = offsetWidth + 100;
+  bool _reset() {
+    num offsetWidth = element.offsetWidth;
+    num width = offsetWidth + 100;
 
     _expandableInner.style.width = '${width}px';
     _expandable.scrollLeft = width;
@@ -115,19 +126,20 @@ class Ruler {
     }
   }
 
-  onScroll(_OnScrollCallback callback) {
-    if (reset() && element.parentNode != null) {
+  void _onScroll(_OnScrollCallback callback) {
+    if (_reset() && element.parentNode != null) {
       callback(_lastOffsetWidth);
     }
   }
 
-  onResize(_OnScrollCallback callback) {
-    _collapsible.onScroll.listen((ev) {
-      onScroll(callback);
+  /// Register a callback to be called when the ruler is resized
+  void onResize(_OnScrollCallback callback) {
+    _collapsible.onScroll.listen((Event _) {
+      _onScroll(callback);
     });
-    _expandable.onScroll.listen((ev) {
-      onScroll(callback);
+    _expandable.onScroll.listen((Event _) {
+      _onScroll(callback);
     });
-    reset();
+    _reset();
   }
 }

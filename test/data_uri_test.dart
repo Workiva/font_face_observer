@@ -4,7 +4,7 @@ import 'dart:typed_data';
 import 'package:test/test.dart';
 import 'package:font_face_observer/data_uri.dart';
 
-main() {
+void main() {
   group('DataUri', () {
     test('should build data uri correctly', () {
       DataUri di = new DataUri();

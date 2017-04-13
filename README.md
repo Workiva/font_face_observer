@@ -46,8 +46,14 @@ FontFaceObserver(
 Future<FontLoadResult> check() async
 
 // Load a font from the given URL by adding a font-face rule
-// returns the same Future<bool> from isLoaded()
+// returns the same Future<FontLoadResult> from check()
 Future<FontLoadResult> load(String url) async
+
+// Unload a group of fonts
+TODO
+
+// Unload a specific font by key and group
+TODO
 ```
 
 # Notes

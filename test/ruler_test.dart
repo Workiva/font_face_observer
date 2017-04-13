@@ -4,15 +4,15 @@ import 'dart:async';
 import 'package:test/test.dart';
 import 'package:font_face_observer/src/ruler.dart';
 
-const int START_WIDTH = 100;
+const int _startWidth = 100;
 
-main() {
+void main() {
   Ruler ruler;
 
   setUp(() {
     ruler = new Ruler('hello');
     ruler.setFont('');
-    ruler.setWidth(START_WIDTH);
+    ruler.setWidth(_startWidth);
     document.body.append(ruler.element);
   });
 
@@ -21,9 +21,9 @@ main() {
     ruler = null;
   });
 
-  Future testResize(width1) async {
-    Completer c = new Completer();
-    ruler.onResize((width) {
+  Future<Null> testResize(num width1) async {
+    Completer<Null> c = new Completer<Null>();
+    ruler.onResize((num width) {
       expect(width, equals(width1));
       c.complete();
     });
@@ -31,10 +31,10 @@ main() {
     return c.future;
   }
 
-  Future testTwoResizes(width1, width2) async {
-    Completer c = new Completer();
-    var first = true;
-    ruler.onResize((width) {
+  Future<Null> testTwoResizes(num width1, num width2) async {
+    Completer<Null> c = new Completer<Null>();
+    bool first = true;
+    ruler.onResize((num width) {
       if (first) {
         expect(width, equals(width1));
         first = false;
@@ -52,54 +52,54 @@ main() {
     test('constructor should init correctly', () {
       expect(ruler, isNotNull);
       expect(ruler.element, isNotNull);
-      expect(ruler.getWidth(), equals(START_WIDTH));
+      expect(ruler.getWidth(), equals(_startWidth));
     });
 
     test('should detect expansion', () async {
-      return testResize(START_WIDTH + 100);
+      return testResize(_startWidth + 100);
     });
 
     test('should detect collapse', () async {
-      return testResize(START_WIDTH - 50);
+      return testResize(_startWidth - 50);
     });
 
     test('should not detect a set to the same width', () async {
       bool failed = false;
-      ruler.onResize((width) {
+      ruler.onResize((num width) {
         failed = true;
       });
-      ruler.setWidth(START_WIDTH);
-      Completer c = new Completer();
+      ruler.setWidth(_startWidth);
+      Completer<Null> c = new Completer<Null>();
       new Timer(new Duration(milliseconds: 20), () {
         expect(failed, isFalse);
-        expect(ruler.getWidth(), equals(START_WIDTH));
+        expect(ruler.getWidth(), equals(_startWidth));
         c.complete();
       });
       return c.future;
     });
 
     test('should detect multiple expansions', () async {
-      return testTwoResizes(START_WIDTH + 100, START_WIDTH + 200);
+      return testTwoResizes(_startWidth + 100, _startWidth + 200);
     });
 
     test('should detect multiple collapses', () async {
-      return testTwoResizes(START_WIDTH - 30, START_WIDTH - 50);
+      return testTwoResizes(_startWidth - 30, _startWidth - 50);
     });
 
     test('should detect an expansion and a collapse', () async {
-      return testTwoResizes(START_WIDTH + 100, START_WIDTH);
+      return testTwoResizes(_startWidth + 100, _startWidth);
     });
 
     test('should detect a collapse and an expansion', () async {
-      return testTwoResizes(START_WIDTH - 30, START_WIDTH);
+      return testTwoResizes(_startWidth - 30, _startWidth);
     });
 
     test('should detect single pixel collapses', () async {
-      return testTwoResizes(START_WIDTH - 1, START_WIDTH - 2);
+      return testTwoResizes(_startWidth - 1, _startWidth - 2);
     });
 
     test('should detect single pixel expansions', () async {
-      return testTwoResizes(START_WIDTH + 1, START_WIDTH + 2);
+      return testTwoResizes(_startWidth + 1, _startWidth + 2);
     });
   });
 }
