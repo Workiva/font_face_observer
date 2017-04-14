@@ -30,10 +30,13 @@ final bool supportsNativeFontLoading = _supportsNativeFontLoading();
 bool _supportsStretch() {
   Element div = document.createElement('div');
   try {
+    // Detect if the browser supports the CSS font-stretch property by trying
+    // to set it on a new empty div. Using condensed will cause an exception
+    // in browsers that don't support it.
     div.style.font = 'condensed 100px sans-serif';
-  } catch (e) {
-    div.style.font = '';
-  }
+  } catch (_) {}
+  // If the font style still has a value, that means the browser accepts
+  // stretch as a valid value and supports it
   return div.style.font != '';
 }
 
