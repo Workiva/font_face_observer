@@ -228,8 +228,6 @@ void main() {
 
     test('should handle async interleaved load and unload calls', () async {
       FontFaceObserver ffo1 = new FontFaceObserver('complex1', group: 'group1');
-      // var ffo2 = new FontFaceObserver('complex2', group: 'group2');
-      // var ffo3 = new FontFaceObserver('complex3', group: 'group1');
       
       // fire this off async
       Future<FontLoadResult> f1 = ffo1.load(_FontUrls.roboto);
@@ -237,18 +235,6 @@ void main() {
       await f1;
       expectKeyNotLoaded(ffo1.key);
       expectGroupNotLoaded(ffo1.group);
-      /*
-      construct 3 different FFOs, same key, different group
-      make load take 1 second
-      call load on FFO1
-      call load on FFO2
-      wait 200ms
-      call await unload group 1
-      it should wait until load finishes, then decrement uses for group 1
-      unload group 2 and it should be removed from the DOM and from the internal map
-      */
-      // fail intentionally until the test is written
-      // expect(1, equals(false));
     });
 
     test('should handle spaces and numbers in font family', () async {
