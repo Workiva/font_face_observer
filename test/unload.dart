@@ -42,7 +42,6 @@ Future<Null> _unloadGroup(String group) async {
 }
 
 Future<Null> _load(_) async {
-  // await Future.wait([loadFont(cfg), loadFont(cfg2), loadFont(cfg3), loadFont(cfg4)]);
   await _loadFont(_cfg);
   _updateCounts();
   await _loadFont(_cfg2);
@@ -71,6 +70,7 @@ Future<Null> _asyncLoadUnload() async {
   await FontFaceObserver.unloadGroup(ffo1.group);
   await f1;
   // The font should be unloaded
+  _updateCounts();
 }
 
 Future<Null> main() async {
