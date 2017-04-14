@@ -1,7 +1,7 @@
 project: static
 language: dart
 
-runner_image: drydock-prod.workiva.net/workiva/smithy-runner-dart:124921
+runner_image: drydock-prod.workiva.net/workiva/smithy-runner-dart:131017 # 1.22.1
 
 env:
   - CODECOV_TOKEN='bQ4MgjJ0G2Y73v8JNX6L7yMK9679nbYB'
