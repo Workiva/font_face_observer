@@ -6,7 +6,7 @@ homepage: https://github.com/Workiva/font_face_observer
 publish_to: https://pub.workiva.org
 
 environment:
-  sdk: '>=1.17.1 <2.0.0'
+  sdk: '>=1.22.1 <2.0.0'
 
 dev_dependencies:
   browser: any
