@@ -220,7 +220,7 @@ class FontFaceObserver {
   /// A [group] of null or only whitespace is invalid and will return zero
   static Future<int> unloadGroup(String group) async {
     // do nothing if no group is passed in
-    if (group == null || group.trim() == '') {
+    if (_isNullOrWhitespace(group)) {
       return 0;
     }
 
@@ -274,25 +274,6 @@ class FontFaceObserver {
 
   /// Returns the group that this FontFaceObserver is in
   String get group => _group;
-  // set group(String group) {
-  //   if (_isNullOrWhitespace(group)) {
-  //     throw new Exception(
-  //         'FontFaceObserver group cannot be null or only whitespace');
-  //   }
-
-  //   if (this._group == group) {
-  //     return;
-  //   }
-
-  //   // update a loaded font to the new group if there is one
-  //   String _key = key;
-  //   if (_loadedFonts.containsKey(_key)) {
-  //     _loadedFonts[_key].incrementGroupCount(group);
-  //     _loadedFonts[_key].decrementGroupCount(this._group);
-  //   }
-
-  //   this._group = group;
-  // }
 
   /// Returns the test string used to detect this font load
   String get testString => _testString;
@@ -305,17 +286,6 @@ class FontFaceObserver {
         _isNullOrWhitespace(newTestString) ? _defaultTestString : newTestString;
   }
 
-  /// Check if the font that this FontFaceObserver represents is loaded.
-  /// If the font is currently loading, this will wait until the load and
-  /// detection are finished before returning.
-  Future<bool> get isLoaded async {
-    _FontRecord record = _loadedFonts[key];
-    if (record == null) {
-      return false;
-    }
-    return (await record.futureLoadResult).isLoaded;
-  }
-
   /// Wait for the font face represented by this FontFaceObserver to become
   /// available in the browser. It will asynchronously return a FontLoadResult
   /// with the result of whether or not the font is loaded or the timeout was
@@ -324,6 +294,11 @@ class FontFaceObserver {
     Timer t;
     if (_result.isCompleted) {
       return _result.future;
+    }
+
+    _FontRecord record = _loadedFonts[key];
+    if (record == null) {
+      return new FontLoadResult(isLoaded: false, didTimeout: false);
     }
 
     if (family != adobeBlankFamily) {
