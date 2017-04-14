@@ -12,7 +12,8 @@ script:
   - pub run dart_dev format --check
   - xvfb-run -s '-screen 0 1024x768x24' pub run dart_dev test -p content-shell
   - xvfb-run -s '-screen 0 1024x768x24' pub run dart_dev coverage --no-html
-
+  - pub run semver_audit report --repo Workiva/font_face_observer
+  
   # Create docs
   - pub run dart_dev docs --no-open
   - tar czvf api.tar.gz -C doc/api .
