@@ -3,9 +3,12 @@ import 'dart:typed_data';
 import 'dart:convert';
 
 /// A utility to create data URLs
-/// Data URLs are genreally of the format
-/// data:[<MIME-type>][;charset=<encoding>][;base64],<data>
-/// further reading: https://en.wikipedia.org/wiki/Data_URI_scheme
+///
+/// Data URLs are generally of the format
+///
+///   data:\[mimeType\] \[;charset=encoding\]\[;base64\],data
+///
+/// [Further Reading on Data URI Scheme](https://en.wikipedia.org/wiki/Data_URI_scheme)
 class DataUri {
   /// The mimetype of the data. If null or empty it will be omitted
   String mimeType;

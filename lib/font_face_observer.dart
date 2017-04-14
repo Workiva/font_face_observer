@@ -32,7 +32,8 @@ class FontLoadResult {
   /// true if timed out while waiting for the font to be loaded
   final bool didTimeout;
 
-  /// Construct a new FontLoadResult
+  /// Constructs a new immutable FontLoadResult with default values
+  /// of [isLoaded] true and [didTimeout] false
   FontLoadResult({this.isLoaded: true, this.didTimeout: false});
 
   @override
@@ -229,7 +230,6 @@ class FontFaceObserver {
     List<String> keysToRemove = new List<String>();
     List<_FontRecord> records = new List<_FontRecord>();
     for (String k in _loadedFonts.keys.toList()) {
-      // _loadedFonts.keys.forEach(await (k) async {
       _FontRecord record = _loadedFonts[k];
       // wait for the load future to complete
       await record.futureLoadResult;
@@ -360,7 +360,6 @@ class FontFaceObserver {
     // if we get here, the font load has timed out
     // make sure the font is unloaded
     _unloadFont(key, record);
-    // TODO return a failed future
     return new FontLoadResult(isLoaded: false, didTimeout: true);
   }
 
