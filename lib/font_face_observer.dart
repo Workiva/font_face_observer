@@ -32,8 +32,8 @@ class FontLoadResult {
   /// true if timed out while waiting for the font to be loaded
   final bool didTimeout;
 
-  /// Constructs a new immutable FontLoadResult with default values
-  /// of [isLoaded] true and [didTimeout] false
+  // ignoring since the constructor is so simple, docs are just redundant
+  // ignore: public_member_api_docs
   FontLoadResult({this.isLoaded: true, this.didTimeout: false});
 
   @override
@@ -189,8 +189,7 @@ class FontFaceObserver {
   /// A global map of unique font key String to _LoadedFont
   static Map<String, _FontRecord> _loadedFonts = new Map<String, _FontRecord>();
 
-  /// The default group used for a font if none is specified. The default group
-  /// name is
+  /// The default group used for a font if none is specified.
   static const String defaultGroup = 'default';
   static Future<FontLoadResult> _adobeBlankLoadedFuture = _loadAdobeBlank();
   static Future<FontLoadResult> _loadAdobeBlank() {
