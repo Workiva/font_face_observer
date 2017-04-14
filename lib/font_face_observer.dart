@@ -152,7 +152,7 @@ class FontFaceObserver {
 
   /// Construct a new FontFaceObserver. The CSS font family name is the only
   /// required parameter.
-  /// 
+  ///
   /// Defaults:
   /// ```
   /// String style: 'normal'
@@ -256,10 +256,10 @@ class FontFaceObserver {
 
   /// Unloads a font by passing in the [key] and [group] that was used to load
   /// it originally. It will decremement the use count for a matching font
-  /// and if no one else is using it, then it will be removed from the browser 
+  /// and if no one else is using it, then it will be removed from the browser
   /// by removing the style element and removing the internal tracking of the
   /// font.
-  /// 
+  ///
   /// Returns true if the font was found and decremented, false if the
   /// key/group combo was not found.
   static Future<bool> unload(String key, String group) async {

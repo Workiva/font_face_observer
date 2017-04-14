@@ -9,9 +9,9 @@ import 'dart:convert';
 /// ```
 ///   data:[mimeType][;charset=encoding][;base64],data
 /// ```
-/// 
+///
 /// [Further Reading on Data URI Scheme](https://en.wikipedia.org/wiki/Data_URI_scheme)
-/// 
+///
 /// Example Usage:
 /// ```
 /// DataUri di = new DataUri();
