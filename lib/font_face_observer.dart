@@ -214,7 +214,8 @@ class FontFaceObserver {
     return loadedGroups;
   }
 
-  /// Decrements the use count of all fonts that are in the given [group]
+  /// Sets the use count for the given [group] to zero for any fonts in that 
+  /// group, then unloads any fonts that are not used any more.
   /// A font will only be actually unloaded from the browser once its use count
   /// is zero. So, if the same font is used by multiple different groups
   /// it will have a count of uses per group and will need to be unloaded from
