@@ -2,13 +2,25 @@ import 'dart:html';
 import 'dart:typed_data';
 import 'dart:convert';
 
-/// A utility to create data URLs
+/// A utility to create data URIs
 ///
-/// Data URLs are generally of the format
+/// Data URIs are generally of the format
 ///
-///   data:\[mimeType\] \[;charset=encoding\]\[;base64\],data
-///
+/// ```
+///   data:[mimeType][;charset=encoding][;base64],data
+/// ```
+/// 
 /// [Further Reading on Data URI Scheme](https://en.wikipedia.org/wiki/Data_URI_scheme)
+/// 
+/// Example Usage:
+/// ```
+/// DataUri di = new DataUri();
+///   ..data = DataUri.base64EncodeString('test');
+///   ..mimeType = 'text/plain';
+///   ..encoding = 'utf-8';
+/// di.toString(); # data:text/plain;charset=utf-8;base64,dGVzdA==
+/// ```
+
 class DataUri {
   /// The mimetype of the data. If null or empty it will be omitted
   String mimeType;

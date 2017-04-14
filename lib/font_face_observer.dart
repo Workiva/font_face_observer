@@ -24,7 +24,7 @@ const String _defaultTestString = 'BESbswy';
 const String _normal = 'normal';
 const int _nativeFontLoadingCheckInterval = 50;
 
-/// A simple immutable container object for font load result data
+/// A simple immutable container object for font load result data.
 class FontLoadResult {
   /// true if the font is loaded successfully, false otherwise
   final bool isLoaded;
@@ -120,17 +120,6 @@ class _FontRecord {
 /// request, you can handle the networking part yourself and then still use
 /// FontFaceObserver to detect when it is ready by passing in the font as a
 /// base64 data or Blob URI.
-///
-/// Example Usage:
-/// FontFaceObserver ffo = new FontFaceObserver('Arial', weight: 'bold');
-/// FontLoadResult result = await ffo.load('/url/to/arial.ttf');
-/// if (result.isLoaded) {
-///     // at this point we're absolutely sure that the font has loaded
-/// }
-/// if (result.didTimeout) {
-///     // We've timed out and are not sure if the font has loaded.
-///     // You can reissue a ffo.check() call to check again if you want
-/// }
 class FontFaceObserver {
   /// CSS font family
   String family;
@@ -161,7 +150,19 @@ class FontFaceObserver {
   /// The completer representing the load status of this font
   Completer<FontLoadResult> _result = new Completer<FontLoadResult>();
 
-  /// Construct a new FontFaceObserver.
+  /// Construct a new FontFaceObserver. The CSS font family name is the only
+  /// required parameter.
+  /// 
+  /// Defaults:
+  /// ```
+  /// String style: 'normal'
+  /// String weight: 'normal'
+  /// String stretch: 'normal'
+  /// String testString: 'BESbswy'
+  /// int timeout: 3000
+  /// bool useSimulatedLoadEvents: false
+  /// ```
+
   FontFaceObserver(this.family,
       {this.style: _normal,
       this.weight: _normal,
@@ -188,7 +189,8 @@ class FontFaceObserver {
   /// A global map of unique font key String to _LoadedFont
   static Map<String, _FontRecord> _loadedFonts = new Map<String, _FontRecord>();
 
-  /// The default group used for a font if not is specified
+  /// The default group used for a font if none is specified. The default group
+  /// name is
   static const String defaultGroup = 'default';
   static Future<FontLoadResult> _adobeBlankLoadedFuture = _loadAdobeBlank();
   static Future<FontLoadResult> _loadAdobeBlank() {
@@ -252,8 +254,14 @@ class FontFaceObserver {
     return keysToRemove.length;
   }
 
-  /// Unloads a font by unique key from the browser by removing the style
-  /// element and removing the internal tracking of the font
+  /// Unloads a font by passing in the [key] and [group] that was used to load
+  /// it originally. It will decremement the use count for a matching font
+  /// and if no one else is using it, then it will be removed from the browser 
+  /// by removing the style element and removing the internal tracking of the
+  /// font.
+  /// 
+  /// Returns true if the font was found and decremented, false if the
+  /// key/group combo was not found.
   static Future<bool> unload(String key, String group) async {
     if (_loadedFonts.containsKey(key)) {
       _FontRecord record = _loadedFonts[key];

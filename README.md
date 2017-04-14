@@ -6,6 +6,9 @@ It wil use the FontFace api if available, otherwise it falls back to a Dart port
 # Usage Example
 
 ```dart
+import 'package:font_face_observer/font_face_observer.dart';
+import 'package:font_face_observer/data_uri.dart';
+
 FontFaceObserver ffo = new FontFaceObserver('Arial', weight: 'bold');
 FontLoadResult result = await ffo.load('/url/to/arial.ttf');
 if (result.isLoaded) {
@@ -15,6 +18,13 @@ if (result.didTimeout) {
     // We've timed out and are not sure if the font has loaded.
     // You can reissue a ffo.check() call to check again if you want
 }
+
+// Build a base64 encoded data URI
+DataUri di = new DataUri();
+  ..data = DataUri.base64EncodeString('test');
+  ..mimeType = 'text/plain';
+  ..encoding = 'utf-8';
+di.toString(); # data:text/plain;charset=utf-8;base64,dGVzdA==
 ```
 
 # Run the demo

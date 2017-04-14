@@ -15,6 +15,11 @@ dev_dependencies:
   coverage: ^0.7.0
   dart_style: ^0.2.0
   dartdoc: 0.9.13
+  semver_audit:
+    hosted:
+      name: semver_audit
+      url: https://pub.workiva.org
+    version: ^1.0.0
 
 transformers:
 - $dart2js:

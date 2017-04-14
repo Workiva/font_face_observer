@@ -15,14 +15,15 @@ limitations under the License.
 */
 import 'dart:html';
 
-/// If the current browser has the webkit fallback bug
+/// Is true if this browser is WebKit and it has the fallback bug
+/// which is present in WebKit 536.11 and earlier.
 final bool hasWebkitFallbackBug =
     _hasWebKitFallbackBug(window.navigator.userAgent);
 
-/// If the current browser supports the CSS font face stretch property
+/// Is true if the current browser supports the CSS font face stretch property
 final bool supportsStretch = _supportsStretch();
 
-/// If the current browser supports the Font Face API
+/// Is true if the current browser supports the Font Face API
 final bool supportsNativeFontLoading = _supportsNativeFontLoading();
 
 /// Returns true if the browser supports font-style in the font short-hand syntax.
