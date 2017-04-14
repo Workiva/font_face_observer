@@ -65,7 +65,7 @@ class _FontRecord {
     } else {
       groupUses[group] = 1;
     }
-    _recalc();
+    _updateGroupUseCounts();
     return groupUses[group];
   }
 
@@ -81,7 +81,7 @@ class _FontRecord {
     } else {
       groupUses.remove(group);
     }
-    _recalc();
+    _updateGroupUseCounts();
     return groupUses[group];
   }
 
@@ -97,7 +97,9 @@ class _FontRecord {
 
   /// Recalculcate the sum of total uses and total list of groups for this
   /// font record and update the data-groups attribute on the style element.
-  void _recalc() {
+  /// It then "caches" the total number of uses in the [uses] property
+  /// so we don't have to sum every time we want to check # of uses.
+  void _updateGroupUseCounts() {
     if (groupUses.length > 0) {
       uses = groupUses.values.reduce((int a, int b) => a + b);
     } else {
@@ -236,7 +238,7 @@ class FontFaceObserver {
 
       if (record.isInGroup(group)) {
         record.groupUses.remove(group);
-        record._recalc();
+        record._updateGroupUseCounts();
         if (record.uses <= 0) {
           keysToRemove.add(k);
           records.add(record);
