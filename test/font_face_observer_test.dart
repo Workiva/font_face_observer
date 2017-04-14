@@ -174,12 +174,13 @@ void main() {
       expect(await FontFaceObserver.unload(key, ffo.group), isTrue);
       expect(styleElement.dataset['uses'],'2');
 
-      // unload the 2nd load
+      // unload the font from the 2nd ffo
       expect(await FontFaceObserver.unload(ffo2.key, ffo2.group), isTrue);
       expect(styleElement.dataset['uses'],'1');
 
       // unload it completely
       expect(await FontFaceObserver.unload(key, ffo.group), isTrue);
+      
       // unload it again, should not go negative
       expect(await FontFaceObserver.unload(key, ffo.group), isFalse);
       expect(querySelector('style[data-key="${key}"]'), isNull);
