@@ -1,7 +1,7 @@
 project: static
 language: dart
 
-runner_image: drydock-prod.workiva.org/workiva/smithy-runner-dart:91483
+runner_image: drydock-prod.workiva.net/workiva/smithy-runner-dart:131017 # 1.22.1
 
 env:
   - CODECOV_TOKEN='bQ4MgjJ0G2Y73v8JNX6L7yMK9679nbYB'
@@ -12,10 +12,11 @@ script:
   - pub run dart_dev format --check
   - xvfb-run -s '-screen 0 1024x768x24' pub run dart_dev test -p content-shell
   - xvfb-run -s '-screen 0 1024x768x24' pub run dart_dev coverage --no-html
-
+  - pub run semver_audit report --repo Workiva/font_face_observer
+  
   # Create docs
-  # - pub run dart_dev docs --no-open
-  # - tar czvf api.tar.gz -C doc/api .
+  - pub run dart_dev docs --no-open
+  - tar czvf api.tar.gz -C doc/api .
 
   # Build assets
   - pub build test
@@ -37,5 +38,5 @@ artifacts:
     - ./font_face_observer.pub.tgz
   dart-dependencies: # For RM dependency tracking
     - ./pubspec.lock
-  # documentation:
-  #   - api.tar.gz
+  documentation:
+    - api.tar.gz

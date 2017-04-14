@@ -7,19 +7,29 @@
   <title>Font Load / Unload</title>
   
 </head>
-<body>
+<body bgcolor="#ffeb3b">
   <h1>Memory / Perf Analysis</h1>
+  <li>GC and take an initial snapshot
+  <li><button id="loadBtn">Load a bunch of fonts</button>
+  <li>GC and take 2nd snapshot (to see what was added)
+  <li><button id="unloadBtn">Unload Roboto_1</button>
+  <li><button id="unloadGroupBtn">Unload group_A</button>
+  <li><button id="unloadGroupBtnB">Unload group_B</button>
+  <li><button id="asyncBtn">Async load Roboto_2 in group_A, then unload group_A</button>
   <li>Force garbage collection
-  <li>Take an initial snapshot
-  <li>Click <button id="loadBtn">Load</button>
-  <li>Force garbage collection
-  <li>Take 2nd snapshot (to see what was added)
-  <li>Click <button id="unloadBtn">Unload</button> or <button id="unloadGroupBtn">Unload Group</button>
-  <li>Force garbage collection
-  <li>Snapshot, should unload everything!
-  <li><span id="ffo_elements"></span> font faces loaded
+  <li>Snapshot, should unload everything (except AdobeBlank)!
+  <hr>
+  <li><span id="ffo_elements"></span> font face style elements
   <li><span id="ffo_temp_elements"></span> font face observer temp DOM nodes.
-  <li>font groups loaded: <span id="ffo_groups"></span>
+  <li>loaded font keys:<span id="ffo_keys"></span>
+  <li>loaded font groups: <span id="ffo_groups"></span>
+
+  <br><br>
+  <div>The text below will update as fonts are loaded / unloaded</div>
+  <div style="font-family: Roboto_1, Times New Roman">Roboto_1 default group</div>
+  <div style="font-family: Roboto_2, Times New Roman">Roboto_2 group_A &amp; group_B</div>
+  <div style="font-family: Roboto_3, Times New Roman">Roboto_3 group_A</div>
+  
   <script type="application/dart" src="unload.dart"></script>
   <script src="../packages/browser/dart.js"></script>
 </body>

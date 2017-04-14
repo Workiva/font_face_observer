@@ -6,7 +6,7 @@ homepage: https://github.com/Workiva/font_face_observer
 publish_to: https://pub.workiva.org
 
 environment:
-  sdk: '>=1.17.1 <2.0.0'
+  sdk: '>=1.22.1 <2.0.0'
 
 dev_dependencies:
   browser: any
@@ -14,6 +14,12 @@ dev_dependencies:
   test: ^0.12.0
   coverage: ^0.7.0
   dart_style: ^0.2.0
+  dartdoc: 0.9.13
+  semver_audit:
+    hosted:
+      name: semver_audit
+      url: https://pub.workiva.org
+    version: ^1.0.0
 
 transformers:
 - $dart2js:

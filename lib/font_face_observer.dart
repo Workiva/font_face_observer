@@ -19,22 +19,21 @@ import 'package:font_face_observer/support.dart';
 import 'package:font_face_observer/src/ruler.dart';
 import 'package:font_face_observer/src/adobe_blank.dart';
 
-const int DEFAULT_TIMEOUT = 3000;
-const String DEFAULT_TEST_STRING = 'BESbswy';
-const String _NORMAL = 'normal';
-const int _NATIVE_FONT_LOADING_CHECK_INTERVAL = 50;
+const int _defaultTimeout = 3000;
+const String _defaultTestString = 'BESbswy';
+const String _normal = 'normal';
+const int _nativeFontLoadingCheckInterval = 50;
 
-Future<FontLoadResult> _adobeBlankLoadedFuture = _loadAdobeBlank();
-
-Future<FontLoadResult> _loadAdobeBlank() {
-  return (new FontFaceObserver(AdobeBlankFamily, group: AdobeBlankFamily))
-      .load(AdobeBlankFontBase64Url);
-}
-
-/// Simple container object for result data
+/// A simple immutable container object for font load result data.
 class FontLoadResult {
+  /// true if the font is loaded successfully, false otherwise
   final bool isLoaded;
+
+  /// true if timed out while waiting for the font to be loaded
   final bool didTimeout;
+
+  // ignoring since the constructor is so simple, docs are just redundant
+  // ignore: public_member_api_docs
   FontLoadResult({this.isLoaded: true, this.didTimeout: false});
 
   @override
@@ -42,48 +41,141 @@ class FontLoadResult {
       'FontLoadResult {isLoaded: $isLoaded, didTimeout: $didTimeout}';
 }
 
-/// holds data about each loaded font
-class _LoadedFont {
-  final StyleElement element;
-  String group;
+/// A [_FontRecord] holds data about each loaded font.
+/// Each distinct font will have only 1 entry in the _loadedFonts map
+/// of the font key -> _FontRecord
+class _FontRecord {
   int _uses = 0;
-  _LoadedFont(this.element, {this.group: FontFaceObserver.defaultGroup});
+  StyleElement styleElement;
+  Map<String, int> groupUses = new Map<String, int>();
+  Future<FontLoadResult> futureLoadResult;
 
   int get uses => _uses;
-  void set uses(int new_uses) {
-    _uses = new_uses;
-    element.dataset['uses'] = _uses.toString();
+  set uses(int newUses) {
+    _uses = newUses;
+    styleElement.dataset['uses'] = _uses.toString();
+  }
+
+  int incrementGroupCount(String group) {
+    if (_isNullOrWhitespace(group)) {
+      return groupUses[group];
+    }
+    if (groupUses.containsKey(group)) {
+      groupUses[group]++;
+    } else {
+      groupUses[group] = 1;
+    }
+    _updateGroupUseCounts();
+    return groupUses[group];
+  }
+
+  int decrementGroupCount(String group) {
+    if (_isNullOrWhitespace(group)) {
+      return groupUses[group];
+    }
+    if (groupUses.containsKey(group)) {
+      groupUses[group]--;
+      if (groupUses[group] <= 0) {
+        groupUses.remove(group);
+      }
+    } else {
+      groupUses.remove(group);
+    }
+    _updateGroupUseCounts();
+    return groupUses[group];
+  }
+
+  bool isInGroup(String group) {
+    if (_isNullOrWhitespace(group)) {
+      return false;
+    }
+    if (groupUses.containsKey(group)) {
+      return groupUses[group] > 0;
+    }
+    return false;
+  }
+
+  /// Recalculcate the sum of total uses and total list of groups for this
+  /// font record and update the data-groups attribute on the style element.
+  /// It then "caches" the total number of uses in the [uses] property
+  /// so we don't have to sum every time we want to check # of uses.
+  void _updateGroupUseCounts() {
+    if (groupUses.length > 0) {
+      uses = groupUses.values.reduce((int a, int b) => a + b);
+    } else {
+      uses = 0;
+      groupUses.clear();
+    }
+    String groupData = '';
+    for (String group in groupUses.keys) {
+      groupData += '$group(${groupUses[group]}) ';
+    }
+    styleElement.dataset['groups'] = groupData;
   }
 }
 
+/// A FontFaceObserver is responsible for loading and detecting when a font
+/// has been successfully loaded into the browser and is ready for use in the
+/// DOM or drawn into a canvas. If you need to load fonts with an authenticated
+/// request, you can handle the networking part yourself and then still use
+/// FontFaceObserver to detect when it is ready by passing in the font as a
+/// base64 data or Blob URI.
 class FontFaceObserver {
-  static const String defaultGroup = "default";
+  /// CSS font family
   String family;
+
+  /// CSS font style
   String style;
+
+  /// CSS font weight
   String weight;
+
+  /// CSS font stretch
   String stretch;
+
+  /// The internal test string to use when detecting font loads
   String _testString;
+
+  /// How long to wait in ms when detecting font loads before timing out
   int timeout;
+
+  /// true forces simulated font load events, false will auto-detect the
+  /// capability of the browser and only use simulated if the Font Face API
+  /// is not supported
   bool useSimulatedLoadEvents;
+
+  /// The internal group name
   String _group;
-  Completer _result = new Completer();
 
-  /// A map of font key String to _LoadedFont
-  static Map<String, _LoadedFont> _loadedFonts = new Map<String, _LoadedFont>();
+  /// The completer representing the load status of this font
+  Completer<FontLoadResult> _result = new Completer<FontLoadResult>();
 
-  FontFaceObserver(String this.family,
-      {String this.style: _NORMAL,
-      String this.weight: _NORMAL,
-      String this.stretch: _NORMAL,
-      String testString: DEFAULT_TEST_STRING,
-      int this.timeout: DEFAULT_TIMEOUT,
-      bool this.useSimulatedLoadEvents: false,
+  /// Construct a new FontFaceObserver. The CSS font family name is the only
+  /// required parameter.
+  ///
+  /// Defaults:
+  /// ```
+  /// String style: 'normal'
+  /// String weight: 'normal'
+  /// String stretch: 'normal'
+  /// String testString: 'BESbswy'
+  /// int timeout: 3000
+  /// bool useSimulatedLoadEvents: false
+  /// ```
+
+  FontFaceObserver(this.family,
+      {this.style: _normal,
+      this.weight: _normal,
+      this.stretch: _normal,
+      String testString: _defaultTestString,
+      this.timeout: _defaultTimeout,
+      this.useSimulatedLoadEvents: false,
       String group: defaultGroup}) {
-    if (key != AdobeBlankKey && !_loadedFonts.containsKey(AdobeBlankKey)) {
+    if (key != adobeBlankKey && !_loadedFonts.containsKey(adobeBlankKey)) {
       _adobeBlankLoadedFuture = _loadAdobeBlank();
     }
     this.testString = testString;
-    this.group = group;
+    this._group = _isNullOrWhitespace(group) ? defaultGroup : group;
     if (family != null) {
       family = family.trim();
       bool hasStartQuote = family.startsWith('"') || family.startsWith("'");
@@ -94,87 +186,114 @@ class FontFaceObserver {
     }
   }
 
+  /// A global map of unique font key String to _LoadedFont
+  static Map<String, _FontRecord> _loadedFonts = new Map<String, _FontRecord>();
+
+  /// The default group used for a font if none is specified.
+  static const String defaultGroup = 'default';
+  static Future<FontLoadResult> _adobeBlankLoadedFuture = _loadAdobeBlank();
+  static Future<FontLoadResult> _loadAdobeBlank() {
+    return (new FontFaceObserver(adobeBlankFamily, group: adobeBlankFamily))
+        .load(adobeBlankFontBase64Url);
+  }
+
+  /// Returns the font keys for all currently loaded fonts
+  static Iterable<String> getLoadedFontKeys() {
+    return _loadedFonts.keys.toSet();
+  }
+
+  /// Returns the groups that the currently loaded fonts are in.
+  /// There will not be duplicate group entries if there are multiple fonts
+  /// in the same group.
+  static Iterable<String> getLoadedGroups() {
+    Set<String> loadedGroups = new Set<String>();
+    _loadedFonts.keys.forEach((String k) {
+      _FontRecord record = _loadedFonts[k];
+      loadedGroups.addAll(record.groupUses.keys);
+    });
+    return loadedGroups;
+  }
+
+  /// Sets the use count for the given [group] to zero for any fonts in that
+  /// group, then unloads any fonts that are not used any more.
+  /// A font will only be actually unloaded from the browser once its use count
+  /// is zero. So, if the same font is used by multiple different groups
+  /// it will have a count of uses per group and will need to be unloaded from
+  /// each group to truly unload it from the browser.
+  ///
+  /// Returns the number of fonts that have been affected.
+  /// A [group] of null or only whitespace is invalid and will return zero
+  static Future<int> unloadGroup(String group) async {
+    // do nothing if no group is passed in
+    if (_isNullOrWhitespace(group)) {
+      return 0;
+    }
+
+    // parallel arrays of keys and groups that go along with the keys at the
+    // same indexes.
+    List<String> keysToRemove = new List<String>();
+    List<_FontRecord> records = new List<_FontRecord>();
+    for (String k in _loadedFonts.keys.toList()) {
+      _FontRecord record = _loadedFonts[k];
+      // wait for the load future to complete
+      await record.futureLoadResult;
+
+      if (record.isInGroup(group)) {
+        record.groupUses.remove(group);
+        record._updateGroupUseCounts();
+        if (record.uses <= 0) {
+          keysToRemove.add(k);
+          records.add(record);
+        }
+      }
+    }
+    for (int k = 0; k < keysToRemove.length; k++) {
+      _unloadFont(keysToRemove[k], records[k]);
+    }
+
+    return keysToRemove.length;
+  }
+
+  /// Unloads a font by passing in the [key] and [group] that was used to load
+  /// it originally. It will decremement the use count for a matching font
+  /// and if no one else is using it, then it will be removed from the browser
+  /// by removing the style element and removing the internal tracking of the
+  /// font.
+  ///
+  /// Returns true if the font was found and decremented, false if the
+  /// key/group combo was not found.
+  static Future<bool> unload(String key, String group) async {
+    if (_loadedFonts.containsKey(key)) {
+      _FontRecord record = _loadedFonts[key];
+      // wait for the load future to complete
+      await record.futureLoadResult;
+
+      record.decrementGroupCount(group);
+
+      if (record.uses <= 0) {
+        _unloadFont(key, record);
+      }
+
+      return true;
+    }
+    return false;
+  }
+
+  /// Returns the key for this FontFaceObserver
   String get key => '${family}_${style}_${weight}_${stretch}';
 
+  /// Returns the group that this FontFaceObserver is in
   String get group => _group;
-  void set group(String group) {
-    if (group == null || group == '' || group.trim() == '') {
-      throw new Exception(
-          'FontFaceObserver group cannot be null or whitespace only');
-    }
-    this._group = group;
 
-    // update a loaded font to the new group if there is one
-    var _key = key;
-    if (_loadedFonts.containsKey(_key)) {
-      _loadedFonts[_key].group = group;
-    }
-  }
-
+  /// Returns the test string used to detect this font load
   String get testString => _testString;
 
+  /// Sets the test string to be used when detecting this font load
+  /// If [newTestString] is null or only whitespace, the default test string
+  /// will be used.
   set testString(String newTestString) {
-    this._testString = newTestString;
-    if (_testString == null) {
-      _testString = DEFAULT_TEST_STRING;
-    }
-    _testString = _testString.trim();
-    if (_testString.length == 0) {
-      _testString = DEFAULT_TEST_STRING;
-    }
-  }
-
-  _LoadedFont _getLoadedFont(String url) {
-    StyleElement styleElement;
-    String _key = key;
-    _LoadedFont loadedFont;
-    if (_loadedFonts.containsKey(_key)) {
-      loadedFont = _loadedFonts[_key];
-    } else {
-      var rule = '''
-      @font-face {
-        font-family: "${family}";
-        font-style: ${style};
-        font-weight: ${weight};
-        src: url(${url});
-      }''';
-      styleElement = new StyleElement()
-        ..className = '_ffo'
-        ..text = rule
-        ..dataset['key'] = _key;
-
-      if (group != null && group.length > 0) {
-        styleElement.dataset['group'] = group;
-      }
-      loadedFont = new _LoadedFont(styleElement, group: group);
-      _loadedFonts[_key] = loadedFont;
-      document.head.append(styleElement);
-    }
-    return loadedFont;
-  }
-
-  String _getStyle(String family, {cssSize: '100px'}) {
-    var _stretch = SUPPORTS_STRETCH ? stretch : '';
-    return '$style $weight $_stretch $cssSize $family';
-  }
-
-  /// This gets called when the timeout has been reached.
-  /// It will cancel the passed in Timer if it is still active and
-  /// complete the result with a timed out FontLoadResult
-  void _onTimeout(Timer t) {
-    if (t != null && t.isActive) {
-      t.cancel();
-    }
-    if (!_result.isCompleted) {
-      _result.complete(new FontLoadResult(isLoaded: false, didTimeout: true));
-    }
-  }
-
-  _periodicallyCheckDocumentFonts(Timer t) {
-    if (document.fonts.check(_getStyle('"$family"'), testString)) {
-      t.cancel();
-      _result.complete(new FontLoadResult(isLoaded: true, didTimeout: false));
-    }
+    _testString =
+        _isNullOrWhitespace(newTestString) ? _defaultTestString : newTestString;
   }
 
   /// Wait for the font face represented by this FontFaceObserver to become
@@ -187,11 +306,16 @@ class FontFaceObserver {
       return _result.future;
     }
 
-    if (family != AdobeBlankFamily) {
+    _FontRecord record = _loadedFonts[key];
+    if (record == null) {
+      return new FontLoadResult(isLoaded: false, didTimeout: false);
+    }
+
+    if (family != adobeBlankFamily) {
       await _adobeBlankLoadedFuture;
     }
 
-    // Since browsers may not load a font until it is actually used
+    // Since browsers may not load a font until it is actually used (lazily loaded)
     // We add this span to trigger the browser to load the font when used
     String _key = '_ffo_dummy_${key}';
     SpanElement dummy = document.getElementById(_key);
@@ -206,9 +330,9 @@ class FontFaceObserver {
 
     // if the browser supports FontFace API set up an interval to check if
     // the font is loaded
-    if (SUPPORTS_NATIVE_FONT_LOADING && !useSimulatedLoadEvents) {
+    if (supportsNativeFontLoading && !useSimulatedLoadEvents) {
       t = new Timer.periodic(
-          new Duration(milliseconds: _NATIVE_FONT_LOADING_CHECK_INTERVAL),
+          new Duration(milliseconds: _nativeFontLoadingCheckInterval),
           _periodicallyCheckDocumentFonts);
     } else {
       t = _simulateFontLoadEvents();
@@ -224,20 +348,115 @@ class FontFaceObserver {
     });
   }
 
+  /// Load the font into the browser given a url that could be a network url
+  /// or a pre-built data or blob url.
+  Future<FontLoadResult> load(String url) async {
+    _FontRecord record = _load(url);
+    if (_result.isCompleted) {
+      return _result.future;
+    }
+
+    try {
+      FontLoadResult flr = await check();
+      if (flr.isLoaded) {
+        return _result.future;
+      }
+    } catch (x) {
+      // On errors, make sure the font is unloaded
+      _unloadFont(key, record);
+      return new FontLoadResult(isLoaded: false, didTimeout: false);
+    }
+
+    // if we get here, the font load has timed out
+    // make sure the font is unloaded
+    _unloadFont(key, record);
+    return new FontLoadResult(isLoaded: false, didTimeout: true);
+  }
+
+  /// Loads the font by either returning the existing _FontRecord if a font is
+  /// already loaded (and incrementing its use count)
+  /// or by adding a new style element to the DOM to load the font with an
+  /// initial use count of 1.
+  _FontRecord _load(String url) {
+    StyleElement styleElement;
+    String _key = key;
+    _FontRecord record;
+    if (_loadedFonts.containsKey(_key)) {
+      record = _loadedFonts[_key];
+    } else {
+      String rule = '''
+      @font-face {
+        font-family: "${family}";
+        font-style: ${style};
+        font-weight: ${weight};
+        src: url(${url});
+      }''';
+
+      styleElement = new StyleElement()
+        ..className = '_ffo'
+        ..text = rule
+        ..dataset['key'] = _key;
+
+      record = new _FontRecord()
+        ..styleElement = styleElement
+        ..futureLoadResult = _result.future;
+
+      _loadedFonts[_key] = record;
+      document.head.append(styleElement);
+    }
+    record.incrementGroupCount(group);
+    return record;
+  }
+
+  /// Generates the CSS style string to be used when detecting a font load
+  /// for a given [family] at a certain [cssSize] (default 100px)
+  String _getStyle(String family, {String cssSize: '100px'}) {
+    String _stretch = supportsStretch ? stretch : '';
+    return '$style $weight $_stretch $cssSize $family';
+  }
+
+  /// This gets called when the timeout has been reached.
+  /// It will cancel the passed in Timer if it is still active and
+  /// complete the result with a timed out FontLoadResult
+  void _onTimeout(Timer t) {
+    if (t != null && t.isActive) {
+      t.cancel();
+    }
+    if (!_result.isCompleted) {
+      _result.complete(new FontLoadResult(isLoaded: false, didTimeout: true));
+    }
+  }
+
+  /// Checks is a font is loaded in the browser using the browser
+  /// built in Font Face API. If it is loaded, the passed in Timer [t] will
+  /// be cancelled. If the font is not loaded, this is a no-op.
+  void _periodicallyCheckDocumentFonts(Timer t) {
+    if (document.fonts.check(_getStyle('"$family"'), testString)) {
+      t.cancel();
+      _result.complete(new FontLoadResult(isLoaded: true, didTimeout: false));
+    }
+  }
+
+  /// Simulate Font Face API load events to detect when a font is loaded and
+  /// ready in the browser. It does this with a series of "rulers" that at least
+  /// one of which will trigger a scroll event when the font loads and the
+  /// dimensions of the test string change. These rulers are checked periodically
+  /// waiting for the font to become available. The Timer is returned so it may
+  /// be cancelled and not check infinitely.
   Timer _simulateFontLoadEvents() {
-    var _rulerSansSerif = new Ruler(testString);
-    var _rulerSerif = new Ruler(testString);
-    var _rulerMonospace = new Ruler(testString);
+    Ruler _rulerSansSerif = new Ruler(testString);
+    Ruler _rulerSerif = new Ruler(testString);
+    Ruler _rulerMonospace = new Ruler(testString);
 
-    var widthSansSerif = -1;
-    var widthSerif = -1;
-    var widthMonospace = -1;
+    num widthSansSerif = -1;
+    num widthSerif = -1;
+    num widthMonospace = -1;
 
-    var fallbackWidthSansSerif = -1;
-    var fallbackWidthSerif = -1;
-    var fallbackWidthMonospace = -1;
+    num fallbackWidthSansSerif = -1;
+    num fallbackWidthSerif = -1;
+    num fallbackWidthMonospace = -1;
 
-    var container = document.createElement('div');
+    Element container = document.createElement('div');
 
     // Internal check function
     // -----------------------
@@ -252,7 +471,7 @@ class FontFaceObserver {
     // 3) WebKit bug: both a, b and c are called and have the same value, but the
     //    values are equal to one of the last resort fonts, we ignore this and
     //    continue waiting until we get new values (or a timeout).
-    _checkWidths() {
+    void _checkWidths() {
       if ((widthSansSerif != -1 && widthSerif != -1) ||
           (widthSansSerif != -1 && widthMonospace != -1) ||
           (widthSerif != -1 && widthMonospace != -1)) {
@@ -260,7 +479,7 @@ class FontFaceObserver {
             widthSansSerif == widthMonospace ||
             widthSerif == widthMonospace) {
           // All values are the same, so the browser has most likely loaded the web font
-          if (HAS_WEBKIT_FALLBACK_BUG) {
+          if (hasWebkitFallbackBug) {
             // Except if the browser has the WebKit fallback bug, in which case we check to see if all
             // values are set to one of the last resort fonts.
 
@@ -306,21 +525,21 @@ class FontFaceObserver {
     fallbackWidthSerif = _rulerSerif.getWidth();
     fallbackWidthMonospace = _rulerMonospace.getWidth();
 
-    _rulerSansSerif.onResize((width) {
+    _rulerSansSerif.onResize((num width) {
       widthSansSerif = width;
       _checkWidths();
     });
 
     _rulerSansSerif.setFont(_getStyle('"$family",AdobeBlank,sans-serif'));
 
-    _rulerSerif.onResize((width) {
+    _rulerSerif.onResize((num width) {
       widthSerif = width;
       _checkWidths();
     });
 
     _rulerSerif.setFont(_getStyle('"$family",AdobeBlank,serif'));
 
-    _rulerMonospace.onResize((width) {
+    _rulerMonospace.onResize((num width) {
       widthMonospace = width;
       _checkWidths();
     });
@@ -340,71 +559,14 @@ class FontFaceObserver {
     });
   }
 
-  /// Load the font into the browser given a url that could be a network url
-  /// or a pre-built data or blob url.
-  Future<FontLoadResult> load(String url) async {
-    _LoadedFont loadedFont = _getLoadedFont(url);
-    loadedFont.uses++;
-
-    if (_result.isCompleted) {
-      return _result.future;
-    }
-
-    return check();
+  // Internal method to forcibly remove the font. It removes all DOM references
+  // and removes the font from internal tracking.
+  static void _unloadFont(String key, _FontRecord record) {
+    record.styleElement.remove();
+    _loadedFonts.remove(key);
   }
+}
 
-  /// A synchronous option for checking if the font that this FontFaceObserver
-  /// instance represents is loaded
-  bool get isLoaded {
-    var loadedFont = _loadedFonts[key];
-    return loadedFont != null && loadedFont.uses > 0;
-  }
-
-  /// A list of font keys for all currently loaded fonts
-  static Iterable<String> getLoadedFontKeys() {
-    return _loadedFonts.keys.toSet();
-  }
-
-  /// A list of groups that the currently loaded fonts are in
-  /// There will not be duplicate group entries if there are multiple fonts
-  /// in the same group.
-  static Iterable<String> getLoadedGroups() {
-    Set<String> loadedGroups = new Set<String>();
-    _loadedFonts.keys.forEach((k) {
-      var loadedFont = _loadedFonts[k];
-      loadedGroups.add(loadedFont.group);
-    });
-    return loadedGroups;
-  }
-
-  /// Removes all fonts that are in the given [group]
-  static int unloadGroup(String group) {
-    if (group == null || group == "") {
-      return 0;
-    }
-    var keysToRemove = [];
-    _loadedFonts.keys.forEach((k) {
-      var loadedFont = _loadedFonts[k];
-      if (loadedFont.group == group) {
-        keysToRemove.add(k);
-      }
-    });
-    keysToRemove.forEach(FontFaceObserver.unload);
-    return keysToRemove.length;
-  }
-
-  /// Unloads a font by unique key from the browser by removing the style
-  /// element and removing the internal tracking of the font
-  static bool unload(String key) {
-    if (_loadedFonts.containsKey(key)) {
-      var loadedFont = _loadedFonts[key];
-      if (loadedFont.uses <= 1) {
-        loadedFont.element.remove();
-        _loadedFonts.remove(key);
-      }
-      loadedFont.uses--;
-      return true;
-    }
-    return false;
-  }
+bool _isNullOrWhitespace(String s) {
+  return s == null || s.trim().isEmpty;
 }

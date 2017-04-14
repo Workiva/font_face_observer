@@ -2,68 +2,82 @@ import 'dart:html';
 import 'dart:async';
 import 'package:font_face_observer/font_face_observer.dart';
 
-String groupName = "group_A";
-var cfg = new FontConfig(family: 'Roboto_1', url: '/fonts/Roboto.ttf', useSimulatedLoadEvents: true);
-var cfg2 = new FontConfig(family: 'Roboto_2', url: '/fonts/Roboto.ttf', group: groupName);
-var cfg3 = new FontConfig(family: 'Roboto_3', url: '/fonts/Roboto.ttf', group: groupName);
+String _groupA = "group_A";
+String _groupB = "group_B";
+_FontConfig _cfg = new _FontConfig(family: 'Roboto_1', url: '/fonts/Roboto.ttf', useSimulatedLoadEvents: true);
+_FontConfig _cfg2 = new _FontConfig(family: 'Roboto_2', url: '/fonts/Roboto.ttf', group: _groupA);
+_FontConfig _cfg3 = new _FontConfig(family: 'Roboto_3', url: '/fonts/Roboto.ttf', group: _groupA);
+_FontConfig _cfg4 = new _FontConfig(family: 'Roboto_2', url: '/fonts/Roboto.ttf', group: _groupB);
 
-ButtonElement unloadButton = document.getElementById('unloadBtn');
-ButtonElement unloadGroupButton = document.getElementById('unloadGroupBtn');
-ButtonElement loadButton = document.getElementById('loadBtn');
+ButtonElement _unloadButton = document.getElementById('unloadBtn');
+ButtonElement _unloadGroupButton = document.getElementById('unloadGroupBtn');
+ButtonElement _unloadGroupButtonB = document.getElementById('unloadGroupBtnB');
+ButtonElement _loadButton = document.getElementById('loadBtn');
+ButtonElement _asyncBtn = document.getElementById('asyncBtn');
 
-class FontConfig {
+class _FontConfig {
   String url;
   String family;
   String group;
   bool useSimulatedLoadEvents;
   bool expectLoad;
-  FontConfig({this.family, this.url, this.useSimulatedLoadEvents: false, this.group: FontFaceObserver.defaultGroup});
+  _FontConfig({this.family, this.url, this.useSimulatedLoadEvents: false, this.group: FontFaceObserver.defaultGroup});
   String key;
 }
 
-loadFont(FontConfig cfg) async {
-  var ffo = new FontFaceObserver(cfg.family, useSimulatedLoadEvents: cfg.useSimulatedLoadEvents, timeout: 500, group: cfg.group);
+Future<FontLoadResult> _loadFont(_FontConfig cfg) async {
+  FontFaceObserver ffo = new FontFaceObserver(cfg.family, useSimulatedLoadEvents: cfg.useSimulatedLoadEvents, group: cfg.group);
   cfg.key = ffo.key;
-  await ffo.load(cfg.url);
-  await ffo.load(cfg.url);
+  return ffo.load(cfg.url);
 }
 
-bool unloadFont(FontConfig cfg) {
-  return FontFaceObserver.unload(cfg.key);
+Future<Null> _unload(_) async {
+  await FontFaceObserver.unload(_cfg.key, _cfg.group);
+  _updateCounts();
 }
 
-unload(_) {
-  FontFaceObserver.unload(cfg.key);
-  updateCounts();
+Future<Null> _unloadGroup(String group) async {
+  await FontFaceObserver.unloadGroup(group);
+  _updateCounts();
 }
 
-unloadGroup(_) {
-  FontFaceObserver.unloadGroup(groupName);
-  updateCounts();
+Future<Null> _load(_) async {
+  await _loadFont(_cfg);
+  _updateCounts();
+  await _loadFont(_cfg2);
+  _updateCounts();
+  await _loadFont(_cfg3);
+  _updateCounts();
+  await _loadFont(_cfg4);
+  _updateCounts();
 }
 
-load(_) async {
-  await loadFont(cfg);
-  updateCounts();
-  await loadFont(cfg2);
-  updateCounts();
-  await loadFont(cfg3);
-  updateCounts();
-}
-
-updateCounts() {
+void _updateCounts() {
   int n = querySelectorAll('._ffo_temp').length;
   document.getElementById('ffo_temp_elements').innerHtml = n.toString();
 
   n = querySelectorAll('style._ffo').length;
   document.getElementById('ffo_elements').innerHtml = n.toString();
 
+  document.getElementById('ffo_keys').innerHtml = FontFaceObserver.getLoadedFontKeys().toString();
   document.getElementById('ffo_groups').innerHtml = FontFaceObserver.getLoadedGroups().toString();
 }
+Future<Null> _asyncLoadUnload() async {
+  FontFaceObserver ffo1 = new FontFaceObserver(_cfg2.family, useSimulatedLoadEvents: _cfg2.useSimulatedLoadEvents, group: _cfg2.group);
 
-main() async {
-  loadButton.onClick.listen(load);
-  unloadButton.onClick.listen(unload);
-  unloadGroupButton.onClick.listen(unloadGroup);
-  updateCounts();
+  // fire this off async
+  Future<FontLoadResult> f1 = ffo1.load(_cfg2.url);
+  await FontFaceObserver.unloadGroup(ffo1.group);
+  await f1;
+  // The font should be unloaded
+  _updateCounts();
+}
+
+Future<Null> main() async {
+  _loadButton.onClick.listen(_load);
+  _unloadButton.onClick.listen(_unload);
+  _unloadGroupButton.onClick.listen((_) => _unloadGroup(_groupA));
+  _unloadGroupButtonB.onClick.listen((_) => _unloadGroup(_groupB));
+  _asyncBtn.onClick.listen((_) => _asyncLoadUnload());
+  _updateCounts();
 }
