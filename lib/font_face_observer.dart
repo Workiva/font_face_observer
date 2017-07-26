@@ -573,13 +573,9 @@ class FontFaceObserver {
   }
 
   void _dispose() {
-    try {
     _rulerSansSerif?.dispose();
     _rulerSerif?.dispose();
     _rulerMonospace?.dispose();
-    } catch (x, s) {
-      print('$x $s');
-    }
   }
 }
 
