@@ -14,6 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 import 'dart:html';
+import 'dart:async';
 
 typedef void _OnScrollCallback(num width);
 
@@ -34,6 +35,8 @@ class Ruler {
 
   /// The test string to use when measuring
   String text;
+
+  final List<StreamSubscription<Event>> _subscriptions = new List<StreamSubscription<Event>>();
 
   /// Construct a Ruler with a given test string [text]
   Ruler(this.text) {
@@ -134,12 +137,19 @@ class Ruler {
 
   /// Register a callback to be called when the ruler is resized
   void onResize(_OnScrollCallback callback) {
-    _collapsible.onScroll.listen((Event _) {
+    _subscriptions.add(_collapsible.onScroll.listen((Event _) {
       _onScroll(callback);
-    });
-    _expandable.onScroll.listen((Event _) {
+    }));
+    _subscriptions.add(_expandable.onScroll.listen((Event _) {
       _onScroll(callback);
-    });
+    }));
     _reset();
+  }
+
+  /// Clean up when this ruler is no longer used
+  void dispose() {
+    for (StreamSubscription<Event> ss in _subscriptions) {
+      ss.cancel();
+    }
   }
 }
