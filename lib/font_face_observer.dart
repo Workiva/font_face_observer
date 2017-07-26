@@ -154,7 +154,6 @@ class FontFaceObserver {
   Ruler _rulerSerif;
   Ruler _rulerMonospace;
 
-
   /// Construct a new FontFaceObserver. The CSS font family name is the only
   /// required parameter.
   ///
@@ -346,7 +345,7 @@ class FontFaceObserver {
     // Start a timeout timer that will cancel everything and complete
     // our _loaded future with false if it isn't already completed
     new Timer(new Duration(milliseconds: timeout), () => _onTimeout(t));
-    
+
     return _result.future.then((FontLoadResult flr) {
       dummy.remove();
       _dispose();

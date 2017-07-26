@@ -36,7 +36,8 @@ class Ruler {
   /// The test string to use when measuring
   String text;
 
-  final List<StreamSubscription<Event>> _subscriptions = new List<StreamSubscription<Event>>();
+  final List<StreamSubscription<Event>> _subscriptions =
+      new List<StreamSubscription<Event>>();
 
   /// Construct a Ruler with a given test string [text]
   Ruler(this.text) {
