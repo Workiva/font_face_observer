@@ -36,7 +36,7 @@ class Ruler {
   /// The test string to use when measuring
   String text;
 
-  final List<StreamSubscription<Event>> _subscriptions =
+  List<StreamSubscription<Event>> _subscriptions =
       new List<StreamSubscription<Event>>();
 
   /// Construct a Ruler with a given test string [text]
@@ -152,5 +152,19 @@ class Ruler {
     for (StreamSubscription<Event> ss in _subscriptions) {
       ss.cancel();
     }
+    _subscriptions.clear();
+    _subscriptions = null;
+
+    element?.remove();
+    _collapsible?.remove();
+    _expandable?.remove();
+    _collapsibleInner?.remove();
+    _expandableInner?.remove();
+
+    element = null;
+    _collapsible = null;
+    _expandable = null;
+    _collapsibleInner = null;
+    _expandableInner = null;
   }
 }
