@@ -348,7 +348,7 @@ class FontFaceObserver {
 
     return _result.future.then((FontLoadResult flr) {
       dummy.remove();
-      _dispose();
+      _cleanupAfterCheck();
       return flr;
     });
   }
@@ -571,7 +571,7 @@ class FontFaceObserver {
     _loadedFonts.remove(key);
   }
 
-  void _dispose() {
+  void _cleanupAfterCheck() {
     _rulerSansSerif?.dispose();
     _rulerSerif?.dispose();
     _rulerMonospace?.dispose();
