@@ -575,13 +575,12 @@ class FontFaceObserver {
     _rulerSansSerif?.dispose();
     _rulerSerif?.dispose();
     _rulerMonospace?.dispose();
-    leaks+=3;
-    print('Total leaks: $leaks');
+    _rulerSansSerif = null;
+    _rulerSerif = null;
+    _rulerMonospace = null;
   }
 }
 
 bool _isNullOrWhitespace(String s) {
   return s == null || s.trim().isEmpty;
 }
-
-int leaks = 0;
