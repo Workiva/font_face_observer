@@ -7,7 +7,8 @@ env:
   - CODECOV_TOKEN='bQ4MgjJ0G2Y73v8JNX6L7yMK9679nbYB'
 
 script:
-  - pub get --packages-dir
+  - pub get
+  - pub publish --dry-run
   - pub run dart_dev analyze
   - pub run dart_dev format --check
   - xvfb-run -s '-screen 0 1024x768x24' pub run dart_dev test -p content-shell
