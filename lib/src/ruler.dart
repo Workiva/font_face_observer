@@ -37,7 +37,7 @@ class Ruler {
   String text;
 
   List<StreamSubscription<Event>> _subscriptions =
-      new List<StreamSubscription<Event>>();
+      <StreamSubscription<Event>>[];
 
   /// Construct a Ruler with a given test string [text]
   Ruler(this.text) {
