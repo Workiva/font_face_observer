@@ -150,6 +150,10 @@ class FontFaceObserver {
   /// The completer representing the load status of this font
   Completer<FontLoadResult> _result = new Completer<FontLoadResult>();
 
+  Ruler _rulerSansSerif;
+  Ruler _rulerSerif;
+  Ruler _rulerMonospace;
+
   /// Construct a new FontFaceObserver. The CSS font family name is the only
   /// required parameter.
   ///
@@ -344,6 +348,7 @@ class FontFaceObserver {
 
     return _result.future.then((FontLoadResult flr) {
       dummy.remove();
+      _cleanupAfterCheck();
       return flr;
     });
   }
@@ -444,9 +449,9 @@ class FontFaceObserver {
   /// waiting for the font to become available. The Timer is returned so it may
   /// be cancelled and not check infinitely.
   Timer _simulateFontLoadEvents() {
-    Ruler _rulerSansSerif = new Ruler(testString);
-    Ruler _rulerSerif = new Ruler(testString);
-    Ruler _rulerMonospace = new Ruler(testString);
+    _rulerSansSerif = new Ruler(testString);
+    _rulerSerif = new Ruler(testString);
+    _rulerMonospace = new Ruler(testString);
 
     num widthSansSerif = -1;
     num widthSerif = -1;
@@ -564,6 +569,15 @@ class FontFaceObserver {
   static void _unloadFont(String key, _FontRecord record) {
     record.styleElement.remove();
     _loadedFonts.remove(key);
+  }
+
+  void _cleanupAfterCheck() {
+    _rulerSansSerif?.dispose();
+    _rulerSerif?.dispose();
+    _rulerMonospace?.dispose();
+    _rulerSansSerif = null;
+    _rulerSerif = null;
+    _rulerMonospace = null;
   }
 }
 

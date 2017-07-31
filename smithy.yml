@@ -1,13 +1,14 @@
 project: static
 language: dart
 
-runner_image: drydock-prod.workiva.net/workiva/smithy-runner-dart:131017 # 1.22.1
+runner_image: drydock-prod.workiva.net/workiva/smithy-runner-generator:194606 # tag 77 Dart 1.24.2
 
 env:
   - CODECOV_TOKEN='bQ4MgjJ0G2Y73v8JNX6L7yMK9679nbYB'
 
 script:
   - pub get --packages-dir
+  - pub publish --dry-run
   - pub run dart_dev analyze
   - pub run dart_dev format --check
   - xvfb-run -s '-screen 0 1024x768x24' pub run dart_dev test -p content-shell
