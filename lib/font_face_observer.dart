@@ -347,6 +347,9 @@ class FontFaceObserver {
     new Timer(new Duration(milliseconds: timeout), () => _onTimeout(t));
 
     return _result.future.then((FontLoadResult flr) {
+      if (t != null && t.isActive) {
+        t.cancel();
+      }
       dummy.remove();
       _cleanupAfterCheck();
       return flr;
@@ -556,9 +559,15 @@ class FontFaceObserver {
     // check for changes in the rulers if the document is hidden
     return new Timer.periodic(new Duration(milliseconds: 50), (Timer t) {
       if (document.hidden) {
-        widthSansSerif = _rulerSansSerif.getWidth();
-        widthSerif = _rulerSerif.getWidth();
-        widthMonospace = _rulerMonospace.getWidth();
+        if (_rulerSansSerif != null) {
+          widthSansSerif = _rulerSansSerif.getWidth();
+        }
+        if (_rulerSerif != null) {
+          widthSerif = _rulerSerif.getWidth();
+        }
+        if (_rulerMonospace != null) {
+          widthMonospace = _rulerMonospace.getWidth();
+        }
         _checkWidths();
       }
     });
