@@ -148,7 +148,7 @@ class FontFaceObserver {
   String _group;
 
   /// The completer representing the load status of this font
-  Completer<FontLoadResult> _result = new Completer<FontLoadResult>();
+  final Completer<FontLoadResult> _result = new Completer<FontLoadResult>();
 
   Ruler _rulerSansSerif;
   Ruler _rulerSerif;
@@ -191,7 +191,8 @@ class FontFaceObserver {
   }
 
   /// A global map of unique font key String to _LoadedFont
-  static Map<String, _FontRecord> _loadedFonts = new Map<String, _FontRecord>();
+  static final Map<String, _FontRecord> _loadedFonts =
+      new Map<String, _FontRecord>();
 
   /// The default group used for a font if none is specified.
   static const String defaultGroup = 'default';
@@ -322,7 +323,7 @@ class FontFaceObserver {
     // Since browsers may not load a font until it is actually used (lazily loaded)
     // We add this span to trigger the browser to load the font when used
     String _key = '_ffo_dummy_${key}';
-    SpanElement dummy = document.getElementById(_key);
+    Element dummy = document.getElementById(_key);
     if (dummy == null) {
       dummy = new SpanElement()
         ..className = '$fontFaceObserverTempClassname _ffo_dummy'

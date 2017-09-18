@@ -31,12 +31,14 @@ final List<_FontConfig> _fonts = new List<_FontConfig>()
   ..add(new _FontConfig(family: 'W', url: '/fonts/W.ttf', testString: '\uE0FF', useSimulatedLoadEvents: true));
 
 void _drawTextToCanvas(String text, String fontName, CanvasElement canvas) {  
-  CanvasRenderingContext2D ctx = canvas.getContext('2d');
-  ctx.setFillColorRgb(255, 255, 255);
-  ctx.fillRect(0,0, canvas.width, canvas.height);
-  ctx.setFillColorRgb(0, 0, 0);
-  ctx.font = '18px $fontName';
-  ctx.fillText(text, 5, 28);
+  Object ctx = canvas.getContext('2d');
+  if (ctx is CanvasRenderingContext2D) {
+    ctx.setFillColorRgb(255, 255, 255);
+    ctx.fillRect(0,0, canvas.width, canvas.height);
+    ctx.setFillColorRgb(0, 0, 0);
+    ctx.font = '18px $fontName';
+    ctx.fillText(text, 5, 28);
+  }
 }
 
 void _writeSupport() {
@@ -58,7 +60,7 @@ Future<Null> _loadFont(_FontConfig cfg, bool useSimulatedLoadEvents) async {
   String message = cfg.testString;
   
   TableRowElement row = new TableRowElement();
-  TableElement table = document.getElementById('table');
+  Element table = document.getElementById('table');
   row.append(new TableCellElement()..text = uniqFamily);
   row.append(new TableCellElement()..text = useSimulatedLoadEvents ? "Simulated" : "FontFace");
   row.append(new TableCellElement()..text = result.isLoaded ? 'Yes' : 'No');

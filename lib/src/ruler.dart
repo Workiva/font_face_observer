@@ -26,7 +26,7 @@ const String fontFaceObserverTempClassname = '_ffo_temp';
 /// a font being loaded.
 class Ruler {
   /// The element in the DOM that this ruler is using to measure
-  DivElement element;
+  Element element;
   SpanElement _collapsible;
   SpanElement _expandable;
   SpanElement _collapsibleInner;
@@ -115,8 +115,8 @@ class Ruler {
   }
 
   bool _reset() {
-    num offsetWidth = element.offsetWidth;
-    num width = offsetWidth + 100;
+    int offsetWidth = element.offsetWidth;
+    int width = offsetWidth + 100;
 
     _expandableInner.style.width = '${width}px';
     _expandable.scrollLeft = width;
