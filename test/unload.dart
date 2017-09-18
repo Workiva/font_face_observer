@@ -9,11 +9,11 @@ _FontConfig _cfg2 = new _FontConfig(family: 'Roboto_2', url: '/fonts/Roboto.ttf'
 _FontConfig _cfg3 = new _FontConfig(family: 'Roboto_3', url: '/fonts/Roboto.ttf', group: _groupA);
 _FontConfig _cfg4 = new _FontConfig(family: 'Roboto_2', url: '/fonts/Roboto.ttf', group: _groupB);
 
-ButtonElement _unloadButton = document.getElementById('unloadBtn');
-ButtonElement _unloadGroupButton = document.getElementById('unloadGroupBtn');
-ButtonElement _unloadGroupButtonB = document.getElementById('unloadGroupBtnB');
-ButtonElement _loadButton = document.getElementById('loadBtn');
-ButtonElement _asyncBtn = document.getElementById('asyncBtn');
+Element _unloadButton = document.getElementById('unloadBtn');
+Element _unloadGroupButton = document.getElementById('unloadGroupBtn');
+Element _unloadGroupButtonB = document.getElementById('unloadGroupBtnB');
+Element _loadButton = document.getElementById('loadBtn');
+Element _asyncBtn = document.getElementById('asyncBtn');
 
 class _FontConfig {
   String url;
@@ -31,7 +31,7 @@ Future<FontLoadResult> _loadFont(_FontConfig cfg) async {
   return ffo.load(cfg.url);
 }
 
-Future<Null> _unload(_) async {
+Future<Null> _unload(Event _) async {
   await FontFaceObserver.unload(_cfg.key, _cfg.group);
   _updateCounts();
 }
@@ -41,7 +41,7 @@ Future<Null> _unloadGroup(String group) async {
   _updateCounts();
 }
 
-Future<Null> _load(_) async {
+Future<Null> _load(Event _) async {
   await _loadFont(_cfg);
   _updateCounts();
   await _loadFont(_cfg2);

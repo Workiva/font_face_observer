@@ -1,5 +1,7 @@
 analyzer:
-  strong-mode: true
+  strong-mode:
+    implicit-casts: false
+    implicit-dynamic: false
 
 # ALL lint rules are included and the ones not in use are commented
 # out with a reason. An up to date list of all options is here
