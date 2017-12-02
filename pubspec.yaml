@@ -8,12 +8,6 @@ publish_to: https://pub.workiva.org
 environment:
   sdk: '>=1.22.1 <2.0.0'
 
-web:
-  compiler: 
-    debug: dartdevc
-    release: dartdevc
-modules: es6
-
 dev_dependencies:
   browser: ^0.10.0
   coverage: ">=0.7.0 < 2.0.0"
