@@ -3,7 +3,6 @@ version: 2.0.4
 description: Font load events, simple, small and efficient. Dart port of https://github.com/bramstein/fontfaceobserver
 author: Rob Becker <rob.becker@workiva.com>
 homepage: https://github.com/Workiva/font_face_observer
-publish_to: https://pub.workiva.org
 
 environment:
   sdk: '>=1.22.1 <2.0.0'
@@ -15,11 +14,6 @@ dev_dependencies:
   dart_style: ">=1.0.0 < 2.0.0"
   dartdoc: ">=0.12.0 < 2.0.0"
   test: ">=0.12.0 < 2.0.0"
-  semver_audit:
-    hosted:
-      name: semver_audit
-      url: https://pub.workiva.org
-    version: ^1.1.1
 
 transformers:
 - $dart2js:
