@@ -1,0 +1,9 @@
+language: dart
+dart:
+  - 1.24.2
+script:
+  - pub get
+  - pub run dart_dev format --check
+  - pub run dart_dev analyze
+  - pub publish --dry-run
+  - pub run dart_dev test -p content-shell
