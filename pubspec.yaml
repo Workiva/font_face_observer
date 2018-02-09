@@ -7,6 +7,10 @@ homepage: https://github.com/Workiva/font_face_observer
 environment:
   sdk: '>=1.22.1 <2.0.0'
 
+web:
+  compiler:
+    debug: dartdevc
+
 dev_dependencies:
   analyzer: ">= 0.29.0 <= 0.30.0+4"
   browser: ^0.10.0
