@@ -62,8 +62,8 @@ Copyright © [YEAR] W3C® (MIT, ERCIM, Keio, Beihang)."
 https://www.w3.org/Consortium/Legal/2015/copyright-software-and-document
 */
 @TestOn('browser')
-import 'dart:html';
 import 'dart:async';
+import 'dart:html';
 import 'package:test/test.dart';
 import 'package:font_face_observer/font_face_observer.dart';
 import 'package:font_face_observer/src/adobe_blank.dart';
@@ -79,7 +79,7 @@ class _FontUrls {
 void main() {
   group('FontFaceObserver', () {
     tearDown(() async {
-      while (FontFaceObserver.getLoadedGroups().length > 0) {
+      while (FontFaceObserver.getLoadedGroups().isNotEmpty) {
         for (String group in FontFaceObserver.getLoadedGroups()) {
           await FontFaceObserver.unloadGroup(group);
         }
@@ -183,7 +183,7 @@ void main() {
       FontLoadResult result = await ffo.load(_FontUrls.roboto);
       expect(result.isLoaded, isTrue);
       ElementList<Element> elements = querySelectorAll('._ffo_temp');
-      if (elements.length > 0) {
+      if (elements.isNotEmpty) {
         elements.forEach( (Element el) => print('${el.tagName}.${el.className}'));
       }
       expect(elements.length, isZero);

@@ -103,7 +103,7 @@ bool _supportsNativeFontLoading() {
 bool _hasWebKitFallbackBug(String userAgent) {
   RegExp regex = new RegExp('AppleWebKit\/([0-9]+)(?:\.([0-9]+))');
   Iterable<Match> matches = regex.allMatches(userAgent);
-  if (matches == null || matches.length == 0) {
+  if (matches == null || matches.isEmpty) {
     return false;
   }
   Match match = matches.first;

@@ -20,29 +20,77 @@ linter:
     # override with // ignore: always_declare_return_types
     - always_declare_return_types
 
+    # Style: Separate the control structure expression from its statement.
+    - always_put_control_body_on_new_line
+
+    # Style: Put @required named parameters first.
+    - always_put_required_named_parameters_first
+
+    # Style: Use @required.
+    - always_require_non_null_named_parameters
+
     # Style: Specify type annotations.
-    - always_specify_types # really annoying for local vars
+    # - always_specify_types # really annoying for local vars
 
     # Style: Annotate overridden members
     - annotate_overrides
 
+    # Style: Avoid annotating with dynamic when not required.
+    # - avoid_annotating_with_dynamic
+
     # Style: Avoid using as.
-    - avoid_as
+    # - avoid_as # comment overrides don't seem to work
+
+    # Style: Avoid catches without on clauses.
+    # - avoid_catches_without_on_clauses
+
+    # Style: Don't explicitly catch Error or types that implement it.
+    # - avoid_catching_errors # Consider uncommenting under Dart 2
+
+    # Style: Avoid defining a class that contains only static members.
+    - avoid_classes_with_only_static_members
 
     # Error: Avoid empty else statements.
     - avoid_empty_else
 
+    # Style: Avoid using forEach with a function literal.
+    - avoid_function_literals_in_foreach_calls
+
     # Style: Don't explicitly initialize variables to null
     - avoid_init_to_null
 
+    # Style: Don't check for null in custom == operators.
+    - avoid_null_checks_in_equality_operators
+
+    # Style: Avoid positional boolean parameters.
+    - avoid_positional_boolean_parameters
+
     # Style: Avoid return types on setters.
     - avoid_return_types_on_setters
+
+    # Style: Avoid returning this from methods just to enable a fluent interface.
+    - avoid_returning_this
+
+    # Style: Avoid setters without getters.
+    - avoid_setters_without_getters
+
+    # Error: Avoid slow async dart:io methods.
+    - avoid_slow_async_io
+
+    # Style: Avoid annotating types for function expression parameters.
+    # - avoid_types_on_closure_parameters
+
+    # Style: Avoid defining unused paramters in constructors.
+    - avoid_unused_constructor_parameters
 
     # Style: Await only futures.
     - await_only_futures
 
     # Style: Name types using UpperCamelCase.
     - camel_case_types
+
+    # Style: Cascade consecutive method invocations on the same reference.
+    # - cascade_invocations
 
     # Error: Cancel instances of dart.async.StreamSubscription.
     - cancel_subscriptions
@@ -54,10 +102,13 @@ linter:
     - comment_references
 
     # Style: Prefer using lowerCamelCase for constant names.
-    - constant_identifier_names
+    # - constant_identifier_names
 
     # Error: Avoid control flow in finally block.
     - control_flow_in_finally
+
+    # Style: Adhere to Effective Dart Guide directives sorting conventions.
+    - directives_ordering
 
     # Style: Avoid empty catch blocks.
     - empty_catches
@@ -80,6 +131,9 @@ linter:
     # Error: Invocation of Iterable.contains with references of unrelated types.
     - iterable_contains_unrelated_type
 
+    # Style: Join return statement with assignment when possible.
+    - join_return_with_assignment
+
     # Style: Name libraries and source files using lowercase_with_underscores.
     - library_names
 
@@ -92,11 +146,20 @@ linter:
     # Error: Conditions should not unconditionally evaluate to "TRUE" or to "FALSE"
     - literal_only_boolean_expressions
 
+    # Error: Don't use adjacent strings in list.
+    - no_adjacent_strings_in_list
+
+    # Error: Don't use more than one case with same value.
+    - no_duplicate_case_values
+
     # Style: Name non-constant identifiers using lowerCamelCase.
-    - non_constant_identifier_names # UiFactories will lint
+    # - non_constant_identifier_names # UiFactories will lint
+
+    # Style: Omit type annotations for local variables.
+    # - omit_local_variable_types
 
     # Style: Avoid defining a one-member abstract class when a simple function will do.
-    - one_member_abstracts
+    # - one_member_abstracts
 
     # Style: Only throw instances of classes extending either Exception or Error
     - only_throw_errors
@@ -114,19 +177,79 @@ linter:
     - package_prefixed_library_names
 
     # Style: Don't reassign references to parameters of functions or methods.
-    - parameter_assignments
+    # - parameter_assignments # team preference
+
+    # Style: Use adjacent strings to concatenate string literals.
+    - prefer_adjacent_string_concatenation
+
+    # Style: Prefer putting asserts in initializer list.
+    - prefer_asserts_in_initializer_lists
+
+    # Style: Prefer using a boolean as the assert condition.
+    - prefer_bool_in_asserts
+
+    # Style: Use collection literals when possible.
+    - prefer_collection_literals
+
+    # Style: Prefer using ??= over testing for null.
+    - prefer_conditional_assignment
+
+    # Style: Prefer const with constant constructors.
+    - prefer_const_constructors
+
+    # Style: Prefer declare const constructors on @immutable classes.
+    - prefer_const_constructors_in_immutables
+
+    # Style: Prefer const over final for declarations.
+    - prefer_const_declarations
+
+    # Style: Prefer use const literals as parameter of constructors on @immutable classes.
+    - prefer_const_literals_to_create_immutables
+
+    # Style: Prefer defining constructors instead of static methods to create instances.
+    - prefer_constructors_over_static_methods
+
+    # Style: Use contains for List and String instances.
+    - prefer_contains
+
+    # Style: Use => for short members whose body is a single return statement.
+    # - prefer_expression_function_bodies
 
     # Style: Private field could be final.
-    - prefer_final_fields
+    # - prefer_final_fields # disabled since over react formatter from the bootstrap script does not abide
 
     # Style: Prefer final for variable declaration if reference is not reassigned.
     # - prefer_final_locals # Noisy, people use var a lot
 
+    # Style: Use forEach to only apply a function to all the elements.
+    - prefer_foreach
+
+    # Style: Use a function declaration to bind a function to a name.
+    - prefer_function_declarations_over_variables
+
+    # Style: Use initializing formals when possible.
+    - prefer_initializing_formals
+
+    # Style: Use interpolation to compose strings and values.
+    - prefer_interpolation_to_compose_strings
+
+    # Style: Use isEmpty for Iterables and Maps.
+    - prefer_is_empty
+
     # Style: Use isNotEmpty for Iterables and Maps.
     - prefer_is_not_empty
 
+    # Style: Prefer single quotes where they won't require escape sequences.
+    - prefer_single_quotes
+
+    # Style: Prefer typing uninitialized variables and fields.
+    - prefer_typing_uninitialized_variables
+
     # Style: Document all public members
-    - public_member_api_docs
+    # - public_member_api_docs # really annoying for lifecycle methods
+
+    # Style: Property getter recursively returns itself.
+    # - recursive_getters # seems buggy
 
     # Style: Prefer to use /// for doc comments
     - slash_for_doc_comments
@@ -147,7 +270,7 @@ linter:
     - throw_in_finally
 
     # Style: Type annotate public APIs.
-    - type_annotate_public_apis # render can return either ReactElement or false
+    - type_annotate_public_apis
 
     # Style: Don't type annotate initializing formals.
     - type_init_formals
@@ -156,10 +279,40 @@ linter:
     - unawaited_futures
 
     # Style: Avoid using braces in interpolation when not needed.
-    # - unnecessary_brace_in_string_interp # preference
+    # - unnecessary_brace_in_string_interps # team preference
 
     # Style: Avoid wrapping fields in getters and setters just to be "safe".
     - unnecessary_getters_setters
+
+    # Style: Don't create a lambda when a tear-off will do.
+    - unnecessary_lambdas
+
+    # Style: Avoid null in null-aware assignment.
+    - unnecessary_null_aware_assignments
+
+    # Style: Avoid using null in if null operators.
+    - unnecessary_null_in_if_null_operators
+
+    # Style: Don't override a method to do a super method invocation with the same parameters.
+    - unnecessary_overrides
+
+    # Style: Don't access members with this unless avoiding shadowing.
+    - unnecessary_this
+
+    # Style: Use rethrow to rethrow a caught exception.
+    - use_rethrow_when_possible
+
+    # Style: Use a setter for operations that conceptually change a property.
+    - use_setters_to_change_properties
+
+    # Style: Use string buffer to compose strings.
+    - use_string_buffers
+
+    # Style: Start the name of the method with to/_to or as/_as if applicable.
+    - use_to_and_as_if_applicable
+
+    # Error: Avoid using unnecessary statements.
+    - unnecessary_statements
 
     # Error: Equality operator (==) invocation with references of unrelated types.
     - unrelated_type_equality_checks

@@ -61,9 +61,9 @@ Copyright © [YEAR] W3C® (MIT, ERCIM, Keio, Beihang)."
 
 https://www.w3.org/Consortium/Legal/2015/copyright-software-and-document
 */
+import 'dart:convert';
 import 'dart:html';
 import 'dart:typed_data';
-import 'dart:convert';
 
 /// A utility to create data URIs
 ///
@@ -107,7 +107,7 @@ class DataUri {
 
   @override
   String toString() =>
-      'data:${mimeType != null && mimeType.length > 0 ? mimeType : ""}${encoding != null && encoding.length > 0 ? ";charset=" + encoding : ""}${isDataBase64Encoded ? ";base64" : ""},${data != null ? data : ""}';
+      'data:${mimeType != null && mimeType.isNotEmpty ? mimeType : ""}${encoding != null && encoding.isNotEmpty ? ";charset=$encoding" : ""}${isDataBase64Encoded ? ";base64" : ""},${data != null ? data : ""}';
 
   /// Static method to encode a string to base64
   static String base64EncodeString(String string) => window.btoa(string);
