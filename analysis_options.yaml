@@ -216,7 +216,7 @@ linter:
     # - prefer_expression_function_bodies
 
     # Style: Private field could be final.
-    # - prefer_final_fields # disabled since over react formatter from the bootstrap script does not abide
+    # - prefer_final_fields
 
     # Style: Prefer final for variable declaration if reference is not reassigned.
     # - prefer_final_locals # Noisy, people use var a lot
