@@ -1,6 +1,6 @@
 # 2.0.7
 * [x] Added more analysis option lint rules
-* [x] default to DDC for debug mode
+* [x] default to DDC for running tests
 
 # 2.0.6
 * [x] #29 Add CHANGELOG.md
