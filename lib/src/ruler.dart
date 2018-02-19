@@ -61,8 +61,8 @@ Copyright © [YEAR] W3C® (MIT, ERCIM, Keio, Beihang)."
 
 https://www.w3.org/Consortium/Legal/2015/copyright-software-and-document
 */
-import 'dart:html';
 import 'dart:async';
+import 'dart:html';
 
 typedef void _OnScrollCallback(num width);
 

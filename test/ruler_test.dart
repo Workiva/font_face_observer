@@ -62,8 +62,8 @@ Copyright © [YEAR] W3C® (MIT, ERCIM, Keio, Beihang)."
 https://www.w3.org/Consortium/Legal/2015/copyright-software-and-document
 */
 @TestOn('browser')
-import 'dart:html';
 import 'dart:async';
+import 'dart:html';
 import 'package:test/test.dart';
 import 'package:font_face_observer/src/ruler.dart';
 
@@ -133,7 +133,7 @@ void main() {
       });
       ruler.setWidth(_startWidth);
       Completer<Null> c = new Completer<Null>();
-      new Timer(new Duration(milliseconds: 20), () {
+      new Timer(const Duration(milliseconds: 20), () {
         expect(failed, isFalse);
         expect(ruler.getWidth(), equals(_startWidth));
         c.complete();

@@ -61,8 +61,8 @@ Copyright © [YEAR] W3C® (MIT, ERCIM, Keio, Beihang)."
 
 https://www.w3.org/Consortium/Legal/2015/copyright-software-and-document
 */
-import 'dart:html';
 import 'dart:async';
+import 'dart:html';
 import 'package:font_face_observer/font_face_observer.dart';
 
 String _groupA = "group_A";

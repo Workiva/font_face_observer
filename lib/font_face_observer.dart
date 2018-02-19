@@ -95,7 +95,7 @@ class FontLoadResult {
 class _FontRecord {
   int _uses = 0;
   StyleElement styleElement;
-  Map<String, int> groupUses = new Map<String, int>();
+  Map<String, int> groupUses = <String, int>{};
   Future<FontLoadResult> futureLoadResult;
 
   int get uses => _uses;
@@ -148,17 +148,17 @@ class _FontRecord {
   /// It then "caches" the total number of uses in the [uses] property
   /// so we don't have to sum every time we want to check # of uses.
   void _updateGroupUseCounts() {
-    if (groupUses.length > 0) {
+    if (groupUses.isNotEmpty) {
       uses = groupUses.values.reduce((int a, int b) => a + b);
     } else {
       uses = 0;
       groupUses.clear();
     }
-    String groupData = '';
+    StringBuffer groupData = new StringBuffer();
     for (String group in groupUses.keys) {
-      groupData += '$group(${groupUses[group]}) ';
+      groupData.write('$group(${groupUses[group]}) ');
     }
-    styleElement.dataset['groups'] = groupData;
+    styleElement.dataset['groups'] = groupData.toString();
   }
 }
 
@@ -227,7 +227,7 @@ class FontFaceObserver {
       _adobeBlankLoadedFuture = _loadAdobeBlank();
     }
     this.testString = testString;
-    this._group = _isNullOrWhitespace(group) ? defaultGroup : group;
+    _group = _isNullOrWhitespace(group) ? defaultGroup : group;
     if (family != null) {
       family = family.trim();
       bool hasStartQuote = family.startsWith('"') || family.startsWith("'");
@@ -239,8 +239,7 @@ class FontFaceObserver {
   }
 
   /// A global map of unique font key String to _LoadedFont
-  static final Map<String, _FontRecord> _loadedFonts =
-      new Map<String, _FontRecord>();
+  static final Map<String, _FontRecord> _loadedFonts = <String, _FontRecord>{};
 
   /// The default group used for a font if none is specified.
   static const String defaultGroup = 'default';
@@ -260,10 +259,13 @@ class FontFaceObserver {
   /// in the same group.
   static Iterable<String> getLoadedGroups() {
     Set<String> loadedGroups = new Set<String>();
-    _loadedFonts.keys.forEach((String k) {
+
+    void getLoadedGroups(String k) {
       _FontRecord record = _loadedFonts[k];
       loadedGroups.addAll(record.groupUses.keys);
-    });
+    }
+
+    _loadedFonts.keys.forEach(getLoadedGroups);
     return loadedGroups;
   }
 
@@ -284,8 +286,8 @@ class FontFaceObserver {
 
     // parallel arrays of keys and groups that go along with the keys at the
     // same indexes.
-    List<String> keysToRemove = new List<String>();
-    List<_FontRecord> records = new List<_FontRecord>();
+    List<String> keysToRemove = <String>[];
+    List<_FontRecord> records = <_FontRecord>[];
     for (String k in _loadedFonts.keys.toList()) {
       _FontRecord record = _loadedFonts[k];
       // wait for the load future to complete
@@ -385,7 +387,7 @@ class FontFaceObserver {
     // the font is loaded
     if (supportsNativeFontLoading && !useSimulatedLoadEvents) {
       t = new Timer.periodic(
-          new Duration(milliseconds: _nativeFontLoadingCheckInterval),
+          const Duration(milliseconds: _nativeFontLoadingCheckInterval),
           _periodicallyCheckDocumentFonts);
     } else {
       t = _simulateFontLoadEvents();
@@ -606,7 +608,7 @@ class FontFaceObserver {
     // The above code will trigger a scroll event when the font loads
     // but if the document is hidden, it may not, so we will periodically
     // check for changes in the rulers if the document is hidden
-    return new Timer.periodic(new Duration(milliseconds: 50), (Timer t) {
+    return new Timer.periodic(const Duration(milliseconds: 50), (Timer t) {
       if (document.hidden) {
         if (_rulerSansSerif != null) {
           widthSansSerif = _rulerSansSerif.getWidth();

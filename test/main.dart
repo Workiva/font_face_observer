@@ -78,7 +78,7 @@ class _FontConfig {
   _FontConfig({this.family, this.url, this.testString: _successMessage, this.expectLoad: true, this.useSimulatedLoadEvents: false });
 }
 
-final List<_FontConfig> _fonts = new List<_FontConfig>()
+final List<_FontConfig> _fonts = <_FontConfig>[]
   ..add(new _FontConfig(family: 'AdobeBlank', url: adobeBlankFontBase64Url))
   ..add(new _FontConfig(family: 'AdobeBlank', url: adobeBlankFontBase64Url, useSimulatedLoadEvents: true))
   ..add(new _FontConfig(family: 'Roboto', url: '/fonts/Roboto.ttf'))
