@@ -5,7 +5,7 @@ author: Rob Becker <rob.becker@workiva.com>
 homepage: https://github.com/Workiva/font_face_observer
 
 environment:
-  sdk: '>=1.22.1 <= 2.0.0'
+  sdk: '>=1.22.1 < 2.0.0'
 
 web:
   compiler:
