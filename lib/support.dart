@@ -76,13 +76,15 @@ final bool supportsNativeFontLoading = _supportsNativeFontLoading();
 
 /// Returns true if the browser supports font-style in the font short-hand syntax.
 bool _supportsStretch() {
-  Element div = document.createElement('div');
+  final Element div = document.createElement('div');
   try {
     // Detect if the browser supports the CSS font-stretch property by trying
     // to set it on a new empty div. Using condensed will cause an exception
     // in browsers that don't support it.
     div.style.font = 'condensed 100px sans-serif';
-  } catch (_) {}
+  } on Exception {
+    // ignore exceptions intentionally
+  }
   // If the font style still has a value, that means the browser accepts
   // stretch as a valid value and supports it
   return div.style.font != '';
@@ -91,8 +93,9 @@ bool _supportsStretch() {
 bool _supportsNativeFontLoading() {
   bool supports = true;
   try {
+    // ignore: unnecessary_statements
     document.fonts.status;
-  } catch (x) {
+  } on Exception {
     supports = false;
   }
   return supports;
@@ -101,16 +104,16 @@ bool _supportsNativeFontLoading() {
 /// Returns true if this browser is WebKit and it has the fallback bug
 /// which is present in WebKit 536.11 and earlier.
 bool _hasWebKitFallbackBug(String userAgent) {
-  RegExp regex = new RegExp('AppleWebKit\/([0-9]+)(?:\.([0-9]+))');
-  Iterable<Match> matches = regex.allMatches(userAgent);
+  final RegExp regex = new RegExp('AppleWebKit\/([0-9]+)(?:\.([0-9]+))');
+  final Iterable<Match> matches = regex.allMatches(userAgent);
   if (matches == null || matches.isEmpty) {
     return false;
   }
-  Match match = matches.first;
+  final Match match = matches.first;
   if (match == null) {
     return false;
   }
-  num major = int.parse(match.group(1));
-  num minor = int.parse(match.group(2));
+  final num major = int.parse(match.group(1));
+  final num minor = int.parse(match.group(2));
   return major < 536 || (major == 536 && minor <= 11);
 }

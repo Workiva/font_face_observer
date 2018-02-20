@@ -89,10 +89,10 @@ class Ruler {
 
   /// Construct a Ruler with a given test string [text]
   Ruler(this.text) {
-    element = document.createElement('div');
-    element.className = 'font_face_ruler_div';
-    element.setAttribute('aria-hidden', 'true');
-    element.text = text;
+    element = document.createElement('div')
+      ..className = 'font_face_ruler_div'
+      ..setAttribute('aria-hidden', 'true')
+      ..text = text;
 
     _collapsible = new SpanElement();
     _expandable = new SpanElement();
@@ -120,8 +120,7 @@ class Ruler {
 
     _collapsible.append(_collapsibleInner);
     _expandable.append(_expandableInner);
-    element.append(_collapsible);
-    element.append(_expandable);
+    element..append(_collapsible)..append(_expandable);
   }
 
   void _styleElement(HtmlElement element) {
@@ -153,9 +152,7 @@ class Ruler {
   }
 
   /// queries the DOM to get the width of [element]
-  int getWidth() {
-    return element.offsetWidth;
-  }
+  int getWidth() => element.offsetWidth;
 
   /// Set the width of [element] using an inline style
   void setWidth(num width) {
@@ -163,8 +160,8 @@ class Ruler {
   }
 
   bool _reset() {
-    int offsetWidth = element.offsetWidth;
-    int width = offsetWidth + 100;
+    final int offsetWidth = element.offsetWidth;
+    final int width = offsetWidth + 100;
 
     _expandableInner.style.width = '${width}px';
     _expandable.scrollLeft = width;
@@ -186,12 +183,13 @@ class Ruler {
 
   /// Register a callback to be called when the ruler is resized
   void onResize(_OnScrollCallback callback) {
-    _subscriptions.add(_collapsible.onScroll.listen((Event _) {
-      _onScroll(callback);
-    }));
-    _subscriptions.add(_expandable.onScroll.listen((Event _) {
-      _onScroll(callback);
-    }));
+    _subscriptions
+      ..add(_collapsible.onScroll.listen((Event _) {
+        _onScroll(callback);
+      }))
+      ..add(_expandable.onScroll.listen((Event _) {
+        _onScroll(callback);
+      }));
     _reset();
   }
 

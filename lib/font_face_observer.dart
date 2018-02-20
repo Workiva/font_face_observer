@@ -154,7 +154,7 @@ class _FontRecord {
       uses = 0;
       groupUses.clear();
     }
-    StringBuffer groupData = new StringBuffer();
+    final StringBuffer groupData = new StringBuffer();
     for (String group in groupUses.keys) {
       groupData.write('$group(${groupUses[group]}) ');
     }
@@ -230,8 +230,9 @@ class FontFaceObserver {
     _group = _isNullOrWhitespace(group) ? defaultGroup : group;
     if (family != null) {
       family = family.trim();
-      bool hasStartQuote = family.startsWith('"') || family.startsWith("'");
-      bool hasEndQuote = family.endsWith('"') || family.endsWith("'");
+      final bool hasStartQuote =
+          family.startsWith('"') || family.startsWith("'");
+      final bool hasEndQuote = family.endsWith('"') || family.endsWith("'");
       if (hasStartQuote && hasEndQuote) {
         family = family.substring(1, family.length - 1);
       }
@@ -244,24 +245,21 @@ class FontFaceObserver {
   /// The default group used for a font if none is specified.
   static const String defaultGroup = 'default';
   static Future<FontLoadResult> _adobeBlankLoadedFuture = _loadAdobeBlank();
-  static Future<FontLoadResult> _loadAdobeBlank() {
-    return (new FontFaceObserver(adobeBlankFamily, group: adobeBlankFamily))
-        .load(adobeBlankFontBase64Url);
-  }
+  static Future<FontLoadResult> _loadAdobeBlank() =>
+      new FontFaceObserver(adobeBlankFamily, group: adobeBlankFamily)
+          .load(adobeBlankFontBase64Url);
 
   /// Returns the font keys for all currently loaded fonts
-  static Iterable<String> getLoadedFontKeys() {
-    return _loadedFonts.keys.toSet();
-  }
+  static Iterable<String> getLoadedFontKeys() => _loadedFonts.keys.toSet();
 
   /// Returns the groups that the currently loaded fonts are in.
   /// There will not be duplicate group entries if there are multiple fonts
   /// in the same group.
   static Iterable<String> getLoadedGroups() {
-    Set<String> loadedGroups = new Set<String>();
+    final Set<String> loadedGroups = new Set<String>();
 
     void getLoadedGroups(String k) {
-      _FontRecord record = _loadedFonts[k];
+      final _FontRecord record = _loadedFonts[k];
       loadedGroups.addAll(record.groupUses.keys);
     }
 
@@ -286,10 +284,10 @@ class FontFaceObserver {
 
     // parallel arrays of keys and groups that go along with the keys at the
     // same indexes.
-    List<String> keysToRemove = <String>[];
-    List<_FontRecord> records = <_FontRecord>[];
+    final List<String> keysToRemove = <String>[];
+    final List<_FontRecord> records = <_FontRecord>[];
     for (String k in _loadedFonts.keys.toList()) {
-      _FontRecord record = _loadedFonts[k];
+      final _FontRecord record = _loadedFonts[k];
       // wait for the load future to complete
       await record.futureLoadResult;
 
@@ -319,7 +317,7 @@ class FontFaceObserver {
   /// key/group combo was not found.
   static Future<bool> unload(String key, String group) async {
     if (_loadedFonts.containsKey(key)) {
-      _FontRecord record = _loadedFonts[key];
+      final _FontRecord record = _loadedFonts[key];
       // wait for the load future to complete
       await record.futureLoadResult;
 
@@ -361,7 +359,7 @@ class FontFaceObserver {
       return _result.future;
     }
 
-    _FontRecord record = _loadedFonts[key];
+    final _FontRecord record = _loadedFonts[key];
     if (record == null) {
       return new FontLoadResult(isLoaded: false, didTimeout: false);
     }
@@ -372,7 +370,7 @@ class FontFaceObserver {
 
     // Since browsers may not load a font until it is actually used (lazily loaded)
     // We add this span to trigger the browser to load the font when used
-    String _key = '_ffo_dummy_${key}';
+    final String _key = '_ffo_dummy_${key}';
     Element dummy = document.getElementById(_key);
     if (dummy == null) {
       dummy = new SpanElement()
@@ -410,17 +408,17 @@ class FontFaceObserver {
   /// Load the font into the browser given a url that could be a network url
   /// or a pre-built data or blob url.
   Future<FontLoadResult> load(String url) async {
-    _FontRecord record = _load(url);
+    final _FontRecord record = _load(url);
     if (_result.isCompleted) {
       return _result.future;
     }
 
     try {
-      FontLoadResult flr = await check();
+      final FontLoadResult flr = await check();
       if (flr.isLoaded) {
         return _result.future;
       }
-    } catch (x) {
+    } on Exception {
       // On errors, make sure the font is unloaded
       _unloadFont(key, record);
       return new FontLoadResult(isLoaded: false, didTimeout: false);
@@ -438,12 +436,12 @@ class FontFaceObserver {
   /// initial use count of 1.
   _FontRecord _load(String url) {
     StyleElement styleElement;
-    String _key = key;
+    final String _key = key;
     _FontRecord record;
     if (_loadedFonts.containsKey(_key)) {
       record = _loadedFonts[_key];
     } else {
-      String rule = '''
+      final String rule = '''
       @font-face {
         font-family: "${family}";
         font-style: ${style};
@@ -470,7 +468,7 @@ class FontFaceObserver {
   /// Generates the CSS style string to be used when detecting a font load
   /// for a given [family] at a certain [cssSize] (default 100px)
   String _getStyle(String family, {String cssSize: '100px'}) {
-    String _stretch = supportsStretch ? stretch : '';
+    final String _stretch = supportsStretch ? stretch : '';
     return '$style $weight $_stretch $cssSize $family';
   }
 
@@ -515,7 +513,7 @@ class FontFaceObserver {
     num fallbackWidthSerif = -1;
     num fallbackWidthMonospace = -1;
 
-    Element container = document.createElement('div');
+    final Element container = document.createElement('div');
 
     // Internal check function
     // -----------------------
@@ -567,16 +565,18 @@ class FontFaceObserver {
     }
 
     // This ensures the scroll direction is correct.
-    container.dir = 'ltr';
-    // add class names for tracking nodes if they leak (and for testing)
-    container.className = '$fontFaceObserverTempClassname _ffo_container';
+    container
+      ..dir = 'ltr'
+      // add class names for tracking nodes if they leak (and for testing)
+      ..className = '$fontFaceObserverTempClassname _ffo_container';
     _rulerSansSerif.setFont(_getStyle('sans-serif'));
     _rulerSerif.setFont(_getStyle('serif'));
     _rulerMonospace.setFont(_getStyle('monospace'));
 
-    container.append(_rulerSansSerif.element);
-    container.append(_rulerSerif.element);
-    container.append(_rulerMonospace.element);
+    container
+      ..append(_rulerSansSerif.element)
+      ..append(_rulerSerif.element)
+      ..append(_rulerMonospace.element);
 
     document.body.append(container);
 
@@ -584,26 +584,26 @@ class FontFaceObserver {
     fallbackWidthSerif = _rulerSerif.getWidth();
     fallbackWidthMonospace = _rulerMonospace.getWidth();
 
-    _rulerSansSerif.onResize((num width) {
-      widthSansSerif = width;
-      _checkWidths();
-    });
+    _rulerSansSerif
+      ..onResize((num width) {
+        widthSansSerif = width;
+        _checkWidths();
+      })
+      ..setFont(_getStyle('"$family",AdobeBlank,sans-serif'));
 
-    _rulerSansSerif.setFont(_getStyle('"$family",AdobeBlank,sans-serif'));
+    _rulerSerif
+      ..onResize((num width) {
+        widthSerif = width;
+        _checkWidths();
+      })
+      ..setFont(_getStyle('"$family",AdobeBlank,serif'));
 
-    _rulerSerif.onResize((num width) {
-      widthSerif = width;
-      _checkWidths();
-    });
-
-    _rulerSerif.setFont(_getStyle('"$family",AdobeBlank,serif'));
-
-    _rulerMonospace.onResize((num width) {
-      widthMonospace = width;
-      _checkWidths();
-    });
-
-    _rulerMonospace.setFont(_getStyle('"$family",AdobeBlank,monospace'));
+    _rulerMonospace
+      ..onResize((num width) {
+        widthMonospace = width;
+        _checkWidths();
+      })
+      ..setFont(_getStyle('"$family",AdobeBlank,monospace'));
 
     // The above code will trigger a scroll event when the font loads
     // but if the document is hidden, it may not, so we will periodically
@@ -641,6 +641,4 @@ class FontFaceObserver {
   }
 }
 
-bool _isNullOrWhitespace(String s) {
-  return s == null || s.trim().isEmpty;
-}
+bool _isNullOrWhitespace(String s) => s == null || s.trim().isEmpty;

@@ -75,36 +75,75 @@ class _FontConfig {
   String testString;
   bool useSimulatedLoadEvents;
   bool expectLoad;
-  _FontConfig({this.family, this.url, this.testString: _successMessage, this.expectLoad: true, this.useSimulatedLoadEvents: false });
+  _FontConfig(
+      {this.family,
+      this.url,
+      this.testString: _successMessage,
+      this.expectLoad: true,
+      this.useSimulatedLoadEvents: false});
 }
 
 final List<_FontConfig> _fonts = <_FontConfig>[]
   ..add(new _FontConfig(family: 'AdobeBlank', url: adobeBlankFontBase64Url))
-  ..add(new _FontConfig(family: 'AdobeBlank', url: adobeBlankFontBase64Url, useSimulatedLoadEvents: true))
+  ..add(new _FontConfig(
+      family: 'AdobeBlank',
+      url: adobeBlankFontBase64Url,
+      useSimulatedLoadEvents: true))
   ..add(new _FontConfig(family: 'Roboto', url: '/fonts/Roboto.ttf'))
-  ..add(new _FontConfig(family: 'Roboto', url: '/fonts/Roboto.ttf', useSimulatedLoadEvents: true))
-  ..add(new _FontConfig(family: 'Wdesk_Icons', url: '/fonts/Wdesk_Icons.ttf',testString: '\uE600 \uE601'))
-  ..add(new _FontConfig(family: 'Wdesk_Icons', url: '/fonts/Wdesk_Icons.ttf',testString: '\uE600 \uE601', useSimulatedLoadEvents: true))
-  ..add(new _FontConfig(family: 'Wdesk_Doctype-Icons', url: '/fonts/Wdesk_Doctype-Icons.ttf', testString: '\uE6D9 \uE026'))
-  ..add(new _FontConfig(family: 'Wdesk_Doctype-Icons', url: '/fonts/Wdesk_Doctype-Icons.ttf', testString: '\uE6D9 \uE026', useSimulatedLoadEvents: true))
-  ..add(new _FontConfig(family: 'Subset', url: '/fonts/subset.ttf', testString: '\u25FC \u4E2D \u56FD'))
-  ..add(new _FontConfig(family: 'Subset', url: '/fonts/subset.ttf', testString: '\u25FC \u4E2D \u56FD', useSimulatedLoadEvents: true))
-  ..add(new _FontConfig(family: 'empty', url: '/fonts/empty.otf', expectLoad: true, testString: '', useSimulatedLoadEvents: true))
+  ..add(new _FontConfig(
+      family: 'Roboto', url: '/fonts/Roboto.ttf', useSimulatedLoadEvents: true))
+  ..add(new _FontConfig(
+      family: 'Wdesk_Icons',
+      url: '/fonts/Wdesk_Icons.ttf',
+      testString: '\uE600 \uE601'))
+  ..add(new _FontConfig(
+      family: 'Wdesk_Icons',
+      url: '/fonts/Wdesk_Icons.ttf',
+      testString: '\uE600 \uE601',
+      useSimulatedLoadEvents: true))
+  ..add(new _FontConfig(
+      family: 'Wdesk_Doctype-Icons',
+      url: '/fonts/Wdesk_Doctype-Icons.ttf',
+      testString: '\uE6D9 \uE026'))
+  ..add(new _FontConfig(
+      family: 'Wdesk_Doctype-Icons',
+      url: '/fonts/Wdesk_Doctype-Icons.ttf',
+      testString: '\uE6D9 \uE026',
+      useSimulatedLoadEvents: true))
+  ..add(new _FontConfig(
+      family: 'Subset',
+      url: '/fonts/subset.ttf',
+      testString: '\u25FC \u4E2D \u56FD'))
+  ..add(new _FontConfig(
+      family: 'Subset',
+      url: '/fonts/subset.ttf',
+      testString: '\u25FC \u4E2D \u56FD',
+      useSimulatedLoadEvents: true))
+  ..add(new _FontConfig(
+      family: 'empty',
+      url: '/fonts/empty.otf',
+      expectLoad: true,
+      testString: '',
+      useSimulatedLoadEvents: true))
   ..add(new _FontConfig(family: 'W', url: '/fonts/W.ttf', testString: '\uE0FF'))
-  ..add(new _FontConfig(family: 'W', url: '/fonts/W.ttf', testString: '\uE0FF', useSimulatedLoadEvents: true));
+  ..add(new _FontConfig(
+      family: 'W',
+      url: '/fonts/W.ttf',
+      testString: '\uE0FF',
+      useSimulatedLoadEvents: true));
 
-void _drawTextToCanvas(String text, String fontName, CanvasElement canvas) {  
+void _drawTextToCanvas(String text, String fontName, CanvasElement canvas) {
   // ignore: avoid_as
-  CanvasRenderingContext2D ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
-  ctx.setFillColorRgb(255, 255, 255);
-  ctx.fillRect(0,0, canvas.width, canvas.height);
-  ctx.setFillColorRgb(0, 0, 0);
-  ctx.font = '18px $fontName';
-  ctx.fillText(text, 5, 28);
+  canvas.getContext('2d') as CanvasRenderingContext2D
+    ..setFillColorRgb(255, 255, 255)
+    ..fillRect(0, 0, canvas.width, canvas.height)
+    ..setFillColorRgb(0, 0, 0)
+    ..font = '18px $fontName'
+    ..fillText(text, 5, 28);
 }
 
 void _writeSupport() {
-  String supportString = '''
+  final String supportString = '''
 supportsStretch: $supportsStretch
 supportsNativeFontLoading: $supportsNativeFontLoading
 hasWebKitFallbackBug: $hasWebkitFallbackBug
@@ -114,32 +153,35 @@ hasWebKitFallbackBug: $hasWebkitFallbackBug
 }
 
 Future<Null> _loadFont(_FontConfig cfg, bool useSimulatedLoadEvents) async {
-  String uniqFamily = '${cfg.family}_${useSimulatedLoadEvents}';
-  print('  > Start Loading $uniqFamily ${useSimulatedLoadEvents ? "simulated" : "native"}');
-  FontFaceObserver ffo = new FontFaceObserver(uniqFamily, useSimulatedLoadEvents: useSimulatedLoadEvents, timeout: 500);
-  FontLoadResult result = await ffo.load(cfg.url);
+  final String uniqFamily = '${cfg.family}_${useSimulatedLoadEvents}';
+  print(
+      '  > Start Loading $uniqFamily ${useSimulatedLoadEvents ? "simulated" : "native"}');
+  final FontFaceObserver ffo = new FontFaceObserver(uniqFamily,
+      useSimulatedLoadEvents: useSimulatedLoadEvents, timeout: 500);
+  final FontLoadResult result = await ffo.load(cfg.url);
+  final bool pass = cfg.expectLoad ? result.isLoaded : !result.isLoaded;
   print('  * $result');
-  String message = cfg.testString;
-  
-  TableRowElement row = new TableRowElement();
-  Element table = document.getElementById('table');
-  row.append(new TableCellElement()..text = uniqFamily);
-  row.append(new TableCellElement()..text = useSimulatedLoadEvents ? "Simulated" : "FontFace");
-  row.append(new TableCellElement()..text = result.isLoaded ? 'Yes' : 'No');
+  final String message = cfg.testString;
 
-  bool pass = cfg.expectLoad ? result.isLoaded : !result.isLoaded;
+  final Element table = document.getElementById('table');
   
-  row.append(new TableCellElement()..text = pass ? 'Yes' : 'No'..style.backgroundColor = pass ? 'green' : 'red');
-
-  row.append(new TableCellElement()..append(new DivElement()
-    ..text = message
-    ..style.fontFamily = uniqFamily
-    ..style.fontSize = '18px'
-  ));
-  CanvasElement canvas = new CanvasElement();
-  canvas.width = 400;
-  canvas.height = 35;
-  row.append(new TableCellElement()..append(canvas));
+  final CanvasElement canvas = new CanvasElement()
+    ..width = 400
+    ..height = 35;
+  final TableRowElement row = new TableRowElement()
+  ..append(new TableCellElement()..text = uniqFamily)
+  ..append(new TableCellElement()
+    ..text = useSimulatedLoadEvents ? 'Simulated' : 'FontFace')
+  ..append(new TableCellElement()..text = result.isLoaded ? 'Yes' : 'No')
+  ..append(new TableCellElement()
+    ..text = pass ? 'Yes' : 'No'
+    ..style.backgroundColor = pass ? 'green' : 'red')
+  ..append(new TableCellElement()
+    ..append(new DivElement()
+      ..text = message
+      ..style.fontFamily = uniqFamily
+      ..style.fontSize = '18px'))
+  ..append(new TableCellElement()..append(canvas));
   table.append(row);
 
   _drawTextToCanvas(message, uniqFamily, canvas);
@@ -151,7 +193,7 @@ Future<Null> main() async {
   _writeSupport();
   int i = 0;
   for (; i < _fonts.length; i++) {
-    _FontConfig cfg = _fonts[i];
+    final _FontConfig cfg = _fonts[i];
     print('${i+2}. Loading ${cfg.family}');
     await _loadFont(cfg, cfg.useSimulatedLoadEvents);
   }

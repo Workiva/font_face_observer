@@ -70,26 +70,30 @@ import 'package:font_face_observer/data_uri.dart';
 void main() {
   group('DataUri', () {
     test('should build data uri correctly', () {
-      DataUri di = new DataUri();
+      final DataUri di = new DataUri();
       expect(di.toString(), equals('data:application/octet-stream;base64,'));
-      
-      di.data = DataUri.base64EncodeString('test');
-      di.mimeType = 'text/plain';
-      di.encoding = 'utf-8';
-      expect(di.toString(), equals('data:text/plain;charset=utf-8;base64,dGVzdA=='));
+
+      di
+        ..data = DataUri.base64EncodeString('test')
+        ..mimeType = 'text/plain'
+        ..encoding = 'utf-8';
+      expect(di.toString(),
+          equals('data:text/plain;charset=utf-8;base64,dGVzdA=='));
 
       di.data = DataUri.base64EncodeByteBuffer(new Uint8List(8).buffer);
-      expect(di.toString(), equals('data:text/plain;charset=utf-8;base64,AAAAAAAAAAA='));
+      expect(di.toString(),
+          equals('data:text/plain;charset=utf-8;base64,AAAAAAAAAAA='));
 
-      di.data = null;
-      di.encoding = null;
-      di.isDataBase64Encoded = false;
-      di.mimeType = null;
+      di.data = null
+        ..encoding = null
+        ..isDataBase64Encoded = false
+        ..mimeType = null;
       expect(di.toString(), equals('data:,'));
 
-      di.data = '';
-      di.encoding = '';
-      di.mimeType = '';
+      di
+        ..data = ''
+        ..encoding = ''
+        ..mimeType = '';
       expect(di.toString(), equals('data:,'));
     });
   });

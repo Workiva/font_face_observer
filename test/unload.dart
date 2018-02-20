@@ -65,8 +65,8 @@ import 'dart:async';
 import 'dart:html';
 import 'package:font_face_observer/font_face_observer.dart';
 
-String _groupA = "group_A";
-String _groupB = "group_B";
+String _groupA = 'group_A';
+String _groupB = 'group_B';
 _FontConfig _cfg = new _FontConfig(family: 'Roboto_1', url: '/fonts/Roboto.ttf', useSimulatedLoadEvents: true);
 _FontConfig _cfg2 = new _FontConfig(family: 'Roboto_2', url: '/fonts/Roboto.ttf', group: _groupA);
 _FontConfig _cfg3 = new _FontConfig(family: 'Roboto_3', url: '/fonts/Roboto.ttf', group: _groupA);
@@ -89,7 +89,7 @@ class _FontConfig {
 }
 
 Future<FontLoadResult> _loadFont(_FontConfig cfg) async {
-  FontFaceObserver ffo = new FontFaceObserver(cfg.family, useSimulatedLoadEvents: cfg.useSimulatedLoadEvents, group: cfg.group);
+  final FontFaceObserver ffo = new FontFaceObserver(cfg.family, useSimulatedLoadEvents: cfg.useSimulatedLoadEvents, group: cfg.group);
   cfg.key = ffo.key;
   return ffo.load(cfg.url);
 }
@@ -126,10 +126,10 @@ void _updateCounts() {
   document.getElementById('ffo_groups').innerHtml = FontFaceObserver.getLoadedGroups().toString();
 }
 Future<Null> _asyncLoadUnload() async {
-  FontFaceObserver ffo1 = new FontFaceObserver(_cfg2.family, useSimulatedLoadEvents: _cfg2.useSimulatedLoadEvents, group: _cfg2.group);
+  final FontFaceObserver ffo1 = new FontFaceObserver(_cfg2.family, useSimulatedLoadEvents: _cfg2.useSimulatedLoadEvents, group: _cfg2.group);
 
   // fire this off async
-  Future<FontLoadResult> f1 = ffo1.load(_cfg2.url);
+  final Future<FontLoadResult> f1 = ffo1.load(_cfg2.url);
   await FontFaceObserver.unloadGroup(ffo1.group);
   await f1;
   // The font should be unloaded
