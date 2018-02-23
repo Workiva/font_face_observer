@@ -90,9 +90,14 @@ bool _supportsStretch() {
   return div.style.font != '';
 }
 
+/// Returns true if the browser supports the FontFace API to load fonts
 bool _supportsNativeFontLoading() {
   bool supports = true;
   try {
+    // Detect if the browser supports the FontFace API by trying
+    // to access document.fonts.status below. If there is no exception,
+    // it is supported. If there is an exception, then it is not supported.
+
     // ignore: unnecessary_statements
     document.fonts.status;
   } on Exception {
