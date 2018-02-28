@@ -17,7 +17,6 @@ analyzer:
 linter:
   rules:
     # Style: Declare method return types.
-    # override with // ignore: always_declare_return_types
     - always_declare_return_types
 
     # Style: Separate the control structure expression from its statement.
@@ -30,22 +29,22 @@ linter:
     - always_require_non_null_named_parameters
 
     # Style: Specify type annotations.
-    # - always_specify_types # really annoying for local vars
+    - always_specify_types
 
     # Style: Annotate overridden members
     - annotate_overrides
 
     # Style: Avoid annotating with dynamic when not required.
-    # - avoid_annotating_with_dynamic
+    - avoid_annotating_with_dynamic
 
     # Style: Avoid using as.
-    # - avoid_as # comment overrides don't seem to work
+    - avoid_as
 
     # Style: Avoid catches without on clauses.
-    # - avoid_catches_without_on_clauses
+    - avoid_catches_without_on_clauses
 
     # Style: Don't explicitly catch Error or types that implement it.
-    # - avoid_catching_errors # Consider uncommenting under Dart 2
+    - avoid_catching_errors
 
     # Style: Avoid defining a class that contains only static members.
     - avoid_classes_with_only_static_members
@@ -78,7 +77,7 @@ linter:
     - avoid_slow_async_io
 
     # Style: Avoid annotating types for function expression parameters.
-    # - avoid_types_on_closure_parameters
+    # - avoid_types_on_closure_parameters # conflicts with always_specify_types
 
     # Style: Avoid defining unused paramters in constructors.
     - avoid_unused_constructor_parameters
@@ -90,7 +89,7 @@ linter:
     - camel_case_types
 
     # Style: Cascade consecutive method invocations on the same reference.
-    # - cascade_invocations
+    - cascade_invocations
 
     # Error: Cancel instances of dart.async.StreamSubscription.
     - cancel_subscriptions
@@ -102,7 +101,7 @@ linter:
     - comment_references
 
     # Style: Prefer using lowerCamelCase for constant names.
-    # - constant_identifier_names
+    - constant_identifier_names
 
     # Error: Avoid control flow in finally block.
     - control_flow_in_finally
@@ -153,13 +152,13 @@ linter:
     - no_duplicate_case_values
 
     # Style: Name non-constant identifiers using lowerCamelCase.
-    # - non_constant_identifier_names # UiFactories will lint
+    - non_constant_identifier_names # UiFactories will lint
 
     # Style: Omit type annotations for local variables.
-    # - omit_local_variable_types
+    # - omit_local_variable_types # conflicts with always_specify_types
 
     # Style: Avoid defining a one-member abstract class when a simple function will do.
-    # - one_member_abstracts
+    - one_member_abstracts
 
     # Style: Only throw instances of classes extending either Exception or Error
     - only_throw_errors
@@ -177,7 +176,7 @@ linter:
     - package_prefixed_library_names
 
     # Style: Don't reassign references to parameters of functions or methods.
-    # - parameter_assignments # team preference
+    - parameter_assignments
 
     # Style: Use adjacent strings to concatenate string literals.
     - prefer_adjacent_string_concatenation
@@ -213,13 +212,13 @@ linter:
     - prefer_contains
 
     # Style: Use => for short members whose body is a single return statement.
-    # - prefer_expression_function_bodies
+    - prefer_expression_function_bodies
 
     # Style: Private field could be final.
-    # - prefer_final_fields
+    - prefer_final_fields
 
     # Style: Prefer final for variable declaration if reference is not reassigned.
-    # - prefer_final_locals # Noisy, people use var a lot
+    - prefer_final_locals # Noisy, people use var a lot
 
     # Style: Use forEach to only apply a function to all the elements.
     - prefer_foreach
@@ -246,10 +245,10 @@ linter:
     - prefer_typing_uninitialized_variables
 
     # Style: Document all public members
-    # - public_member_api_docs # really annoying for lifecycle methods
+    - public_member_api_docs
 
     # Style: Property getter recursively returns itself.
-    # - recursive_getters # seems buggy
+    - recursive_getters
 
     # Style: Prefer to use /// for doc comments
     - slash_for_doc_comments
