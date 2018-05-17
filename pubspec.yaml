@@ -4,6 +4,9 @@ description: Font load events, simple, small and efficient. Dart port of https:/
 author: Rob Becker <rob.becker@workiva.com>
 homepage: https://github.com/Workiva/font_face_observer
 
+environment:
+  sdk: '>=1.22.1 <=2.0.0'
+
 dependencies:
   dart2_constant: ^1.0.0
 
