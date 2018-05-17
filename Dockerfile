@@ -20,7 +20,6 @@ RUN echo "Starting the script sections" && \
 	pub run dart_dev analyze && \
 	pub run dart_dev format --check && \
 	xvfb-run -s '-screen 0 1024x768x24' pub run dart_dev test --web-compiler=dartdevc -p chrome && \
-	xvfb-run -s '-screen 0 1024x768x24' pub run dart_dev coverage --no-html && \
 	pub run dart_dev docs --no-open && \
 	tar czvf api.tar.gz -C doc/api . && \
 	pub run dart_build test && \
