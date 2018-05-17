@@ -61,9 +61,10 @@ Copyright © [YEAR] W3C® (MIT, ERCIM, Keio, Beihang)."
 
 https://www.w3.org/Consortium/Legal/2015/copyright-software-and-document
 */
-import 'dart:convert';
+
 import 'dart:html';
 import 'dart:typed_data';
+import 'package:dart2_constant/convert.dart' as convert;
 
 /// A utility to create data URIs
 ///
@@ -115,5 +116,5 @@ class DataUri {
   /// Static method to encode a ByteBuffer (which you get back from an
   /// HttpRequest) to base64 String
   static String base64EncodeByteBuffer(ByteBuffer buf) =>
-      BASE64.encode(buf.asUint8List().toList());
+      convert.base64.encode(buf.asUint8List().toList());
 }

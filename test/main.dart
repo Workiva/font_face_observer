@@ -164,24 +164,24 @@ Future<Null> _loadFont(_FontConfig cfg, bool useSimulatedLoadEvents) async {
   final String message = cfg.testString;
 
   final Element table = document.getElementById('table');
-  
+
   final CanvasElement canvas = new CanvasElement()
     ..width = 400
     ..height = 35;
   final TableRowElement row = new TableRowElement()
-  ..append(new TableCellElement()..text = uniqFamily)
-  ..append(new TableCellElement()
-    ..text = useSimulatedLoadEvents ? 'Simulated' : 'FontFace')
-  ..append(new TableCellElement()..text = result.isLoaded ? 'Yes' : 'No')
-  ..append(new TableCellElement()
-    ..text = pass ? 'Yes' : 'No'
-    ..style.backgroundColor = pass ? 'green' : 'red')
-  ..append(new TableCellElement()
-    ..append(new DivElement()
-      ..text = message
-      ..style.fontFamily = uniqFamily
-      ..style.fontSize = '18px'))
-  ..append(new TableCellElement()..append(canvas));
+    ..append(new TableCellElement()..text = uniqFamily)
+    ..append(new TableCellElement()
+      ..text = useSimulatedLoadEvents ? 'Simulated' : 'FontFace')
+    ..append(new TableCellElement()..text = result.isLoaded ? 'Yes' : 'No')
+    ..append(new TableCellElement()
+      ..text = pass ? 'Yes' : 'No'
+      ..style.backgroundColor = pass ? 'green' : 'red')
+    ..append(new TableCellElement()
+      ..append(new DivElement()
+        ..text = message
+        ..style.fontFamily = uniqFamily
+        ..style.fontSize = '18px'))
+    ..append(new TableCellElement()..append(canvas));
   table.append(row);
 
   _drawTextToCanvas(message, uniqFamily, canvas);

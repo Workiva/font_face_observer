@@ -103,12 +103,12 @@ void main() {
     });
 
     test('should init correctly with passed in values', () {
-      final String family = 'my family';
-      final String style = 'my style';
-      final String weight = 'my weight';
-      final String stretch = 'my stretch';
-      final String testString = 'my testString';
-      final int timeout = 1337;
+      const String family = 'my family';
+      const String style = 'my style';
+      const String weight = 'my weight';
+      const String stretch = 'my stretch';
+      const String testString = 'my testString';
+      const int timeout = 1337;
 
       final FontFaceObserver ffo = new FontFaceObserver(family,
           style: style,
@@ -207,7 +207,7 @@ void main() {
     });
 
     test('should unload a font by group', () async {
-      final String group = 'somegroup';
+      const String group = 'somegroup';
       await new FontFaceObserver('unload_by_group1', group: group).load(_FontUrls.roboto);
       await new FontFaceObserver('unload_by_group2', group: group).load(_FontUrls.roboto);
       await FontFaceObserver.unloadGroup(group);
@@ -216,7 +216,7 @@ void main() {
 
 
     test('should keep data-uses attribute up to date', () async {
-      final String differentGroup = 'diff';
+      const String differentGroup = 'diff';
       final FontFaceObserver ffo = new FontFaceObserver('uses_test');
       final String key = ffo.key;
       FontLoadResult result = await ffo.load(_FontUrls.roboto);

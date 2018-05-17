@@ -66,7 +66,7 @@ https://www.w3.org/Consortium/Legal/2015/copyright-software-and-document
 const String adobeBlankFamily = 'AdobeBlank';
 
 /// The font key for the AdobeBlank font
-final String adobeBlankKey = '${adobeBlankFamily}_normal_normal_normal';
+const String adobeBlankKey = '${adobeBlankFamily}_normal_normal_normal';
 
 /// The base64 encoded AdobeBlank font
 const String adobeBlankFontBase64Url =
