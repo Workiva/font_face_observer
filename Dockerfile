@@ -22,7 +22,6 @@ RUN echo "Starting the script sections" && \
 	dart --version && \
 	pub --version && \
 	pub get && \
-	pub publish --dry-run && \
 	pub run dart_dev analyze && \
 	pub run dart_dev format --check && \
 	xvfb-run -s '-screen 0 1024x768x24' pub run dart_dev test --web-compiler=dartdevc -p chrome && \
@@ -33,6 +32,10 @@ RUN echo "Starting the script sections" && \
 	tar -hcf build.tar.gz build/test/ && \
 	tar czvf font_face_observer.pub.tgz LICENSE README.md pubspec.yaml analysis_options.yaml lib/ && \
 	./tool/codecov.sh && \
+	mkdir .temp && \
+	tar xzvf font_face_observer.pub.tgz -C .temp && \
+	cd .temp && \
+	pub publish --dry-run && \
 	echo "Script sections completed"
 ARG BUILD_ARTIFACTS_WEB_BUILD=/build/build.tar.gz
 ARG BUILD_ARTIFACTS_DOCUMENTATION=/build/api.tar.gz
