@@ -1,4 +1,4 @@
-FROM drydock-prod.workiva.net/workiva/smithy-runner-generator:313742 as build
+FROM drydock-prod.workiva.net/workiva/smithy-runner-generator:316274 as build
 
 # Build Environment Vars
 ARG BUILD_ID
@@ -15,10 +15,10 @@ WORKDIR /build/
 ADD . /build/
 ENV CODECOV_TOKEN='bQ4MgjJ0G2Y73v8JNX6L7yMK9679nbYB'
 RUN echo "Starting the script sections" && \
-	wget https://storage.googleapis.com/dart-archive/channels/dev/release/2.0.0-dev.58.0/sdk/dartsdk-linux-x64-release.zip && \
-	unzip dartsdk-linux-x64-release.zip && \
-	export D2PATH=`pwd`/dart-sdk/bin && \
-	export PATH=$D2PATH:$PATH && \
+	# wget https://storage.googleapis.com/dart-archive/channels/dev/release/2.0.0-dev.58.0/sdk/dartsdk-linux-x64-release.zip && \
+	# unzip dartsdk-linux-x64-release.zip && \
+	# export D2PATH=`pwd`/dart-sdk/bin && \
+	# export PATH=$D2PATH:$PATH && \
 	dart --version && \
 	pub --version && \
 	pub get && \
