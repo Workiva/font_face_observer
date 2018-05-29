@@ -84,7 +84,8 @@ void main() {
       expect(di.toString(),
           equals('data:text/plain;charset=utf-8;base64,AAAAAAAAAAA='));
 
-      di..data = null
+      di
+        ..data = null
         ..encoding = null
         ..isDataBase64Encoded = false
         ..mimeType = null;
