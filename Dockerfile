@@ -25,13 +25,14 @@ RUN echo "Starting the script sections" && \
 	pub run dart_dev analyze && \
 	pub run dart_dev format --check && \
 	xvfb-run -s '-screen 0 1024x768x24' pub run dart_dev test --web-compiler=dartdevc -p chrome && \
+	#xvfb-run -s '-screen 0 1024x768x24' pub run dart_dev coverage --no-html && \
 	pub run dart_dev docs --no-open && \
 	tar czvf api.tar.gz -C doc/api . && \
 	pub run dart_build build test && \
 	./tool/stage_for_cdn.sh && \
 	tar -hcf build.tar.gz build/test/ && \
 	tar czvf font_face_observer.pub.tgz LICENSE README.md pubspec.yaml analysis_options.yaml lib/ && \
-	./tool/codecov.sh && \
+	#./tool/codecov.sh && \
 	mkdir .temp && \
 	tar xzvf font_face_observer.pub.tgz -C .temp && \
 	cd .temp && \
