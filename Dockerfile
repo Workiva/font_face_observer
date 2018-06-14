@@ -22,7 +22,15 @@ RUN echo "Starting the script sections" && \
 	dart --version && \
 	pub --version && \
 	pub get && \
+	# make a temp location to run pub publish dry run so it only looks at what is published
+	# otherwise it fails with "Your package is 232.8 MB. Hosted packages must be smaller than 100 MB."
+	tar czvf font_face_observer.pub.tgz LICENSE README.md pubspec.yaml analysis_options.yaml lib/ && \
+	mkdir .temp && \
+	tar xzvf font_face_observer.pub.tgz -C .temp && \
+	cd .temp && \
 	pub publish --dry-run && \
+	cd .. && \
+	rm .temp && \
 	pub run dart_dev analyze && \
 	xvfb-run -s '-screen 0 1024x768x24' pub run dart_dev test --web-compiler=dartdevc -p chrome && \
 	# Switch to Dart 2
@@ -38,7 +46,9 @@ RUN echo "Starting the script sections" && \
 	pub run dart_build build test && \
 	./tool/stage_for_cdn.sh && \
 	tar -hcf build.tar.gz build/test/ && \
-	tar czvf font_face_observer.pub.tgz LICENSE README.md pubspec.yaml analysis_options.yaml lib/ && \
+
+
+
 	echo "Script sections completed"
 ARG BUILD_ARTIFACTS_WEB_BUILD=/build/build.tar.gz
 ARG BUILD_ARTIFACTS_DOCUMENTATION=/build/api.tar.gz
