@@ -30,7 +30,6 @@ RUN echo "Starting the script sections" && \
 	cd .temp && \
 	pub publish --dry-run && \
 	cd .. && \
-	rm .temp && \
 	pub run dart_dev analyze && \
 	xvfb-run -s '-screen 0 1024x768x24' pub run dart_dev test --web-compiler=dartdevc -p chrome && \
 	# Switch to Dart 2
