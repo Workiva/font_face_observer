@@ -45,9 +45,6 @@ RUN echo "Starting the script sections" && \
 	pub run dart_build build test && \
 	./tool/stage_for_cdn.sh && \
 	tar -hcf build.tar.gz build/test/ && \
-
-
-
 	echo "Script sections completed"
 ARG BUILD_ARTIFACTS_WEB_BUILD=/build/build.tar.gz
 ARG BUILD_ARTIFACTS_DOCUMENTATION=/build/api.tar.gz
