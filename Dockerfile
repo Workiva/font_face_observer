@@ -15,9 +15,17 @@ WORKDIR /build/
 ADD . /build/
 ENV CODECOV_TOKEN='bQ4MgjJ0G2Y73v8JNX6L7yMK9679nbYB'
 RUN echo "Starting the script sections" && \
-	wget https://storage.googleapis.com/dart-archive/channels/dev/release/2.0.0-dev.58.0/sdk/dartsdk-linux-x64-release.zip && \
+	wget https://storage.googleapis.com/dart-archive/channels/dev/release/2.0.0-dev.62.0/sdk/dartsdk-linux-x64-release.zip && \
 	unzip dartsdk-linux-x64-release.zip && \
 	export D2PATH=`pwd`/dart-sdk/bin && \
+	# Start with Dart 1
+	dart --version && \
+	pub --version && \
+	pub get && \
+	pub run dart_dev analyze && \
+	xvfb-run -s '-screen 0 1024x768x24' pub run dart_dev test --web-compiler=dartdevc -p chrome && \
+	xvfb-run -s '-screen 0 1024x768x24' pub run dart_dev coverage --no-html && \
+	# Switch to Dart 2
 	export PATH=$D2PATH:$PATH && \
 	dart --version && \
 	pub --version && \
@@ -25,7 +33,6 @@ RUN echo "Starting the script sections" && \
 	pub run dart_dev analyze && \
 	pub run dart_dev format --check && \
 	xvfb-run -s '-screen 0 1024x768x24' pub run dart_dev test --web-compiler=dartdevc -p chrome && \
-	#xvfb-run -s '-screen 0 1024x768x24' pub run dart_dev coverage --no-html && \
 	pub run dart_dev docs --no-open && \
 	tar czvf api.tar.gz -C doc/api . && \
 	pub run dart_build build test && \
