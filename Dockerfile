@@ -24,7 +24,6 @@ RUN echo "Starting the script sections" && \
 	pub get && \
 	pub run dart_dev analyze && \
 	xvfb-run -s '-screen 0 1024x768x24' pub run dart_dev test --web-compiler=dartdevc -p chrome && \
-	xvfb-run -s '-screen 0 1024x768x24' pub run dart_dev coverage --no-html && \
 	# Switch to Dart 2
 	export PATH=$D2PATH:$PATH && \
 	dart --version && \
