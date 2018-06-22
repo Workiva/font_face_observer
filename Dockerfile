@@ -15,7 +15,7 @@ WORKDIR /build/
 ADD . /build/
 ENV CODECOV_TOKEN='bQ4MgjJ0G2Y73v8JNX6L7yMK9679nbYB'
 RUN echo "Starting the script sections" && \
-	wget https://storage.googleapis.com/dart-archive/channels/dev/release/2.0.0-dev.62.0/sdk/dartsdk-linux-x64-release.zip && \
+	wget https://storage.googleapis.com/dart-archive/channels/dev/release/2.0.0-dev.64.1/sdk/dartsdk-linux-x64-release.zip && \
 	unzip dartsdk-linux-x64-release.zip && \
 	export D2PATH=`pwd`/dart-sdk/bin && \
 	# Start with Dart 1
