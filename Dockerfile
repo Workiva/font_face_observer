@@ -1,4 +1,4 @@
-FROM drydock-prod.workiva.net/workiva/smithy-runner-generator:355624 as build
+FROM drydock-prod.workiva.net/workiva/smithy-runner-generator:243252 as build
 
 # Build Environment Vars
 ARG BUILD_ID
@@ -15,7 +15,8 @@ WORKDIR /build/
 ADD . /build/
 ENV CODECOV_TOKEN='bQ4MgjJ0G2Y73v8JNX6L7yMK9679nbYB'
 RUN echo "Starting the script sections" && \
-	which content_shell && \
+	export DARTIUM_EXPIRATION_TIME=1577836800 && \
+	export DART_FLAGS='--checked --load_deferred_eagerly' && \
 	pub get --packages-dir && \
 	pub publish --dry-run && \
 	pub run dart_dev analyze && \
