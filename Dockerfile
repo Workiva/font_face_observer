@@ -15,20 +15,21 @@ WORKDIR /build/
 ADD . /build/
 ENV CODECOV_TOKEN='bQ4MgjJ0G2Y73v8JNX6L7yMK9679nbYB'
 RUN echo "Starting the script sections" && \
-		pub get --packages-dir && \
-		pub publish --dry-run && \
-		pub run dart_dev analyze && \
-		pub run dart_dev format --check && \
-		xvfb-run -s '-screen 0 1024x768x24' pub run dart_dev test --web-compiler=dartdevc -p content-shell && \
-		xvfb-run -s '-screen 0 1024x768x24' pub run dart_dev coverage --no-html && \
-		pub run dart_dev docs --no-open && \
-		tar czvf api.tar.gz -C doc/api . && \
-		pub build test && \
-		./tool/stage_for_cdn.sh && \
-		tar -hcf build.tar.gz build/test/ && \
-		tar czvf font_face_observer.pub.tgz LICENSE README.md pubspec.yaml lib/ && \
-		./tool/codecov.sh && \
-		echo "Script sections completed"
+	export DARTIUM_EXPIRATION_TIME=1577836800 && \
+	pub get --packages-dir && \
+	pub publish --dry-run && \
+	pub run dart_dev analyze && \
+	pub run dart_dev format --check && \
+	xvfb-run -s '-screen 0 1024x768x24' pub run dart_dev test --web-compiler=dartdevc -p content-shell && \
+	xvfb-run -s '-screen 0 1024x768x24' pub run dart_dev coverage --no-html && \
+	pub run dart_dev docs --no-open && \
+	tar czvf api.tar.gz -C doc/api . && \
+	pub build test && \
+	./tool/stage_for_cdn.sh && \
+	tar -hcf build.tar.gz build/test/ && \
+	tar czvf font_face_observer.pub.tgz LICENSE README.md pubspec.yaml lib/ && \
+	./tool/codecov.sh && \
+	echo "Script sections completed"
 ARG BUILD_ARTIFACTS_WEB_BUILD=/build/build.tar.gz
 ARG BUILD_ARTIFACTS_DOCUMENTATION=/build/api.tar.gz
 ARG BUILD_ARTIFACTS_DART-DEPENDENCIES=/build/pubspec.lock
