@@ -1,4 +1,4 @@
-FROM drydock-prod.workiva.net/workiva/smithy-runner-generator:245585 as build
+FROM drydock-prod.workiva.net/workiva/smithy-runner-generator:355624 as build
 
 # Build Environment Vars
 ARG BUILD_ID
@@ -21,7 +21,7 @@ RUN echo "Starting the script sections" && \
 	pub publish --dry-run && \
 	pub run dart_dev analyze && \
 	pub run dart_dev format --check && \
-	xvfb-run -s '-screen 0 1024x768x24' pub run dart_dev test --web-compiler=dartdevc -p content-shell && \
+	xvfb-run -s '-screen 0 1024x768x24' pub run dart_dev test --web-compiler=dartdevc -p dartium && \
 	xvfb-run -s '-screen 0 1024x768x24' pub run dart_dev coverage --no-html && \
 	pub run dart_dev docs --no-open && \
 	tar czvf api.tar.gz -C doc/api . && \
