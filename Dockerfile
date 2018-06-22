@@ -16,6 +16,7 @@ ADD . /build/
 ENV CODECOV_TOKEN='bQ4MgjJ0G2Y73v8JNX6L7yMK9679nbYB'
 RUN echo "Starting the script sections" && \
 	export DARTIUM_EXPIRATION_TIME=1577836800 && \
+	export DART_FLAGS='--checked --load_deferred_eagerly' && \
 	pub get --packages-dir && \
 	pub publish --dry-run && \
 	pub run dart_dev analyze && \
