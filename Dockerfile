@@ -20,6 +20,9 @@ RUN echo "Starting the script sections" && \
 	pub get --packages-dir && \
 	pub publish --dry-run && \
 	pub run dart_dev analyze && \
+	pub run abide && \
+	pub run dependency_validator -i abide,analyzer,browser,coverage,dart_dev,dart_style,dartdoc,semver_audit && \
+	pub run semver_audit report --repo Workiva/font_face_observer && \
 	pub run dart_dev format --check && \
 	xvfb-run -s '-screen 0 1024x768x24' pub run dart_dev test --web-compiler=dartdevc -p dartium && \
 	xvfb-run -s '-screen 0 1024x768x24' pub run dart_dev coverage --no-html && \
