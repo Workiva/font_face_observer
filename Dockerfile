@@ -15,7 +15,7 @@ WORKDIR /build/
 ADD . /build/
 ENV CODECOV_TOKEN='bQ4MgjJ0G2Y73v8JNX6L7yMK9679nbYB'
 RUN echo "Starting the script sections" && \
-	wget https://storage.googleapis.com/dart-archive/channels/dev/release/2.0.0-dev.64.1/sdk/dartsdk-linux-x64-release.zip && \
+	wget https://storage.googleapis.com/dart-archive/channels/dev/release/2.0.0-dev.69/sdk/dartsdk-linux-x64-release.zip && \
 	unzip dartsdk-linux-x64-release.zip && \
 	export D2PATH=`pwd`/dart-sdk/bin && \
 	# Start with Dart 1
@@ -39,7 +39,7 @@ RUN echo "Starting the script sections" && \
 	pub get && \
 	dartanalyzer . && \
 	dartfmt -w --set-exit-if-changed && \
-	xvfb-run -s '-screen 0 1024x768x24' pub run test test/*_test.dart -p chrome && \
+	xvfb-run -s '-screen 0 1024x768x24' pub run build_runner test -- test/*_test.dart -p chrome && \
 	dartdoc && \
 	tar czvf api.tar.gz -C doc/api . && \
 	pub run dart_build build test && \
