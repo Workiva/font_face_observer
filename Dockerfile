@@ -30,17 +30,17 @@ RUN echo "Starting the script sections" && \
 	cd .temp && \
 	pub publish --dry-run && \
 	cd .. && \
-	pub run dart_dev analyze && \
-	xvfb-run -s '-screen 0 1024x768x24' pub run dart_dev test --web-compiler=dartdevc -p chrome && \
+	dartanalyzer . && \
+	xvfb-run -s '-screen 0 1024x768x24' pub run test test/*_test.dart --web-compiler=dartdevc -p chrome && \
 	# Switch to Dart 2
 	export PATH=$D2PATH:$PATH && \
 	dart --version && \
 	pub --version && \
 	pub get && \
-	pub run dart_dev analyze && \
-	pub run dart_dev format --check && \
-	xvfb-run -s '-screen 0 1024x768x24' pub run dart_dev test --web-compiler=dartdevc -p chrome && \
-	pub run dart_dev docs --no-open && \
+	dartanalyzer . && \
+	dartfmt -w --set-exit-if-changed && \
+	xvfb-run -s '-screen 0 1024x768x24' pub run test test/*_test.dart -p chrome && \
+	dartdoc && \
 	tar czvf api.tar.gz -C doc/api . && \
 	pub run dart_build build test && \
 	./tool/stage_for_cdn.sh && \
