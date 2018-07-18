@@ -69,11 +69,11 @@ import 'package:font_face_observer/font_face_observer.dart';
 import 'package:font_face_observer/src/adobe_blank.dart';
 
 class _FontUrls {
-  static const String roboto = 'fonts/Roboto.ttf';
-  static const String w = 'fonts/W.ttf';
-  static const String empty = 'fonts/empty.ttf';
-  static const String subset = 'fonts/subset.ttf';
-  static const String fontNotFound = 'fonts/font_not_found.ttf';
+  static const String roboto = '../example/fonts/Roboto.ttf';
+  static const String w = '../example/fonts/W.ttf';
+  static const String empty = '../example/fonts/empty.ttf';
+  static const String subset = '../example/fonts/subset.ttf';
+  static const String fontNotFound = '../example/fonts/font_not_found.ttf';
 }
 
 void main() {

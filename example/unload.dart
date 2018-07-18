@@ -67,14 +67,14 @@ import 'package:font_face_observer/font_face_observer.dart';
 
 String _groupA = 'group_A';
 String _groupB = 'group_B';
-_FontConfig _cfg = new _FontConfig(
+_FontConfig _cfg = _FontConfig(
     family: 'Roboto_1', url: '/fonts/Roboto.ttf', useSimulatedLoadEvents: true);
-_FontConfig _cfg2 = new _FontConfig(
-    family: 'Roboto_2', url: '/fonts/Roboto.ttf', group: _groupA);
-_FontConfig _cfg3 = new _FontConfig(
-    family: 'Roboto_3', url: '/fonts/Roboto.ttf', group: _groupA);
-_FontConfig _cfg4 = new _FontConfig(
-    family: 'Roboto_2', url: '/fonts/Roboto.ttf', group: _groupB);
+_FontConfig _cfg2 =
+    _FontConfig(family: 'Roboto_2', url: '/fonts/Roboto.ttf', group: _groupA);
+_FontConfig _cfg3 =
+    _FontConfig(family: 'Roboto_3', url: '/fonts/Roboto.ttf', group: _groupA);
+_FontConfig _cfg4 =
+    _FontConfig(family: 'Roboto_2', url: '/fonts/Roboto.ttf', group: _groupB);
 
 Element _unloadButton = document.getElementById('unloadBtn');
 Element _unloadGroupButton = document.getElementById('unloadGroupBtn');
@@ -91,13 +91,13 @@ class _FontConfig {
   _FontConfig(
       {this.family,
       this.url,
-      this.useSimulatedLoadEvents: false,
-      this.group: FontFaceObserver.defaultGroup});
+      this.useSimulatedLoadEvents = false,
+      this.group = FontFaceObserver.defaultGroup});
   String key;
 }
 
 Future<FontLoadResult> _loadFont(_FontConfig cfg) async {
-  final FontFaceObserver ffo = new FontFaceObserver(cfg.family,
+  final FontFaceObserver ffo = FontFaceObserver(cfg.family,
       useSimulatedLoadEvents: cfg.useSimulatedLoadEvents, group: cfg.group);
   cfg.key = ffo.key;
   return ffo.load(cfg.url);
@@ -138,7 +138,7 @@ void _updateCounts() {
 }
 
 Future<Null> _asyncLoadUnload() async {
-  final FontFaceObserver ffo1 = new FontFaceObserver(_cfg2.family,
+  final FontFaceObserver ffo1 = FontFaceObserver(_cfg2.family,
       useSimulatedLoadEvents: _cfg2.useSimulatedLoadEvents, group: _cfg2.group);
 
   // fire this off async
