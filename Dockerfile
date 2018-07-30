@@ -15,12 +15,7 @@ WORKDIR /build/
 ADD . /build/
 ENV CODECOV_TOKEN='bQ4MgjJ0G2Y73v8JNX6L7yMK9679nbYB'
 RUN echo "Starting the script sections" && \
-	wget https://storage.googleapis.com/dart-archive/channels/dev/release/2.0.0-dev.69.4/sdk/dartsdk-linux-x64-release.zip && \
-	unzip dartsdk-linux-x64-release.zip && \
-	export D2PATH=`pwd`/dart-sdk/bin && \
-	# Start with Dart 1
 	dart --version && \
-	pub --version && \
 	pub get && \
 	# make a temp location to run pub publish dry run so it only looks at what is published
 	# otherwise it fails with "Your package is 232.8 MB. Hosted packages must be smaller than 100 MB."
@@ -31,17 +26,8 @@ RUN echo "Starting the script sections" && \
 	pub publish --dry-run && \
 	cd .. && \
 	dartanalyzer lib && \
-	xvfb-run -s '-screen 0 1024x768x24' pub run test test/*_test.dart -p chrome && \
-	# Switch to Dart 2
-	rm -r .pub .dart_tool/pub && echo "Removed .pub/"; find . -name packages | xargs rm -rf && echo "Removed packages/"; rm .packages && echo "Removed .packages" && \
-	rm pubspec.lock && echo "Removed pubspec.lock" && \
-	export PATH=$D2PATH:$PATH && \
-	dart --version && \
-	pub --version && \
-	pub get && \
-	dartanalyzer . && \
 	dartfmt -w --set-exit-if-changed lib example && \
-	xvfb-run -s '-screen 0 1024x768x24' pub run build_runner test -- test/*_test.dart -p chrome && \
+	xvfb-run -s '-screen 0 1024x768x24' pub run test test/*_test.dart -p chrome && \
 	dartdoc && \
 	tar czvf api.tar.gz -C doc/api .
 ARG BUILD_ARTIFACTS_DOCUMENTATION=/build/api.tar.gz
