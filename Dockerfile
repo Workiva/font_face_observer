@@ -31,7 +31,7 @@ RUN echo "Starting the script sections" && \
 	pub publish --dry-run && \
 	cd .. && \
 	dartanalyzer lib && \
-	xvfb-run -s '-screen 0 1024x768x24' pub run test test/*_test.dart --web-compiler=dartdevc -p chrome && \
+	xvfb-run -s '-screen 0 1024x768x24' pub run test test/*_test.dart -p chrome && \
 	# Switch to Dart 2
 	export PATH=$D2PATH:$PATH && \
 	dart --version && \
