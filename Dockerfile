@@ -43,12 +43,7 @@ RUN echo "Starting the script sections" && \
 	dartfmt -w --set-exit-if-changed lib example && \
 	xvfb-run -s '-screen 0 1024x768x24' pub run build_runner test -- test/*_test.dart -p chrome && \
 	dartdoc && \
-	tar czvf api.tar.gz -C doc/api . && \
-	pub run dart_build build test && \
-	./tool/stage_for_cdn.sh && \
-	tar -hcf build.tar.gz build/test/ && \
-	echo "Script sections completed"
-ARG BUILD_ARTIFACTS_WEB_BUILD=/build/build.tar.gz
+	tar czvf api.tar.gz -C doc/api .
 ARG BUILD_ARTIFACTS_DOCUMENTATION=/build/api.tar.gz
 ARG BUILD_ARTIFACTS_DART-DEPENDENCIES=/build/pubspec.lock
 ARG BUILD_ARTIFACTS_PUB=/build/font_face_observer.pub.tgz
