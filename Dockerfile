@@ -38,7 +38,7 @@ RUN echo "Starting the script sections" && \
 	export PATH=$D2PATH:$PATH && \
 	dart --version && \
 	pub --version && \
-	puclean && \
+	pubclean && \
 	pub get && \
 	dartanalyzer . && \
 	dartfmt -w --set-exit-if-changed && \
