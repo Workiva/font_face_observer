@@ -85,26 +85,52 @@ class _FontConfig {
 
 final List<_FontConfig> _fonts = <_FontConfig>[]
   ..add(new _FontConfig(family: 'AdobeBlank', url: adobeBlankFontBase64Url))
-  ..add(new _FontConfig(family: 'AdobeBlank', url: adobeBlankFontBase64Url, useSimulatedLoadEvents: true))
+  ..add(new _FontConfig(
+      family: 'AdobeBlank',
+      url: adobeBlankFontBase64Url,
+      useSimulatedLoadEvents: true))
   ..add(new _FontConfig(family: 'Roboto', url: '/fonts/Roboto.ttf'))
-  ..add(new _FontConfig(family: 'Roboto', url: '/fonts/Roboto.ttf', useSimulatedLoadEvents: true))
-  ..add(new _FontConfig(family: 'Wdesk_Icons', url: '/fonts/Wdesk_Icons.ttf', testString: '\uE600 \uE601'))
   ..add(new _FontConfig(
-      family: 'Wdesk_Icons', url: '/fonts/Wdesk_Icons.ttf', testString: '\uE600 \uE601', useSimulatedLoadEvents: true))
+      family: 'Roboto', url: '/fonts/Roboto.ttf', useSimulatedLoadEvents: true))
   ..add(new _FontConfig(
-      family: 'Wdesk_Doctype-Icons', url: '/fonts/Wdesk_Doctype-Icons.ttf', testString: '\uE6D9 \uE026'))
+      family: 'Wdesk_Icons',
+      url: '/fonts/Wdesk_Icons.ttf',
+      testString: '\uE600 \uE601'))
+  ..add(new _FontConfig(
+      family: 'Wdesk_Icons',
+      url: '/fonts/Wdesk_Icons.ttf',
+      testString: '\uE600 \uE601',
+      useSimulatedLoadEvents: true))
+  ..add(new _FontConfig(
+      family: 'Wdesk_Doctype-Icons',
+      url: '/fonts/Wdesk_Doctype-Icons.ttf',
+      testString: '\uE6D9 \uE026'))
   ..add(new _FontConfig(
       family: 'Wdesk_Doctype-Icons',
       url: '/fonts/Wdesk_Doctype-Icons.ttf',
       testString: '\uE6D9 \uE026',
       useSimulatedLoadEvents: true))
-  ..add(new _FontConfig(family: 'Subset', url: '/fonts/subset.ttf', testString: '\u25FC \u4E2D \u56FD'))
   ..add(new _FontConfig(
-      family: 'Subset', url: '/fonts/subset.ttf', testString: '\u25FC \u4E2D \u56FD', useSimulatedLoadEvents: true))
+      family: 'Subset',
+      url: '/fonts/subset.ttf',
+      testString: '\u25FC \u4E2D \u56FD'))
   ..add(new _FontConfig(
-      family: 'empty', url: '/fonts/empty.otf', expectLoad: true, testString: '', useSimulatedLoadEvents: true))
+      family: 'Subset',
+      url: '/fonts/subset.ttf',
+      testString: '\u25FC \u4E2D \u56FD',
+      useSimulatedLoadEvents: true))
+  ..add(new _FontConfig(
+      family: 'empty',
+      url: '/fonts/empty.otf',
+      expectLoad: true,
+      testString: '',
+      useSimulatedLoadEvents: true))
   ..add(new _FontConfig(family: 'W', url: '/fonts/W.ttf', testString: '\uE0FF'))
-  ..add(new _FontConfig(family: 'W', url: '/fonts/W.ttf', testString: '\uE0FF', useSimulatedLoadEvents: true));
+  ..add(new _FontConfig(
+      family: 'W',
+      url: '/fonts/W.ttf',
+      testString: '\uE0FF',
+      useSimulatedLoadEvents: true));
 
 void _drawTextToCanvas(String text, String fontName, CanvasElement canvas) {
   // ignore: avoid_as
@@ -128,9 +154,10 @@ hasWebKitFallbackBug: $hasWebkitFallbackBug
 
 Future<Null> _loadFont(_FontConfig cfg, bool useSimulatedLoadEvents) async {
   final String uniqFamily = '${cfg.family}_${useSimulatedLoadEvents}';
-  print('  > Start Loading $uniqFamily ${useSimulatedLoadEvents ? "simulated" : "native"}');
-  final FontFaceObserver ffo =
-      new FontFaceObserver(uniqFamily, useSimulatedLoadEvents: useSimulatedLoadEvents, timeout: 500);
+  print(
+      '  > Start Loading $uniqFamily ${useSimulatedLoadEvents ? "simulated" : "native"}');
+  final FontFaceObserver ffo = new FontFaceObserver(uniqFamily,
+      useSimulatedLoadEvents: useSimulatedLoadEvents, timeout: 500);
   final FontLoadResult result = await ffo.load(cfg.url);
   final bool pass = cfg.expectLoad ? result.isLoaded : !result.isLoaded;
   print('  * $result');
@@ -143,7 +170,8 @@ Future<Null> _loadFont(_FontConfig cfg, bool useSimulatedLoadEvents) async {
     ..height = 35;
   final TableRowElement row = new TableRowElement()
     ..append(new TableCellElement()..text = uniqFamily)
-    ..append(new TableCellElement()..text = useSimulatedLoadEvents ? 'Simulated' : 'FontFace')
+    ..append(new TableCellElement()
+      ..text = useSimulatedLoadEvents ? 'Simulated' : 'FontFace')
     ..append(new TableCellElement()..text = result.isLoaded ? 'Yes' : 'No')
     ..append(new TableCellElement()
       ..text = pass ? 'Yes' : 'No'
