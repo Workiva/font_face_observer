@@ -33,8 +33,8 @@ RUN echo "Starting the script sections" && \
 	dartanalyzer lib && \
 	xvfb-run -s '-screen 0 1024x768x24' pub run test test/*_test.dart -p chrome && \
 	# Switch to Dart 2
-	alias pubcleanlock='git ls-files pubspec.lock --error-unmatch &>/dev/null && echo "Not removing pubspec.lock - it is tracked" || (rm pubspec.lock && echo "Removed pubspec.lock")' && \
-	alias pubclean='rm -r .pub .dart_tool/pub && echo "Removed .pub/"; find . -name packages | xargs rm -rf && echo "Removed packages/"; rm .packages && echo "Removed .packages"; pubcleanlock' && \
+	rm -r .pub .dart_tool/pub && echo "Removed .pub/"; find . -name packages | xargs rm -rf && echo "Removed packages/"; rm .packages && echo "Removed .packages" && \
+	rm pubspec.lock && echo "Removed pubspec.lock" && \
 	export PATH=$D2PATH:$PATH && \
 	dart --version && \
 	pub --version && \
