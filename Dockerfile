@@ -40,7 +40,7 @@ RUN echo "Starting the script sections" && \
 	pub --version && \
 	pub get && \
 	dartanalyzer . && \
-	dartfmt -w --set-exit-if-changed && \
+	dartfmt -w --set-exit-if-changed lib example && \
 	xvfb-run -s '-screen 0 1024x768x24' pub run build_runner test -- test/*_test.dart -p chrome && \
 	dartdoc && \
 	tar czvf api.tar.gz -C doc/api . && \
