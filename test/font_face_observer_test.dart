@@ -69,11 +69,11 @@ import 'package:font_face_observer/font_face_observer.dart';
 import 'package:font_face_observer/src/adobe_blank.dart';
 
 class _FontUrls {
-  static const String roboto = 'fonts/Roboto.ttf';
-  static const String w = 'fonts/W.ttf';
-  static const String empty = 'fonts/empty.ttf';
-  static const String subset = 'fonts/subset.ttf';
-  static const String fontNotFound = 'fonts/font_not_found.ttf';
+  static const String roboto = '../example/fonts/Roboto.ttf';
+  static const String w = '../example/fonts/W.ttf';
+  static const String empty = '../example/fonts/empty.ttf';
+  static const String subset = '../example/fonts/subset.ttf';
+  static const String fontNotFound = '../example/fonts/font_not_found.ttf';
 }
 
 void main() {
@@ -103,12 +103,12 @@ void main() {
     });
 
     test('should init correctly with passed in values', () {
-      final String family = 'my family';
-      final String style = 'my style';
-      final String weight = 'my weight';
-      final String stretch = 'my stretch';
-      final String testString = 'my testString';
-      final int timeout = 1337;
+      const String family = 'my family';
+      const String style = 'my style';
+      const String weight = 'my weight';
+      const String stretch = 'my stretch';
+      const String testString = 'my testString';
+      const int timeout = 1337;
 
       final FontFaceObserver ffo = new FontFaceObserver(family,
           style: style,
@@ -128,26 +128,33 @@ void main() {
       ffo.testString = '  ';
       expect(ffo.testString, equals('BESbswy'));
     });
-    
-    test('should timeout and fail for a bogus font when using FontFace API', () async {
-      final FontLoadResult result = await new FontFaceObserver('bogus', timeout: 500).load(_FontUrls.fontNotFound);
+
+    test('should timeout and fail for a bogus font when using FontFace API',
+        () async {
+      final FontLoadResult result =
+          await new FontFaceObserver('bogus', timeout: 500)
+              .load(_FontUrls.fontNotFound);
       expect(result.isLoaded, isFalse);
       expect(result.didTimeout, isTrue);
     });
 
     test('should detect a bogus font with simulated events', () async {
-      final FontLoadResult result = await new FontFaceObserver('bogus2', timeout: 100, useSimulatedLoadEvents: true).load(_FontUrls.fontNotFound);
+      final FontLoadResult result = await new FontFaceObserver('bogus2',
+              timeout: 100, useSimulatedLoadEvents: true)
+          .load(_FontUrls.fontNotFound);
       expect(result.isLoaded, isTrue);
       expect(result.didTimeout, isFalse);
     });
 
     test('should load a real font', () async {
-      final FontLoadResult result = await new FontFaceObserver('test1').load(_FontUrls.roboto);
+      final FontLoadResult result =
+          await new FontFaceObserver('test1').load(_FontUrls.roboto);
       expect(result.isLoaded, isTrue);
     });
 
     test('should load a real font using simulated events', () async {
-      final FontFaceObserver ffo = new FontFaceObserver('test2', useSimulatedLoadEvents: true);
+      final FontFaceObserver ffo =
+          new FontFaceObserver('test2', useSimulatedLoadEvents: true);
       FontLoadResult result = await ffo.load(_FontUrls.roboto);
       expect(result.isLoaded, isTrue);
       result = await ffo.check();
@@ -157,8 +164,10 @@ void main() {
     test('should track the font keys and groups correctly', () async {
       await new FontFaceObserver('font_keys1').load(_FontUrls.roboto);
       await new FontFaceObserver('font_keys2').load(_FontUrls.roboto);
-      await new FontFaceObserver('font_keys3', group: 'group_1').load(_FontUrls.roboto);
-      await new FontFaceObserver('font_keys4', group: 'group_2').load(_FontUrls.roboto);
+      await new FontFaceObserver('font_keys3', group: 'group_1')
+          .load(_FontUrls.roboto);
+      await new FontFaceObserver('font_keys4', group: 'group_2')
+          .load(_FontUrls.roboto);
 
       // AdobeBlank is always loaded, so expect that too
       final Iterable<String> keys = FontFaceObserver.getLoadedFontKeys();
@@ -179,7 +188,8 @@ void main() {
     });
 
     test('should not leave temp DOM nodes after detecting', () async {
-      final FontFaceObserver ffo = new FontFaceObserver('no_dom_leaks', useSimulatedLoadEvents: true);
+      final FontFaceObserver ffo =
+          new FontFaceObserver('no_dom_leaks', useSimulatedLoadEvents: true);
       final FontLoadResult result = await ffo.load(_FontUrls.roboto);
       expect(result.isLoaded, isTrue);
       final ElementList<Element> elements = querySelectorAll('._ffo_temp');
@@ -198,7 +208,7 @@ void main() {
       expect(result.isLoaded, isTrue);
       await FontFaceObserver.unload(key, ffo.group);
       final Element styleElement = querySelector('style[data-key="${key}"]');
-      expect(styleElement,isNull);
+      expect(styleElement, isNull);
     });
 
     test('should use the default group if no group specified', () async {
@@ -207,66 +217,76 @@ void main() {
     });
 
     test('should unload a font by group', () async {
-      final String group = 'somegroup';
-      await new FontFaceObserver('unload_by_group1', group: group).load(_FontUrls.roboto);
-      await new FontFaceObserver('unload_by_group2', group: group).load(_FontUrls.roboto);
+      const String group = 'somegroup';
+      await new FontFaceObserver('unload_by_group1', group: group)
+          .load(_FontUrls.roboto);
+      await new FontFaceObserver('unload_by_group2', group: group)
+          .load(_FontUrls.roboto);
       await FontFaceObserver.unloadGroup(group);
       expect(querySelectorAll('style[data-group="${group}"]').length, isZero);
     });
 
-
     test('should keep data-uses attribute up to date', () async {
-      final String differentGroup = 'diff';
+      const String differentGroup = 'diff';
       final FontFaceObserver ffo = new FontFaceObserver('uses_test');
       final String key = ffo.key;
       FontLoadResult result = await ffo.load(_FontUrls.roboto);
       expect(result.isLoaded, isTrue);
       final Element styleElement = querySelector('style[data-key="${key}"]');
-      expect(styleElement.dataset['uses'],'1');
+      expect(styleElement.dataset['uses'], '1');
 
       // load it again with the same group, uses should be 2
       result = await ffo.load(_FontUrls.roboto);
       expect(result.isLoaded, isTrue);
-      expect(styleElement.dataset['uses'],'2');
+      expect(styleElement.dataset['uses'], '2');
 
       // load it again with a different group, uses should be 3
-      final FontFaceObserver ffo2 = new FontFaceObserver('uses_test', group: differentGroup);
+      final FontFaceObserver ffo2 =
+          new FontFaceObserver('uses_test', group: differentGroup);
       result = await ffo2.load(_FontUrls.roboto);
       expect(result.isLoaded, isTrue);
-      expect(styleElement.dataset['uses'],'3');
+      expect(styleElement.dataset['uses'], '3');
 
       // unload it once with the default group
       expect(await FontFaceObserver.unload(key, ffo.group), isTrue);
-      expect(styleElement.dataset['uses'],'2');
+      expect(styleElement.dataset['uses'], '2');
 
       // unload the font from the 2nd ffo
       expect(await FontFaceObserver.unload(ffo2.key, ffo2.group), isTrue);
-      expect(styleElement.dataset['uses'],'1');
+      expect(styleElement.dataset['uses'], '1');
 
       // unload it completely
       expect(await FontFaceObserver.unload(key, ffo.group), isTrue);
-      
+
       // unload it again, should not go negative
       expect(await FontFaceObserver.unload(key, ffo.group), isFalse);
       expect(querySelector('style[data-key="${key}"]'), isNull);
       expect(querySelector('span[data-key="${key}"]'), isNull);
-      expect(styleElement.dataset['uses'],'0');
+      expect(styleElement.dataset['uses'], '0');
     });
 
     test('should timeout on an empty font, not throw an exception', () async {
-      final FontLoadResult result = await new FontFaceObserver('empty1', timeout: 100).load(_FontUrls.empty);
+      final FontLoadResult result =
+          await new FontFaceObserver('empty1', timeout: 100)
+              .load(_FontUrls.empty);
       expect(result.isLoaded, isFalse);
       expect(result.didTimeout, isTrue);
     });
 
-    test('should detect an empty font, not throw an exception with simulated events', () async {
-      final FontLoadResult result = await new FontFaceObserver('empty2', timeout: 100, useSimulatedLoadEvents: true).load(_FontUrls.empty);
+    test(
+        'should detect an empty font, not throw an exception with simulated events',
+        () async {
+      final FontLoadResult result = await new FontFaceObserver('empty2',
+              timeout: 100, useSimulatedLoadEvents: true)
+          .load(_FontUrls.empty);
       expect(result.isLoaded, isTrue);
       expect(result.didTimeout, isFalse);
     });
 
     test('should load user-region-only font', () async {
-      final FontLoadResult result = await new FontFaceObserver('w', timeout: 100, testString: '\uE0FF').load(_FontUrls.w); // 57599
+      final FontLoadResult result =
+          await new FontFaceObserver('w', timeout: 100, testString: '\uE0FF')
+              .load(_FontUrls.w); // 57599
       expect(result.isLoaded, isTrue);
       expect(result.didTimeout, isFalse);
     });
@@ -278,12 +298,14 @@ void main() {
     });
 
     test('should cleanup when not successful', () async {
-      final FontFaceObserver ffo1 = new FontFaceObserver('cleanup1', timeout: 100, group: 'group1');
-      final FontFaceObserver ffo2 = new FontFaceObserver('cleanup2', timeout: 100, group: 'group2');
+      final FontFaceObserver ffo1 =
+          new FontFaceObserver('cleanup1', timeout: 100, group: 'group1');
+      final FontFaceObserver ffo2 =
+          new FontFaceObserver('cleanup2', timeout: 100, group: 'group2');
 
       final FontLoadResult result1 = await ffo1.load(_FontUrls.empty);
       final FontLoadResult result2 = await ffo2.load(_FontUrls.fontNotFound);
-    
+
       expect(result1.isLoaded, isFalse);
       expect(result2.isLoaded, isFalse);
       expectKeyNotLoaded(ffo1.key);
@@ -293,8 +315,9 @@ void main() {
     });
 
     test('should handle async interleaved load and unload calls', () async {
-      final FontFaceObserver ffo1 = new FontFaceObserver('complex1', group: 'group1');
-      
+      final FontFaceObserver ffo1 =
+          new FontFaceObserver('complex1', group: 'group1');
+
       // fire this off async
       final Future<FontLoadResult> f1 = ffo1.load(_FontUrls.roboto);
       await FontFaceObserver.unloadGroup(ffo1.group);
@@ -304,37 +327,60 @@ void main() {
     });
 
     test('should handle spaces and numbers in font family', () async {
-      final FontLoadResult result = await new FontFaceObserver('Garamond 7').load(_FontUrls.roboto);
+      final FontLoadResult result =
+          await new FontFaceObserver('Garamond 7').load(_FontUrls.roboto);
       expect(result.isLoaded, isTrue);
     });
 
-    test('should find a font with a custom unicode range within ASCII', () async {
-      final FontLoadResult result = await new FontFaceObserver('unicode1', testString: '\u0021').load(_FontUrls.subset);
+    test('should find a font with a custom unicode range within ASCII',
+        () async {
+      final FontLoadResult result =
+          await new FontFaceObserver('unicode1', testString: '\u0021')
+              .load(_FontUrls.subset);
       expect(result.isLoaded, isTrue);
     });
 
-    test('should find a font with a custom unicode range outside ASCII (but within BMP)', () async {
-      final FontLoadResult result = await new FontFaceObserver('unicode2', testString: '\u4e2d\u56fd').load(_FontUrls.subset);
+    test(
+        'should find a font with a custom unicode range outside ASCII (but within BMP)',
+        () async {
+      final FontLoadResult result =
+          await new FontFaceObserver('unicode2', testString: '\u4e2d\u56fd')
+              .load(_FontUrls.subset);
       expect(result.isLoaded, isTrue);
     });
 
-    test('should find a font with a custom unicode range outside the BMP', () async {
-      final FontLoadResult result = await new FontFaceObserver('unicode3', testString: '\udbff\udfff').load(_FontUrls.subset);
+    test('should find a font with a custom unicode range outside the BMP',
+        () async {
+      final FontLoadResult result =
+          await new FontFaceObserver('unicode3', testString: '\udbff\udfff')
+              .load(_FontUrls.subset);
       expect(result.isLoaded, isTrue);
     });
 
-    test('should find a font with a custom unicode range within ASCII with simulated events', () async {
-      final FontLoadResult result = await new FontFaceObserver('unicode1', testString: '\u0021', useSimulatedLoadEvents: true).load(_FontUrls.subset);
+    test(
+        'should find a font with a custom unicode range within ASCII with simulated events',
+        () async {
+      final FontLoadResult result = await new FontFaceObserver('unicode1',
+              testString: '\u0021', useSimulatedLoadEvents: true)
+          .load(_FontUrls.subset);
       expect(result.isLoaded, isTrue);
     });
 
-    test('should find a font with a custom unicode range outside ASCII (but within BMP) with simulated events', () async {
-      final FontLoadResult result = await new FontFaceObserver('unicode2', testString: '\u4e2d\u56fd', useSimulatedLoadEvents: true).load(_FontUrls.subset);
+    test(
+        'should find a font with a custom unicode range outside ASCII (but within BMP) with simulated events',
+        () async {
+      final FontLoadResult result = await new FontFaceObserver('unicode2',
+              testString: '\u4e2d\u56fd', useSimulatedLoadEvents: true)
+          .load(_FontUrls.subset);
       expect(result.isLoaded, isTrue);
     });
 
-    test('should find a font with a custom unicode range outside the BMP with simulated events', () async {
-      final FontLoadResult result = await new FontFaceObserver('unicode3', testString: '\udbff\udfff', useSimulatedLoadEvents: true).load(_FontUrls.subset);
+    test(
+        'should find a font with a custom unicode range outside the BMP with simulated events',
+        () async {
+      final FontLoadResult result = await new FontFaceObserver('unicode3',
+              testString: '\udbff\udfff', useSimulatedLoadEvents: true)
+          .load(_FontUrls.subset);
       expect(result.isLoaded, isTrue);
     });
   });

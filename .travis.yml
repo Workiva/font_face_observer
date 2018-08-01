@@ -1,5 +1,10 @@
 language: dart
+sudo: required
 dart:
-  - 1.24.2
+  - 1.24.3
+  - dev
 dart_task:
-  - test
+  - test: --platform vm
+  - test: --platform chrome
+  - dartanalyzer: lib example
+  - dartfmt: true

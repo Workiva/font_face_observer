@@ -1,12 +1,7 @@
 # analysis_options.yaml docs: https://www.dartlang.org/guides/language/analysis-options 
 analyzer:
   # Strong mode is required. Applies to the current project.
-  strong-mode:
-    # When compiling to JS, both implicit options apply to the current 
-    # project and all dependencies. They are useful to find possible 
-    # Type fixes or areas for explicit typing.
-    implicit-casts: false
-    implicit-dynamic: false
+  strong-mode: true
 
 # ALL lint rules are included. Unused lints should be commented
 # out with a reason. An up to date list of all options is here

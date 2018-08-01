@@ -5,21 +5,13 @@ author: Rob Becker <rob.becker@workiva.com>
 homepage: https://github.com/Workiva/font_face_observer
 
 environment:
-  sdk: '>=1.22.1 < 2.0.0'
+  sdk: '>=1.22.1 <3.0.0'
 
-web:
-  compiler:
-    debug: dartdevc
+dependencies:
+  dart2_constant: ^1.0.0
 
 dev_dependencies:
-  analyzer: ">= 0.29.0 <= 0.30.0+4"
-  browser: ^0.10.0
-  coverage: ">=0.7.0 < 2.0.0"
-  dart_dev: ^1.7.8
-  dart_style: ">=1.0.0 < 2.0.0"
-  dartdoc: ">=0.12.0 <= 0.15.1"
-  test: ">=0.12.0 < 2.0.0"
-
-transformers:
-- $dart2js:
-    sourceMaps: true
+  build_runner: ">=0.6.0<1.0.0"
+  build_test: ">=0.9.0<1.0.0"
+  build_web_compilers: ">=0.2.0<1.0.0"
+  test: ">=0.12.30 <2.0.0"
