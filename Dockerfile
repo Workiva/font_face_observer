@@ -17,6 +17,8 @@ ENV CODECOV_TOKEN='bQ4MgjJ0G2Y73v8JNX6L7yMK9679nbYB'
 RUN echo "Starting the script sections" && \
 	dart --version && \
 	pub get && \
+	pub global activate --source git https://github.com/Workiva/abide.git && \
+	pub global run abide && \
 	# make a temp location to run pub publish dry run so it only looks at what is published
 	# otherwise it fails with "Your package is 232.8 MB. Hosted packages must be smaller than 100 MB."
 	tar czvf font_face_observer.pub.tgz LICENSE README.md pubspec.yaml analysis_options.yaml lib/ && \
