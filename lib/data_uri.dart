@@ -101,10 +101,10 @@ class DataUri {
   /// Construct a new DataUri. Assume that [data] is base64 encoded unless
   /// [isDataBase64Encoded] is passed in as false
   DataUri(
-      {this.mimeType: 'application/octet-stream',
+      {this.mimeType = 'application/octet-stream',
       this.encoding,
       this.data,
-      this.isDataBase64Encoded: true});
+      this.isDataBase64Encoded = true});
 
   @override
   String toString() =>

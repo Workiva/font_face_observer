@@ -82,7 +82,7 @@ class FontLoadResult {
 
   // ignoring since the constructor is so simple, docs are just redundant
   // ignore: public_member_api_docs
-  FontLoadResult({this.isLoaded: true, this.didTimeout: false});
+  FontLoadResult({this.isLoaded = true, this.didTimeout = false});
 
   @override
   String toString() =>
@@ -216,13 +216,13 @@ class FontFaceObserver {
   /// ```
 
   FontFaceObserver(this.family,
-      {this.style: _normal,
-      this.weight: _normal,
-      this.stretch: _normal,
-      String testString: _defaultTestString,
-      this.timeout: _defaultTimeout,
-      this.useSimulatedLoadEvents: false,
-      String group: defaultGroup}) {
+      {this.style = _normal,
+      this.weight = _normal,
+      this.stretch = _normal,
+      String testString = _defaultTestString,
+      this.timeout = _defaultTimeout,
+      this.useSimulatedLoadEvents = false,
+      String group = defaultGroup}) {
     if (key != adobeBlankKey && !_loadedFonts.containsKey(adobeBlankKey)) {
       _adobeBlankLoadedFuture = _loadAdobeBlank();
     }
@@ -467,7 +467,7 @@ class FontFaceObserver {
 
   /// Generates the CSS style string to be used when detecting a font load
   /// for a given [family] at a certain [cssSize] (default 100px)
-  String _getStyle(String family, {String cssSize: '100px'}) {
+  String _getStyle(String family, {String cssSize = '100px'}) {
     final String _stretch = supportsStretch ? stretch : '';
     return '$style $weight $_stretch $cssSize $family';
   }

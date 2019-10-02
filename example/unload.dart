@@ -91,8 +91,8 @@ class _FontConfig {
   _FontConfig(
       {this.family,
       this.url,
-      this.useSimulatedLoadEvents: false,
-      this.group: FontFaceObserver.defaultGroup});
+      this.useSimulatedLoadEvents = false,
+      this.group = FontFaceObserver.defaultGroup});
   String key;
 }
 
