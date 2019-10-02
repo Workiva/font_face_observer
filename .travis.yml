@@ -1,8 +1,7 @@
 language: dart
 sudo: required
 dart:
-  - 1.24.3
-  - dev
+  - stable
 dart_task:
   - test: --platform vm
   - test: --platform chrome
