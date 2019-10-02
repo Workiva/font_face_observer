@@ -78,9 +78,9 @@ class _FontConfig {
   _FontConfig(
       {this.family,
       this.url,
-      this.testString: _successMessage,
-      this.expectLoad: true,
-      this.useSimulatedLoadEvents: false});
+      this.testString = _successMessage,
+      this.expectLoad = true,
+      this.useSimulatedLoadEvents = false});
 }
 
 final List<_FontConfig> _fonts = <_FontConfig>[]
