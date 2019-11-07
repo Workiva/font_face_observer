@@ -70,7 +70,7 @@ import 'package:font_face_observer/data_uri.dart';
 void main() {
   group('DataUri', () {
     test('should build data uri correctly', () {
-      final DataUri di = new DataUri();
+      final DataUri di = DataUri();
       expect(di.toString(), equals('data:application/octet-stream;base64,'));
 
       di
@@ -80,7 +80,7 @@ void main() {
       expect(di.toString(),
           equals('data:text/plain;charset=utf-8;base64,dGVzdA=='));
 
-      di.data = DataUri.base64EncodeByteBuffer(new Uint8List(8).buffer);
+      di.data = DataUri.base64EncodeByteBuffer(Uint8List(8).buffer);
       expect(di.toString(),
           equals('data:text/plain;charset=utf-8;base64,AAAAAAAAAAA='));
 

@@ -94,10 +94,10 @@ class Ruler {
       ..setAttribute('aria-hidden', 'true')
       ..text = text;
 
-    _collapsible = new SpanElement();
-    _expandable = new SpanElement();
-    _collapsibleInner = new SpanElement();
-    _expandableInner = new SpanElement();
+    _collapsible = SpanElement();
+    _expandable = SpanElement();
+    _collapsibleInner = SpanElement();
+    _expandableInner = SpanElement();
     // add class names for tracking nodes if they leak (and for testing)
     _collapsible.className =
         '$fontFaceObserverTempClassname _ffo_ruler_span_collapsible';
