@@ -64,7 +64,7 @@ https://www.w3.org/Consortium/Legal/2015/copyright-software-and-document
 import 'dart:async';
 import 'dart:html';
 
-typedef void _OnScrollCallback(num width);
+typedef _OnScrollCallback = void Function(num width);
 
 /// The CSS class name to add to temporary DOM nodes used when detecting
 /// font load.
