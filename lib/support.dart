@@ -109,7 +109,7 @@ bool _supportsNativeFontLoading() {
 /// Returns true if this browser is WebKit and it has the fallback bug
 /// which is present in WebKit 536.11 and earlier.
 bool _hasWebKitFallbackBug(String userAgent) {
-  final RegExp regex = new RegExp('AppleWebKit\/([0-9]+)(?:\.([0-9]+))');
+  final RegExp regex = RegExp('AppleWebKit\/([0-9]+)(?:\.([0-9]+))');
   final Iterable<Match> matches = regex.allMatches(userAgent);
   if (matches == null || matches.isEmpty) {
     return false;

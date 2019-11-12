@@ -73,7 +73,7 @@ void main() {
   Ruler ruler;
 
   setUp(() {
-    ruler = new Ruler('hello')
+    ruler = Ruler('hello')
       ..setFont('')
       ..setWidth(_startWidth);
     document.body.append(ruler.element);
@@ -85,7 +85,7 @@ void main() {
   });
 
   Future<Null> testResize(num width1) async {
-    final Completer<Null> c = new Completer<Null>();
+    final Completer<Null> c = Completer<Null>();
     ruler
       ..onResize((num width) {
         expect(width, equals(width1));
@@ -96,7 +96,7 @@ void main() {
   }
 
   Future<Null> testTwoResizes(num width1, num width2) async {
-    final Completer<Null> c = new Completer<Null>();
+    final Completer<Null> c = Completer<Null>();
     bool first = true;
     ruler
       ..onResize((num width) {
@@ -131,8 +131,8 @@ void main() {
           failed = true;
         })
         ..setWidth(_startWidth);
-      final Completer<Null> c = new Completer<Null>();
-      new Timer(const Duration(milliseconds: 20), () {
+      final Completer<Null> c = Completer<Null>();
+      Timer(const Duration(milliseconds: 20), () {
         expect(failed, isFalse);
         expect(ruler.getWidth(), equals(_startWidth));
         c.complete();

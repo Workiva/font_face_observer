@@ -1,9 +1,24 @@
 language: dart
 sudo: required
-dart:
-  - stable
-dart_task:
-  - test: --platform vm
-  - test: --platform chrome
-  - dartanalyzer: lib example
-  - dartfmt: true
+
+addons:
+  chrome: stable
+
+jobs:
+  include:
+    - dart: 2.4.0
+      name: "SDK: 2.4.0"
+      script:
+        - dartanalyzer .
+        - pub run test
+    - dart: stable
+      name: "SDK: stable"
+      script:
+        - dartanalyzer .
+        - dartfmt -n --set-exit-if-changed .
+        - pub run test
+    - dart: dev
+      name: "SDK: dev"
+      script:
+        - dartanalyzer .
+        - pub run test

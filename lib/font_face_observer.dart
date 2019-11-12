@@ -154,7 +154,7 @@ class _FontRecord {
       uses = 0;
       groupUses.clear();
     }
-    final StringBuffer groupData = new StringBuffer();
+    final StringBuffer groupData = StringBuffer();
     for (String group in groupUses.keys) {
       groupData.write('$group(${groupUses[group]}) ');
     }
@@ -196,7 +196,7 @@ class FontFaceObserver {
   String _group;
 
   /// The completer representing the load status of this font
-  final Completer<FontLoadResult> _result = new Completer<FontLoadResult>();
+  final Completer<FontLoadResult> _result = Completer<FontLoadResult>();
 
   Ruler _rulerSansSerif;
   Ruler _rulerSerif;
@@ -246,7 +246,7 @@ class FontFaceObserver {
   static const String defaultGroup = 'default';
   static Future<FontLoadResult> _adobeBlankLoadedFuture = _loadAdobeBlank();
   static Future<FontLoadResult> _loadAdobeBlank() =>
-      new FontFaceObserver(adobeBlankFamily, group: adobeBlankFamily)
+      FontFaceObserver(adobeBlankFamily, group: adobeBlankFamily)
           .load(adobeBlankFontBase64Url);
 
   /// Returns the font keys for all currently loaded fonts
@@ -256,7 +256,7 @@ class FontFaceObserver {
   /// There will not be duplicate group entries if there are multiple fonts
   /// in the same group.
   static Iterable<String> getLoadedGroups() {
-    final Set<String> loadedGroups = new Set<String>();
+    final Set<String> loadedGroups = Set<String>();
 
     void getLoadedGroups(String k) {
       final _FontRecord record = _loadedFonts[k];
@@ -361,7 +361,7 @@ class FontFaceObserver {
 
     final _FontRecord record = _loadedFonts[key];
     if (record == null) {
-      return new FontLoadResult(isLoaded: false, didTimeout: false);
+      return FontLoadResult(isLoaded: false, didTimeout: false);
     }
 
     if (family != adobeBlankFamily) {
@@ -373,7 +373,7 @@ class FontFaceObserver {
     final String _key = '_ffo_dummy_${key}';
     Element dummy = document.getElementById(_key);
     if (dummy == null) {
-      dummy = new SpanElement()
+      dummy = SpanElement()
         ..className = '$fontFaceObserverTempClassname _ffo_dummy'
         ..id = _key
         ..setAttribute('style', 'font-family: "${family}"; visibility: hidden;')
@@ -384,7 +384,7 @@ class FontFaceObserver {
     // if the browser supports FontFace API set up an interval to check if
     // the font is loaded
     if (supportsNativeFontLoading && !useSimulatedLoadEvents) {
-      t = new Timer.periodic(
+      t = Timer.periodic(
           const Duration(milliseconds: _nativeFontLoadingCheckInterval),
           _periodicallyCheckDocumentFonts);
     } else {
@@ -393,7 +393,7 @@ class FontFaceObserver {
 
     // Start a timeout timer that will cancel everything and complete
     // our _loaded future with false if it isn't already completed
-    new Timer(new Duration(milliseconds: timeout), () => _onTimeout(t));
+    Timer(Duration(milliseconds: timeout), () => _onTimeout(t));
 
     return _result.future.then((FontLoadResult flr) {
       if (t != null && t.isActive) {
@@ -421,13 +421,13 @@ class FontFaceObserver {
     } on Exception {
       // On errors, make sure the font is unloaded
       _unloadFont(key, record);
-      return new FontLoadResult(isLoaded: false, didTimeout: false);
+      return FontLoadResult(isLoaded: false, didTimeout: false);
     }
 
     // if we get here, the font load has timed out
     // make sure the font is unloaded
     _unloadFont(key, record);
-    return new FontLoadResult(isLoaded: false, didTimeout: true);
+    return FontLoadResult(isLoaded: false, didTimeout: true);
   }
 
   /// Loads the font by either returning the existing _FontRecord if a font is
@@ -449,12 +449,12 @@ class FontFaceObserver {
         src: url(${url});
       }''';
 
-      styleElement = new StyleElement()
+      styleElement = StyleElement()
         ..className = '_ffo'
         ..text = rule
         ..dataset['key'] = _key;
 
-      record = new _FontRecord()
+      record = _FontRecord()
         ..styleElement = styleElement
         ..futureLoadResult = _result.future;
 
@@ -480,7 +480,7 @@ class FontFaceObserver {
       t.cancel();
     }
     if (!_result.isCompleted) {
-      _result.complete(new FontLoadResult(isLoaded: false, didTimeout: true));
+      _result.complete(FontLoadResult(isLoaded: false, didTimeout: true));
     }
   }
 
@@ -490,7 +490,7 @@ class FontFaceObserver {
   void _periodicallyCheckDocumentFonts(Timer t) {
     if (document.fonts.check(_getStyle('"$family"'), testString)) {
       t.cancel();
-      _result.complete(new FontLoadResult(isLoaded: true, didTimeout: false));
+      _result.complete(FontLoadResult(isLoaded: true, didTimeout: false));
     }
   }
 
@@ -501,9 +501,9 @@ class FontFaceObserver {
   /// waiting for the font to become available. The Timer is returned so it may
   /// be cancelled and not check infinitely.
   Timer _simulateFontLoadEvents() {
-    _rulerSansSerif = new Ruler(testString);
-    _rulerSerif = new Ruler(testString);
-    _rulerMonospace = new Ruler(testString);
+    _rulerSansSerif = Ruler(testString);
+    _rulerSerif = Ruler(testString);
+    _rulerMonospace = Ruler(testString);
 
     num widthSansSerif = -1;
     num widthSerif = -1;
@@ -557,8 +557,7 @@ class FontFaceObserver {
             container.remove();
           }
           if (!_result.isCompleted) {
-            _result.complete(
-                new FontLoadResult(isLoaded: true, didTimeout: false));
+            _result.complete(FontLoadResult(isLoaded: true, didTimeout: false));
           }
         }
       }
@@ -608,7 +607,7 @@ class FontFaceObserver {
     // The above code will trigger a scroll event when the font loads
     // but if the document is hidden, it may not, so we will periodically
     // check for changes in the rulers if the document is hidden
-    return new Timer.periodic(const Duration(milliseconds: 50), (Timer t) {
+    return Timer.periodic(const Duration(milliseconds: 50), (Timer t) {
       if (document.hidden) {
         if (_rulerSansSerif != null) {
           widthSansSerif = _rulerSansSerif.getWidth();
