@@ -7,8 +7,6 @@ homepage: https://github.com/Workiva/font_face_observer
 environment:
   sdk: '>=2.4.0 <3.0.0'
 
-dependencies:
-
 dev_dependencies:
   build_runner: ^1.7.1
   build_test: ^0.10.9
