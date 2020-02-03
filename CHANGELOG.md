@@ -1,3 +1,12 @@
+## 2.0.13
+* [x] [#53](https://github.com/Workiva/font_face_observer/pull/53) Update CHANGELOG.md for recent releases
+
+## 2.0.12
+* [x] [#52](https://github.com/Workiva/font_face_observer/pull/52) Catch Errors in addtion to Exceptions in feature detection functions
+
+## 2.0.11
+* [x] [#50](https://github.com/Workiva/font_face_observer/pull/50) Remove Dart 1 support
+
 ## 2.0.10
 * [x] [#46](https://github.com/Workiva/font_face_observer/pull/46) Use = instead of : for default values
 
