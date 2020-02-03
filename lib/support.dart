@@ -82,7 +82,7 @@ bool _supportsStretch() {
     // to set it on a new empty div. Using condensed will cause an exception
     // in browsers that don't support it.
     div.style.font = 'condensed 100px sans-serif';
-  } on Exception {
+  } catch (_) {
     // ignore exceptions intentionally
   }
   // If the font style still has a value, that means the browser accepts
@@ -100,7 +100,7 @@ bool _supportsNativeFontLoading() {
 
     // ignore: unnecessary_statements
     document.fonts.status;
-  } on Exception {
+  } catch (_) {
     supports = false;
   }
   return supports;
