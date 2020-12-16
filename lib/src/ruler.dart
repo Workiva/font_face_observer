@@ -74,11 +74,11 @@ const String fontFaceObserverTempClassname = '_ffo_temp';
 /// a font being loaded.
 class Ruler {
   /// The element in the DOM that this ruler is using to measure
-  Element element;
-  SpanElement _collapsible;
-  SpanElement _expandable;
-  SpanElement _collapsibleInner;
-  SpanElement _expandableInner;
+  late Element element;
+  late SpanElement _collapsible;
+  late SpanElement _expandable;
+  late SpanElement _collapsibleInner;
+  late SpanElement _expandableInner;
   int _lastOffsetWidth = -1;
 
   /// The test string to use when measuring
@@ -199,18 +199,11 @@ class Ruler {
       ss.cancel();
     }
     _subscriptions.clear();
-    _subscriptions = null;
 
-    element?.remove();
-    _collapsible?.remove();
-    _expandable?.remove();
-    _collapsibleInner?.remove();
-    _expandableInner?.remove();
-
-    element = null;
-    _collapsible = null;
-    _expandable = null;
-    _collapsibleInner = null;
-    _expandableInner = null;
+    element.remove();
+    _collapsible.remove();
+    _expandable.remove();
+    _collapsibleInner.remove();
+    _expandableInner.remove();
   }
 }

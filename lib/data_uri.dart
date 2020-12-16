@@ -78,10 +78,10 @@ import 'dart:typed_data';
 ///
 /// Example Usage:
 /// ```
-/// DataUri di = new DataUri();
-///   ..data = DataUri.base64EncodeString('test');
-///   ..mimeType = 'text/plain';
-///   ..encoding = 'utf-8';
+/// DataUri di = new DataUri(
+///   data: DataUri.base64EncodeString('test');
+///   mimeType: 'text/plain';
+///   encoding: 'utf-8');
 /// di.toString(); # data:text/plain;charset=utf-8;base64,dGVzdA==
 /// ```
 
@@ -102,13 +102,13 @@ class DataUri {
   /// [isDataBase64Encoded] is passed in as false
   DataUri(
       {this.mimeType = 'application/octet-stream',
-      this.encoding,
-      this.data,
+      this.encoding = '',
+      this.data = '',
       this.isDataBase64Encoded = true});
 
   @override
   String toString() =>
-      'data:${mimeType != null && mimeType.isNotEmpty ? mimeType : ""}${encoding != null && encoding.isNotEmpty ? ";charset=$encoding" : ""}${isDataBase64Encoded ? ";base64" : ""},${data != null ? data : ""}';
+      'data:${mimeType.isNotEmpty ? mimeType : ""}${encoding.isNotEmpty ? ";charset=$encoding" : ""}${isDataBase64Encoded ? ";base64" : ""},${data}';
 
   /// Static method to encode a string to base64
   static String base64EncodeString(String string) => window.btoa(string);

@@ -170,7 +170,7 @@ void main() {
           .load(_FontUrls.roboto);
 
       // AdobeBlank is always loaded, so expect that too
-      final Iterable<String> keys = FontFaceObserver.getLoadedFontKeys();
+      final keys = FontFaceObserver.getLoadedFontKeys();
       expect(keys.length, equals(5));
       expect(keys.contains('font_keys1_normal_normal_normal'), isTrue);
       expect(keys.contains('font_keys2_normal_normal_normal'), isTrue);
@@ -179,7 +179,7 @@ void main() {
       expect(keys.contains(adobeBlankKey), isTrue);
 
       // expect the default group too
-      final Iterable<String> groups = FontFaceObserver.getLoadedGroups();
+      final groups = FontFaceObserver.getLoadedGroups();
       expect(groups.length, equals(4));
       expect(groups.contains(FontFaceObserver.defaultGroup), isTrue);
       expect(groups.contains('group_1'), isTrue);
@@ -207,7 +207,7 @@ void main() {
       final FontLoadResult result = await ffo.load(_FontUrls.roboto);
       expect(result.isLoaded, isTrue);
       await FontFaceObserver.unload(key, ffo.group);
-      final Element styleElement = querySelector('style[data-key="${key}"]');
+      final styleElement = querySelector('style[data-key="${key}"]');
       expect(styleElement, isNull);
     });
 
@@ -232,7 +232,7 @@ void main() {
       final String key = ffo.key;
       FontLoadResult result = await ffo.load(_FontUrls.roboto);
       expect(result.isLoaded, isTrue);
-      final Element styleElement = querySelector('style[data-key="${key}"]');
+      final Element styleElement = querySelector('style[data-key="${key}"]')!;
       expect(styleElement.dataset['uses'], '1');
 
       // load it again with the same group, uses should be 2

@@ -85,15 +85,9 @@ void main() {
           equals('data:text/plain;charset=utf-8;base64,AAAAAAAAAAA='));
 
       di
-        ..data = null
-        ..encoding = null
-        ..isDataBase64Encoded = false
-        ..mimeType = null;
-      expect(di.toString(), equals('data:,'));
-
-      di
         ..data = ''
         ..encoding = ''
+        ..isDataBase64Encoded = false
         ..mimeType = '';
       expect(di.toString(), equals('data:,'));
     });

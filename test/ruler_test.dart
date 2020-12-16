@@ -70,18 +70,17 @@ import 'package:font_face_observer/src/ruler.dart';
 const int _startWidth = 100;
 
 void main() {
-  Ruler ruler;
+  late Ruler ruler;
 
   setUp(() {
     ruler = Ruler('hello')
       ..setFont('')
       ..setWidth(_startWidth);
-    document.body.append(ruler.element);
+    document.body!.append(ruler.element);
   });
 
   tearDown(() {
     ruler.element.remove();
-    ruler = null;
   });
 
   Future<Null> testResize(num width1) async {
