@@ -1,7 +1,6 @@
 name: font_face_observer
 version: 3.0.0
 description: Font load events, simple, small and efficient. Dart port of https://github.com/bramstein/fontfaceobserver
-author: Rob Becker <rob.becker@workiva.com>
 homepage: https://github.com/Workiva/font_face_observer
 
 environment:
