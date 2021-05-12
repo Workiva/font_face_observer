@@ -200,10 +200,6 @@ class FontFaceObserver {
   /// The completer representing the load status of this font
   final Completer<FontLoadResult> _result = Completer<FontLoadResult>();
 
-  late Ruler _rulerSansSerif;
-  late Ruler _rulerSerif;
-  late Ruler _rulerMonospace;
-
   /// Construct a new FontFaceObserver. The CSS font family name is the only
   /// required parameter.
   ///
@@ -383,6 +379,10 @@ class FontFaceObserver {
       document.body!.append(dummy);
     }
 
+    late Ruler _rulerSansSerif;
+    late Ruler _rulerSerif;
+    late Ruler _rulerMonospace;
+
     // if the browser supports FontFace API set up an interval to check if
     // the font is loaded
     final isNative = supportsNativeFontLoading && !useSimulatedLoadEvents;
@@ -391,7 +391,10 @@ class FontFaceObserver {
           const Duration(milliseconds: _nativeFontLoadingCheckInterval),
           _periodicallyCheckDocumentFonts);
     } else {
-      t = _simulateFontLoadEvents();
+      _rulerSansSerif = Ruler(testString);
+      _rulerSerif = Ruler(testString);
+      _rulerMonospace = Ruler(testString);
+      t = _simulateFontLoadEvents(_rulerSansSerif, _rulerSerif, _rulerMonospace);
     }
 
     // Start a timeout timer that will cancel everything and complete
@@ -509,11 +512,7 @@ class FontFaceObserver {
   /// dimensions of the test string change. These rulers are checked periodically
   /// waiting for the font to become available. The Timer is returned so it may
   /// be cancelled and not check infinitely.
-  Timer _simulateFontLoadEvents() {
-    _rulerSansSerif = Ruler(testString);
-    _rulerSerif = Ruler(testString);
-    _rulerMonospace = Ruler(testString);
-
+  Timer _simulateFontLoadEvents(Ruler _rulerSansSerif, Ruler _rulerSerif, Ruler _rulerMonospace) {
     num widthSansSerif = -1;
     num widthSerif = -1;
     num widthMonospace = -1;
