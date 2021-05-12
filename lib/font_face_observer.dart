@@ -394,7 +394,8 @@ class FontFaceObserver {
       _rulerSansSerif = Ruler(testString);
       _rulerSerif = Ruler(testString);
       _rulerMonospace = Ruler(testString);
-      t = _simulateFontLoadEvents(_rulerSansSerif, _rulerSerif, _rulerMonospace);
+      t = _simulateFontLoadEvents(
+          _rulerSansSerif, _rulerSerif, _rulerMonospace);
     }
 
     // Start a timeout timer that will cancel everything and complete
@@ -512,7 +513,8 @@ class FontFaceObserver {
   /// dimensions of the test string change. These rulers are checked periodically
   /// waiting for the font to become available. The Timer is returned so it may
   /// be cancelled and not check infinitely.
-  Timer _simulateFontLoadEvents(Ruler _rulerSansSerif, Ruler _rulerSerif, Ruler _rulerMonospace) {
+  Timer _simulateFontLoadEvents(
+      Ruler _rulerSansSerif, Ruler _rulerSerif, Ruler _rulerMonospace) {
     num widthSansSerif = -1;
     num widthSerif = -1;
     num widthMonospace = -1;
