@@ -379,9 +379,9 @@ class FontFaceObserver {
       document.body!.append(dummy);
     }
 
-    late Ruler _rulerSansSerif;
-    late Ruler _rulerSerif;
-    late Ruler _rulerMonospace;
+    Ruler? _rulerSansSerif;
+    Ruler? _rulerSerif;
+    Ruler? _rulerMonospace;
 
     // if the browser supports FontFace API set up an interval to check if
     // the font is loaded
@@ -410,9 +410,9 @@ class FontFaceObserver {
 
       // cleanup rulers only if simulating font load events
       if (!isNative) {
-        _rulerSansSerif.dispose();
-        _rulerSerif.dispose();
-        _rulerMonospace.dispose();
+        _rulerSansSerif?.dispose();
+        _rulerSerif?.dispose();
+        _rulerMonospace?.dispose();
       }
 
       return flr;
