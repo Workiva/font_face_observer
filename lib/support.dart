@@ -99,7 +99,7 @@ bool _supportsNativeFontLoading() {
     // it is supported. If there is an exception, then it is not supported.
 
     // ignore: unnecessary_statements
-    document.fonts.status;
+    document.fonts!.status;
   } catch (_) {
     supports = false;
   }
@@ -111,14 +111,11 @@ bool _supportsNativeFontLoading() {
 bool _hasWebKitFallbackBug(String userAgent) {
   final RegExp regex = RegExp('AppleWebKit\/([0-9]+)(?:\.([0-9]+))');
   final Iterable<Match> matches = regex.allMatches(userAgent);
-  if (matches == null || matches.isEmpty) {
+  if (matches.isEmpty) {
     return false;
   }
   final Match match = matches.first;
-  if (match == null) {
-    return false;
-  }
-  final num major = int.parse(match.group(1));
-  final num minor = int.parse(match.group(2));
+  final num major = int.parse(match.group(1)!);
+  final num minor = int.parse(match.group(2)!);
   return major < 536 || (major == 536 && minor <= 11);
 }

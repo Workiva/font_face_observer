@@ -76,8 +76,8 @@ class _FontConfig {
   bool useSimulatedLoadEvents;
   bool expectLoad;
   _FontConfig(
-      {this.family,
-      this.url,
+      {required this.family,
+      required this.url,
       this.testString = _successMessage,
       this.expectLoad = true,
       this.useSimulatedLoadEvents = false});
@@ -136,7 +136,7 @@ void _drawTextToCanvas(String text, String fontName, CanvasElement canvas) {
   // ignore: avoid_as
   canvas.getContext('2d') as CanvasRenderingContext2D
     ..setFillColorRgb(255, 255, 255)
-    ..fillRect(0, 0, canvas.width, canvas.height)
+    ..fillRect(0, 0, canvas.width!, canvas.height!)
     ..setFillColorRgb(0, 0, 0)
     ..font = '18px $fontName'
     ..fillText(text, 5, 28);
@@ -148,7 +148,7 @@ supportsStretch: $supportsStretch
 supportsNativeFontLoading: $supportsNativeFontLoading
 hasWebKitFallbackBug: $hasWebkitFallbackBug
   ''';
-  document.getElementById('supports').text = supportString;
+  document.getElementById('supports')!.text = supportString;
   print(supportString);
 }
 
@@ -163,7 +163,7 @@ Future<Null> _loadFont(_FontConfig cfg, bool useSimulatedLoadEvents) async {
   print('  * $result');
   final String message = cfg.testString;
 
-  final Element table = document.getElementById('table');
+  final Element table = document.getElementById('table')!;
 
   final CanvasElement canvas = CanvasElement()
     ..width = 400

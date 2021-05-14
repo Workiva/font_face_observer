@@ -76,24 +76,25 @@ _FontConfig _cfg3 =
 _FontConfig _cfg4 =
     _FontConfig(family: 'Roboto_2', url: '/fonts/Roboto.ttf', group: _groupB);
 
-Element _unloadButton = document.getElementById('unloadBtn');
-Element _unloadGroupButton = document.getElementById('unloadGroupBtn');
-Element _unloadGroupButtonB = document.getElementById('unloadGroupBtnB');
-Element _loadButton = document.getElementById('loadBtn');
-Element _asyncBtn = document.getElementById('asyncBtn');
+Element _unloadButton = document.getElementById('unloadBtn')!;
+Element _unloadGroupButton = document.getElementById('unloadGroupBtn')!;
+Element _unloadGroupButtonB = document.getElementById('unloadGroupBtnB')!;
+Element _loadButton = document.getElementById('loadBtn')!;
+Element _asyncBtn = document.getElementById('asyncBtn')!;
 
 class _FontConfig {
+  String key;
   String url;
   String family;
   String group;
   bool useSimulatedLoadEvents;
-  bool expectLoad;
+
   _FontConfig(
-      {this.family,
-      this.url,
+      {required this.family,
+      required this.url,
       this.useSimulatedLoadEvents = false,
-      this.group = FontFaceObserver.defaultGroup});
-  String key;
+      this.group = FontFaceObserver.defaultGroup,
+      this.key = ''});
 }
 
 Future<FontLoadResult> _loadFont(_FontConfig cfg) async {
@@ -126,14 +127,14 @@ Future<Null> _load(Event _) async {
 
 void _updateCounts() {
   int n = querySelectorAll('._ffo_temp').length;
-  document.getElementById('ffo_temp_elements').innerHtml = n.toString();
+  document.getElementById('ffo_temp_elements')!.innerHtml = n.toString();
 
   n = querySelectorAll('style._ffo').length;
-  document.getElementById('ffo_elements').innerHtml = n.toString();
+  document.getElementById('ffo_elements')!.innerHtml = n.toString();
 
-  document.getElementById('ffo_keys').innerHtml =
+  document.getElementById('ffo_keys')!.innerHtml =
       FontFaceObserver.getLoadedFontKeys().toString();
-  document.getElementById('ffo_groups').innerHtml =
+  document.getElementById('ffo_groups')!.innerHtml =
       FontFaceObserver.getLoadedGroups().toString();
 }
 

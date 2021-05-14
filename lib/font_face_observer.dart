@@ -98,6 +98,8 @@ class _FontRecord {
   Map<String, int> groupUses = <String, int>{};
   Future<FontLoadResult> futureLoadResult;
 
+  _FontRecord({required this.styleElement, required this.futureLoadResult});
+
   int get uses => _uses;
   set uses(int newUses) {
     _uses = newUses;
@@ -105,40 +107,40 @@ class _FontRecord {
   }
 
   int incrementGroupCount(String group) {
-    if (_isNullOrWhitespace(group)) {
-      return groupUses[group];
+    if (_isWhitespace(group)) {
+      return 0;
     }
     if (groupUses.containsKey(group)) {
-      groupUses[group]++;
+      groupUses[group] = (groupUses[group] ?? 0) + 1;
     } else {
       groupUses[group] = 1;
     }
     _updateGroupUseCounts();
-    return groupUses[group];
+    return groupUses[group] ?? 0;
   }
 
   int decrementGroupCount(String group) {
-    if (_isNullOrWhitespace(group)) {
-      return groupUses[group];
+    if (_isWhitespace(group)) {
+      return 0;
     }
     if (groupUses.containsKey(group)) {
-      groupUses[group]--;
-      if (groupUses[group] <= 0) {
+      groupUses[group] = (groupUses[group] ?? 0) - 1;
+      if (groupUses[group]! <= 0) {
         groupUses.remove(group);
       }
     } else {
       groupUses.remove(group);
     }
     _updateGroupUseCounts();
-    return groupUses[group];
+    return groupUses[group] ?? 0;
   }
 
   bool isInGroup(String group) {
-    if (_isNullOrWhitespace(group)) {
+    if (_isWhitespace(group)) {
       return false;
     }
     if (groupUses.containsKey(group)) {
-      return groupUses[group] > 0;
+      return (groupUses[group] ?? 0) > 0;
     }
     return false;
   }
@@ -155,7 +157,7 @@ class _FontRecord {
       groupUses.clear();
     }
     final StringBuffer groupData = StringBuffer();
-    for (String group in groupUses.keys) {
+    for (final group in groupUses.keys) {
       groupData.write('$group(${groupUses[group]}) ');
     }
     styleElement.dataset['groups'] = groupData.toString();
@@ -198,10 +200,6 @@ class FontFaceObserver {
   /// The completer representing the load status of this font
   final Completer<FontLoadResult> _result = Completer<FontLoadResult>();
 
-  Ruler _rulerSansSerif;
-  Ruler _rulerSerif;
-  Ruler _rulerMonospace;
-
   /// Construct a new FontFaceObserver. The CSS font family name is the only
   /// required parameter.
   ///
@@ -222,20 +220,20 @@ class FontFaceObserver {
       String testString = _defaultTestString,
       this.timeout = _defaultTimeout,
       this.useSimulatedLoadEvents = false,
-      String group = defaultGroup}) {
+      String group = defaultGroup})
+      : _testString =
+            _isWhitespace(testString) ? _defaultTestString : testString,
+        _group = _isWhitespace(group) ? defaultGroup : group {
     if (key != adobeBlankKey && !_loadedFonts.containsKey(adobeBlankKey)) {
       _adobeBlankLoadedFuture = _loadAdobeBlank();
     }
-    this.testString = testString;
-    _group = _isNullOrWhitespace(group) ? defaultGroup : group;
-    if (family != null) {
-      family = family.trim();
-      final bool hasStartQuote =
-          family.startsWith('"') || family.startsWith("'");
-      final bool hasEndQuote = family.endsWith('"') || family.endsWith("'");
-      if (hasStartQuote && hasEndQuote) {
-        family = family.substring(1, family.length - 1);
-      }
+
+    _group = _isWhitespace(group) ? defaultGroup : group;
+    family = family.trim();
+    final bool hasStartQuote = family.startsWith('"') || family.startsWith("'");
+    final bool hasEndQuote = family.endsWith('"') || family.endsWith("'");
+    if (hasStartQuote && hasEndQuote) {
+      family = family.substring(1, family.length - 1);
     }
   }
 
@@ -259,7 +257,7 @@ class FontFaceObserver {
     final Set<String> loadedGroups = Set<String>();
 
     void getLoadedGroups(String k) {
-      final _FontRecord record = _loadedFonts[k];
+      final _FontRecord record = _loadedFonts[k]!;
       loadedGroups.addAll(record.groupUses.keys);
     }
 
@@ -278,7 +276,7 @@ class FontFaceObserver {
   /// A [group] of null or only whitespace is invalid and will return zero
   static Future<int> unloadGroup(String group) async {
     // do nothing if no group is passed in
-    if (_isNullOrWhitespace(group)) {
+    if (_isWhitespace(group)) {
       return 0;
     }
 
@@ -287,7 +285,7 @@ class FontFaceObserver {
     final List<String> keysToRemove = <String>[];
     final List<_FontRecord> records = <_FontRecord>[];
     for (String k in _loadedFonts.keys.toList()) {
-      final _FontRecord record = _loadedFonts[k];
+      final _FontRecord record = _loadedFonts[k]!;
       // wait for the load future to complete
       await record.futureLoadResult;
 
@@ -317,7 +315,7 @@ class FontFaceObserver {
   /// key/group combo was not found.
   static Future<bool> unload(String key, String group) async {
     if (_loadedFonts.containsKey(key)) {
-      final _FontRecord record = _loadedFonts[key];
+      final _FontRecord record = _loadedFonts[key]!;
       // wait for the load future to complete
       await record.futureLoadResult;
 
@@ -346,7 +344,7 @@ class FontFaceObserver {
   /// will be used.
   set testString(String newTestString) {
     _testString =
-        _isNullOrWhitespace(newTestString) ? _defaultTestString : newTestString;
+        _isWhitespace(newTestString) ? _defaultTestString : newTestString;
   }
 
   /// Wait for the font face represented by this FontFaceObserver to become
@@ -359,7 +357,7 @@ class FontFaceObserver {
       return _result.future;
     }
 
-    final _FontRecord record = _loadedFonts[key];
+    final record = _loadedFonts[key];
     if (record == null) {
       return FontLoadResult(isLoaded: false, didTimeout: false);
     }
@@ -371,24 +369,33 @@ class FontFaceObserver {
     // Since browsers may not load a font until it is actually used (lazily loaded)
     // We add this span to trigger the browser to load the font when used
     final String _key = '_ffo_dummy_${key}';
-    Element dummy = document.getElementById(_key);
+    var dummy = document.getElementById(_key);
     if (dummy == null) {
       dummy = SpanElement()
         ..className = '$fontFaceObserverTempClassname _ffo_dummy'
         ..id = _key
         ..setAttribute('style', 'font-family: "${family}"; visibility: hidden;')
         ..text = testString;
-      document.body.append(dummy);
+      document.body!.append(dummy);
     }
+
+    Ruler? _rulerSansSerif;
+    Ruler? _rulerSerif;
+    Ruler? _rulerMonospace;
 
     // if the browser supports FontFace API set up an interval to check if
     // the font is loaded
-    if (supportsNativeFontLoading && !useSimulatedLoadEvents) {
+    final isNative = supportsNativeFontLoading && !useSimulatedLoadEvents;
+    if (isNative) {
       t = Timer.periodic(
           const Duration(milliseconds: _nativeFontLoadingCheckInterval),
           _periodicallyCheckDocumentFonts);
     } else {
-      t = _simulateFontLoadEvents();
+      _rulerSansSerif = Ruler(testString);
+      _rulerSerif = Ruler(testString);
+      _rulerMonospace = Ruler(testString);
+      t = _simulateFontLoadEvents(
+          _rulerSansSerif, _rulerSerif, _rulerMonospace);
     }
 
     // Start a timeout timer that will cancel everything and complete
@@ -396,11 +403,18 @@ class FontFaceObserver {
     Timer(Duration(milliseconds: timeout), () => _onTimeout(t));
 
     return _result.future.then((FontLoadResult flr) {
-      if (t != null && t.isActive) {
+      if (t.isActive) {
         t.cancel();
       }
-      dummy.remove();
-      _cleanupAfterCheck();
+      dummy?.remove();
+
+      // cleanup rulers only if simulating font load events
+      if (!isNative) {
+        _rulerSansSerif?.dispose();
+        _rulerSerif?.dispose();
+        _rulerMonospace?.dispose();
+      }
+
       return flr;
     });
   }
@@ -408,7 +422,7 @@ class FontFaceObserver {
   /// Load the font into the browser given a url that could be a network url
   /// or a pre-built data or blob url.
   Future<FontLoadResult> load(String url) async {
-    final _FontRecord record = _load(url);
+    final record = _load(url);
     if (_result.isCompleted) {
       return _result.future;
     }
@@ -437,9 +451,9 @@ class FontFaceObserver {
   _FontRecord _load(String url) {
     StyleElement styleElement;
     final String _key = key;
-    _FontRecord record;
-    if (_loadedFonts.containsKey(_key)) {
-      record = _loadedFonts[_key];
+    late _FontRecord record;
+    if (_loadedFonts.containsKey(_key) && _loadedFonts[_key] != null) {
+      record = _loadedFonts[_key]!;
     } else {
       final String rule = '''
       @font-face {
@@ -454,12 +468,11 @@ class FontFaceObserver {
         ..text = rule
         ..dataset['key'] = _key;
 
-      record = _FontRecord()
-        ..styleElement = styleElement
-        ..futureLoadResult = _result.future;
+      record = _FontRecord(
+          styleElement: styleElement, futureLoadResult: _result.future);
 
       _loadedFonts[_key] = record;
-      document.head.append(styleElement);
+      document.head!.append(styleElement);
     }
     record.incrementGroupCount(group);
     return record;
@@ -476,7 +489,7 @@ class FontFaceObserver {
   /// It will cancel the passed in Timer if it is still active and
   /// complete the result with a timed out FontLoadResult
   void _onTimeout(Timer t) {
-    if (t != null && t.isActive) {
+    if (t.isActive) {
       t.cancel();
     }
     if (!_result.isCompleted) {
@@ -488,7 +501,7 @@ class FontFaceObserver {
   /// built in Font Face API. If it is loaded, the passed in Timer [t] will
   /// be cancelled. If the font is not loaded, this is a no-op.
   void _periodicallyCheckDocumentFonts(Timer t) {
-    if (document.fonts.check(_getStyle('"$family"'), testString)) {
+    if (document.fonts!.check(_getStyle('"$family"'), testString)) {
       t.cancel();
       _result.complete(FontLoadResult(isLoaded: true, didTimeout: false));
     }
@@ -500,11 +513,8 @@ class FontFaceObserver {
   /// dimensions of the test string change. These rulers are checked periodically
   /// waiting for the font to become available. The Timer is returned so it may
   /// be cancelled and not check infinitely.
-  Timer _simulateFontLoadEvents() {
-    _rulerSansSerif = Ruler(testString);
-    _rulerSerif = Ruler(testString);
-    _rulerMonospace = Ruler(testString);
-
+  Timer _simulateFontLoadEvents(
+      Ruler _rulerSansSerif, Ruler _rulerSerif, Ruler _rulerMonospace) {
     num widthSansSerif = -1;
     num widthSerif = -1;
     num widthMonospace = -1;
@@ -553,9 +563,7 @@ class FontFaceObserver {
               return;
             }
           }
-          if (container != null) {
-            container.remove();
-          }
+          container.remove();
           if (!_result.isCompleted) {
             _result.complete(FontLoadResult(isLoaded: true, didTimeout: false));
           }
@@ -577,7 +585,7 @@ class FontFaceObserver {
       ..append(_rulerSerif.element)
       ..append(_rulerMonospace.element);
 
-    document.body.append(container);
+    document.body!.append(container);
 
     fallbackWidthSansSerif = _rulerSansSerif.getWidth();
     fallbackWidthSerif = _rulerSerif.getWidth();
@@ -608,16 +616,10 @@ class FontFaceObserver {
     // but if the document is hidden, it may not, so we will periodically
     // check for changes in the rulers if the document is hidden
     return Timer.periodic(const Duration(milliseconds: 50), (Timer t) {
-      if (document.hidden) {
-        if (_rulerSansSerif != null) {
-          widthSansSerif = _rulerSansSerif.getWidth();
-        }
-        if (_rulerSerif != null) {
-          widthSerif = _rulerSerif.getWidth();
-        }
-        if (_rulerMonospace != null) {
-          widthMonospace = _rulerMonospace.getWidth();
-        }
+      if (document.hidden!) {
+        widthSansSerif = _rulerSansSerif.getWidth();
+        widthSerif = _rulerSerif.getWidth();
+        widthMonospace = _rulerMonospace.getWidth();
         _checkWidths();
       }
     });
@@ -629,15 +631,6 @@ class FontFaceObserver {
     record.styleElement.remove();
     _loadedFonts.remove(key);
   }
-
-  void _cleanupAfterCheck() {
-    _rulerSansSerif?.dispose();
-    _rulerSerif?.dispose();
-    _rulerMonospace?.dispose();
-    _rulerSansSerif = null;
-    _rulerSerif = null;
-    _rulerMonospace = null;
-  }
 }
 
-bool _isNullOrWhitespace(String s) => s == null || s.trim().isEmpty;
+bool _isWhitespace(String s) => s.trim().isEmpty;
