@@ -1,3 +1,6 @@
+## 3.0.0
+* [x] First null-safe release
+
 ## 2.0.13
 * [x] [#53](https://github.com/Workiva/font_face_observer/pull/53) Update CHANGELOG.md for recent releases
 
