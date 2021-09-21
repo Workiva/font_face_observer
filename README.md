@@ -68,9 +68,5 @@ Future<bool> FontFaceObserver.unload(String key, String group);
 
 # Notes
 Font Face Observer will use the FontFace API
-https://developer.mozilla.org/en-US/docs/Web/API/FontFace if available to detect
-when a font has loaded. If the browser does not support that API it will
-fallback to the method used in https://github.com/bramstein/fontfaceobserver which
-relies on scroll events when the font loads and is quite efficient. If you want
-to force the use of the fallback mode, you can set
-`useSimulatedLoadEvents: true` when constructing your FontFaceObserver.
+https://developer.mozilla.org/en-US/docs/Web/API/FontFace to detect
+when a font has loaded.

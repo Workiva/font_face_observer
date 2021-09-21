@@ -63,11 +63,6 @@ https://www.w3.org/Consortium/Legal/2015/copyright-software-and-document
 */
 import 'dart:html';
 
-/// Is true if this browser is WebKit and it has the fallback bug
-/// which is present in WebKit 536.11 and earlier.
-final bool hasWebkitFallbackBug =
-    _hasWebKitFallbackBug(window.navigator.userAgent);
-
 /// Is true if the current browser supports the CSS font face stretch property
 final bool supportsStretch = _supportsStretch();
 
@@ -104,18 +99,4 @@ bool _supportsNativeFontLoading() {
     supports = false;
   }
   return supports;
-}
-
-/// Returns true if this browser is WebKit and it has the fallback bug
-/// which is present in WebKit 536.11 and earlier.
-bool _hasWebKitFallbackBug(String userAgent) {
-  final RegExp regex = RegExp('AppleWebKit\/([0-9]+)(?:\.([0-9]+))');
-  final Iterable<Match> matches = regex.allMatches(userAgent);
-  if (matches.isEmpty) {
-    return false;
-  }
-  final Match match = matches.first;
-  final num major = int.parse(match.group(1)!);
-  final num minor = int.parse(match.group(2)!);
-  return major < 536 || (major == 536 && minor <= 11);
 }

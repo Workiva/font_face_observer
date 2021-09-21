@@ -64,9 +64,11 @@ https://www.w3.org/Consortium/Legal/2015/copyright-software-and-document
 import 'dart:async';
 import 'dart:html';
 import 'package:font_face_observer/support.dart';
-import 'package:font_face_observer/src/ruler.dart';
-import 'package:font_face_observer/src/adobe_blank.dart';
+// import 'package:font_face_observer/src/ruler.dart';
+//import 'package:font_face_observer/src/adobe_blank.dart';
 
+/// The CSS class name to add to temporary DOM nodes when detecting font load.
+const String fontFaceObserverTempClassname = '_ffo_temp';
 const int _defaultTimeout = 3000;
 const String _defaultTestString = 'BESbswy';
 const String _normal = 'normal';
@@ -189,10 +191,10 @@ class FontFaceObserver {
   /// How long to wait in ms when detecting font loads before timing out
   int timeout;
 
-  /// true forces simulated font load events, false will auto-detect the
-  /// capability of the browser and only use simulated if the Font Face API
-  /// is not supported
-  bool useSimulatedLoadEvents;
+  /// This option is always false now that simulated Font Load event support is removed
+  @Deprecated(
+      'This option is always false now that simulated Font Load event support is removed')
+  final bool useSimulatedLoadEvents = false;
 
   /// The internal group name
   String _group;
@@ -213,21 +215,19 @@ class FontFaceObserver {
   /// bool useSimulatedLoadEvents: false
   /// ```
 
-  FontFaceObserver(this.family,
+  FontFaceObserver(
+      this.family,
       {this.style = _normal,
       this.weight = _normal,
       this.stretch = _normal,
       String testString = _defaultTestString,
       this.timeout = _defaultTimeout,
-      this.useSimulatedLoadEvents = false,
+      @Deprecated('This option does nothing now that simulated Font Load event support is removed')
+          useSimulatedLoadEvents = false,
       String group = defaultGroup})
       : _testString =
             _isWhitespace(testString) ? _defaultTestString : testString,
         _group = _isWhitespace(group) ? defaultGroup : group {
-    if (key != adobeBlankKey && !_loadedFonts.containsKey(adobeBlankKey)) {
-      _adobeBlankLoadedFuture = _loadAdobeBlank();
-    }
-
     _group = _isWhitespace(group) ? defaultGroup : group;
     family = family.trim();
     final bool hasStartQuote = family.startsWith('"') || family.startsWith("'");
@@ -242,10 +242,10 @@ class FontFaceObserver {
 
   /// The default group used for a font if none is specified.
   static const String defaultGroup = 'default';
-  static Future<FontLoadResult> _adobeBlankLoadedFuture = _loadAdobeBlank();
-  static Future<FontLoadResult> _loadAdobeBlank() =>
-      FontFaceObserver(adobeBlankFamily, group: adobeBlankFamily)
-          .load(adobeBlankFontBase64Url);
+  // static Future<FontLoadResult> _adobeBlankLoadedFuture = _loadAdobeBlank();
+  // static Future<FontLoadResult> _loadAdobeBlank() =>
+  //     FontFaceObserver(adobeBlankFamily, group: adobeBlankFamily)
+  //         .load(adobeBlankFontBase64Url);
 
   /// Returns the font keys for all currently loaded fonts
   static Iterable<String> getLoadedFontKeys() => _loadedFonts.keys.toSet();
@@ -362,9 +362,9 @@ class FontFaceObserver {
       return FontLoadResult(isLoaded: false, didTimeout: false);
     }
 
-    if (family != adobeBlankFamily) {
-      await _adobeBlankLoadedFuture;
-    }
+    // if (family != adobeBlankFamily) {
+    //   await _adobeBlankLoadedFuture;
+    // }
 
     // Since browsers may not load a font until it is actually used (lazily loaded)
     // We add this span to trigger the browser to load the font when used
@@ -379,24 +379,11 @@ class FontFaceObserver {
       document.body!.append(dummy);
     }
 
-    Ruler? _rulerSansSerif;
-    Ruler? _rulerSerif;
-    Ruler? _rulerMonospace;
-
-    // if the browser supports FontFace API set up an interval to check if
-    // the font is loaded
-    final isNative = supportsNativeFontLoading && !useSimulatedLoadEvents;
-    if (isNative) {
-      t = Timer.periodic(
-          const Duration(milliseconds: _nativeFontLoadingCheckInterval),
-          _periodicallyCheckDocumentFonts);
-    } else {
-      _rulerSansSerif = Ruler(testString);
-      _rulerSerif = Ruler(testString);
-      _rulerMonospace = Ruler(testString);
-      t = _simulateFontLoadEvents(
-          _rulerSansSerif, _rulerSerif, _rulerMonospace);
-    }
+    // Assume the browser supports FontFace API
+    // set up an interval to check if the font is loaded
+    t = Timer.periodic(
+        const Duration(milliseconds: _nativeFontLoadingCheckInterval),
+        _periodicallyCheckDocumentFonts);
 
     // Start a timeout timer that will cancel everything and complete
     // our _loaded future with false if it isn't already completed
@@ -407,14 +394,6 @@ class FontFaceObserver {
         t.cancel();
       }
       dummy?.remove();
-
-      // cleanup rulers only if simulating font load events
-      if (!isNative) {
-        _rulerSansSerif?.dispose();
-        _rulerSerif?.dispose();
-        _rulerMonospace?.dispose();
-      }
-
       return flr;
     });
   }
@@ -497,7 +476,7 @@ class FontFaceObserver {
     }
   }
 
-  /// Checks is a font is loaded in the browser using the browser
+  /// Checks if a font is loaded in the browser using the browser
   /// built in Font Face API. If it is loaded, the passed in Timer [t] will
   /// be cancelled. If the font is not loaded, this is a no-op.
   void _periodicallyCheckDocumentFonts(Timer t) {
@@ -505,124 +484,6 @@ class FontFaceObserver {
       t.cancel();
       _result.complete(FontLoadResult(isLoaded: true, didTimeout: false));
     }
-  }
-
-  /// Simulate Font Face API load events to detect when a font is loaded and
-  /// ready in the browser. It does this with a series of "rulers" that at least
-  /// one of which will trigger a scroll event when the font loads and the
-  /// dimensions of the test string change. These rulers are checked periodically
-  /// waiting for the font to become available. The Timer is returned so it may
-  /// be cancelled and not check infinitely.
-  Timer _simulateFontLoadEvents(
-      Ruler _rulerSansSerif, Ruler _rulerSerif, Ruler _rulerMonospace) {
-    num widthSansSerif = -1;
-    num widthSerif = -1;
-    num widthMonospace = -1;
-
-    num fallbackWidthSansSerif = -1;
-    num fallbackWidthSerif = -1;
-    num fallbackWidthMonospace = -1;
-
-    final Element container = document.createElement('div');
-
-    // Internal check function
-    // -----------------------
-    // If metric compatible fonts are detected, one of the widths will be -1. This is
-    // because a metric compatible font won't trigger a scroll event. We work around
-    // this by considering a font loaded if at least two of the widths are the same.
-    // Because we have three widths, this still prevents false positives.
-    //
-    // Cases:
-    // 1) Font loads: both a, b and c are called and have the same value.
-    // 2) Font fails to load: resize callback is never called and timeout happens.
-    // 3) WebKit bug: both a, b and c are called and have the same value, but the
-    //    values are equal to one of the last resort fonts, we ignore this and
-    //    continue waiting until we get new values (or a timeout).
-    void _checkWidths() {
-      if ((widthSansSerif != -1 && widthSerif != -1) ||
-          (widthSansSerif != -1 && widthMonospace != -1) ||
-          (widthSerif != -1 && widthMonospace != -1)) {
-        if (widthSansSerif == widthSerif ||
-            widthSansSerif == widthMonospace ||
-            widthSerif == widthMonospace) {
-          // All values are the same, so the browser has most likely loaded the web font
-          if (hasWebkitFallbackBug) {
-            // Except if the browser has the WebKit fallback bug, in which case we check to see if all
-            // values are set to one of the last resort fonts.
-
-            if (((widthSansSerif == fallbackWidthSansSerif &&
-                    widthSerif == fallbackWidthSansSerif &&
-                    widthMonospace == fallbackWidthSansSerif) ||
-                (widthSansSerif == fallbackWidthSerif &&
-                    widthSerif == fallbackWidthSerif &&
-                    widthMonospace == fallbackWidthSerif) ||
-                (widthSansSerif == fallbackWidthMonospace &&
-                    widthSerif == fallbackWidthMonospace &&
-                    widthMonospace == fallbackWidthMonospace))) {
-              // The width we got matches some of the known last resort fonts, so let's assume we're dealing with the last resort font.
-              return;
-            }
-          }
-          container.remove();
-          if (!_result.isCompleted) {
-            _result.complete(FontLoadResult(isLoaded: true, didTimeout: false));
-          }
-        }
-      }
-    }
-
-    // This ensures the scroll direction is correct.
-    container
-      ..dir = 'ltr'
-      // add class names for tracking nodes if they leak (and for testing)
-      ..className = '$fontFaceObserverTempClassname _ffo_container';
-    _rulerSansSerif.setFont(_getStyle('sans-serif'));
-    _rulerSerif.setFont(_getStyle('serif'));
-    _rulerMonospace.setFont(_getStyle('monospace'));
-
-    container
-      ..append(_rulerSansSerif.element)
-      ..append(_rulerSerif.element)
-      ..append(_rulerMonospace.element);
-
-    document.body!.append(container);
-
-    fallbackWidthSansSerif = _rulerSansSerif.getWidth();
-    fallbackWidthSerif = _rulerSerif.getWidth();
-    fallbackWidthMonospace = _rulerMonospace.getWidth();
-
-    _rulerSansSerif
-      ..onResize((num width) {
-        widthSansSerif = width;
-        _checkWidths();
-      })
-      ..setFont(_getStyle('"$family",AdobeBlank,sans-serif'));
-
-    _rulerSerif
-      ..onResize((num width) {
-        widthSerif = width;
-        _checkWidths();
-      })
-      ..setFont(_getStyle('"$family",AdobeBlank,serif'));
-
-    _rulerMonospace
-      ..onResize((num width) {
-        widthMonospace = width;
-        _checkWidths();
-      })
-      ..setFont(_getStyle('"$family",AdobeBlank,monospace'));
-
-    // The above code will trigger a scroll event when the font loads
-    // but if the document is hidden, it may not, so we will periodically
-    // check for changes in the rulers if the document is hidden
-    return Timer.periodic(const Duration(milliseconds: 50), (Timer t) {
-      if (document.hidden!) {
-        widthSansSerif = _rulerSansSerif.getWidth();
-        widthSerif = _rulerSerif.getWidth();
-        widthMonospace = _rulerMonospace.getWidth();
-        _checkWidths();
-      }
-    });
   }
 
   // Internal method to forcibly remove the font. It removes all DOM references
