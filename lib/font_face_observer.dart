@@ -64,8 +64,6 @@ https://www.w3.org/Consortium/Legal/2015/copyright-software-and-document
 import 'dart:async';
 import 'dart:html';
 import 'package:font_face_observer/support.dart';
-// import 'package:font_face_observer/src/ruler.dart';
-//import 'package:font_face_observer/src/adobe_blank.dart';
 
 /// The CSS class name to add to temporary DOM nodes when detecting font load.
 const String fontFaceObserverTempClassname = '_ffo_temp';
@@ -191,9 +189,9 @@ class FontFaceObserver {
   /// How long to wait in ms when detecting font loads before timing out
   int timeout;
 
-  /// This option is always false now that simulated Font Load event support is removed
+  /// This option is always false now that simulated font load event support is removed
   @Deprecated(
-      'This option is always false now that simulated Font Load event support is removed')
+      'This option is always false now that simulated font load event support is removed')
   final bool useSimulatedLoadEvents = false;
 
   /// The internal group name
@@ -222,7 +220,7 @@ class FontFaceObserver {
       this.stretch = _normal,
       String testString = _defaultTestString,
       this.timeout = _defaultTimeout,
-      @Deprecated('This option does nothing now that simulated Font Load event support is removed')
+      @Deprecated('This option does nothing now that simulated font load event support is removed')
           useSimulatedLoadEvents = false,
       String group = defaultGroup})
       : _testString =
@@ -242,10 +240,6 @@ class FontFaceObserver {
 
   /// The default group used for a font if none is specified.
   static const String defaultGroup = 'default';
-  // static Future<FontLoadResult> _adobeBlankLoadedFuture = _loadAdobeBlank();
-  // static Future<FontLoadResult> _loadAdobeBlank() =>
-  //     FontFaceObserver(adobeBlankFamily, group: adobeBlankFamily)
-  //         .load(adobeBlankFontBase64Url);
 
   /// Returns the font keys for all currently loaded fonts
   static Iterable<String> getLoadedFontKeys() => _loadedFonts.keys.toSet();
@@ -361,10 +355,6 @@ class FontFaceObserver {
     if (record == null) {
       return FontLoadResult(isLoaded: false, didTimeout: false);
     }
-
-    // if (family != adobeBlankFamily) {
-    //   await _adobeBlankLoadedFuture;
-    // }
 
     // Since browsers may not load a font until it is actually used (lazily loaded)
     // We add this span to trigger the browser to load the font when used
