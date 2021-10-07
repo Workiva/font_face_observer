@@ -1,3 +1,10 @@
+## 3.1.1
+* [x] Update changelog w/ 3.1.0 and 3.1.1 versions
+
+## 3.1.0
+* [x] Remove simulated load events https://github.com/Workiva/font_face_observer/pull/59
+*Breaking Change*: This removes support for older browsers like IE and Edge <= 18
+
 ## 3.0.0
 * [x] First null-safe release
 
