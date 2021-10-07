@@ -67,13 +67,12 @@ import 'package:font_face_observer/font_face_observer.dart';
 
 String _groupA = 'group_A';
 String _groupB = 'group_B';
-_FontConfig _cfg = _FontConfig(
-    family: 'Roboto_1', url: '/fonts/Roboto.ttf', useSimulatedLoadEvents: true);
-_FontConfig _cfg2 =
+
+_FontConfig _cfg1 =
     _FontConfig(family: 'Roboto_2', url: '/fonts/Roboto.ttf', group: _groupA);
-_FontConfig _cfg3 =
+_FontConfig _cfg2 =
     _FontConfig(family: 'Roboto_3', url: '/fonts/Roboto.ttf', group: _groupA);
-_FontConfig _cfg4 =
+_FontConfig _cfg3 =
     _FontConfig(family: 'Roboto_2', url: '/fonts/Roboto.ttf', group: _groupB);
 
 Element _unloadButton = document.getElementById('unloadBtn')!;
@@ -87,25 +86,22 @@ class _FontConfig {
   String url;
   String family;
   String group;
-  bool useSimulatedLoadEvents;
 
   _FontConfig(
       {required this.family,
       required this.url,
-      this.useSimulatedLoadEvents = false,
       this.group = FontFaceObserver.defaultGroup,
       this.key = ''});
 }
 
 Future<FontLoadResult> _loadFont(_FontConfig cfg) async {
-  final FontFaceObserver ffo = FontFaceObserver(cfg.family,
-      useSimulatedLoadEvents: cfg.useSimulatedLoadEvents, group: cfg.group);
+  final FontFaceObserver ffo = FontFaceObserver(cfg.family, group: cfg.group);
   cfg.key = ffo.key;
   return ffo.load(cfg.url);
 }
 
 Future<Null> _unload(Event _) async {
-  await FontFaceObserver.unload(_cfg.key, _cfg.group);
+  await FontFaceObserver.unload(_cfg1.key, _cfg1.group);
   _updateCounts();
 }
 
@@ -115,13 +111,11 @@ Future<Null> _unloadGroup(String group) async {
 }
 
 Future<Null> _load(Event _) async {
-  await _loadFont(_cfg);
+  await _loadFont(_cfg1);
   _updateCounts();
   await _loadFont(_cfg2);
   _updateCounts();
   await _loadFont(_cfg3);
-  _updateCounts();
-  await _loadFont(_cfg4);
   _updateCounts();
 }
 
@@ -139,8 +133,8 @@ void _updateCounts() {
 }
 
 Future<Null> _asyncLoadUnload() async {
-  final FontFaceObserver ffo1 = FontFaceObserver(_cfg2.family,
-      useSimulatedLoadEvents: _cfg2.useSimulatedLoadEvents, group: _cfg2.group);
+  final FontFaceObserver ffo1 =
+      FontFaceObserver(_cfg2.family, group: _cfg2.group);
 
   // fire this off async
   final Future<FontLoadResult> f1 = ffo1.load(_cfg2.url);
