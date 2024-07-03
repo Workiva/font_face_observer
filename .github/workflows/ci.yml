@@ -1,0 +1,47 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - 'master'
+      - 'test_consume_*'
+  pull_request:
+    branches:
+      - '**'
+
+permissions:
+  pull-requests: write
+  contents: write
+  id-token: write
+
+jobs:
+  dart:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ ubuntu, windows ]
+        sdk: [ 2.19.6, stable ]
+    name: Dart ${{ matrix.sdk }} on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dart-lang/setup-dart@v1
+        with:
+          sdk: ${{ matrix.sdk }}
+      - name: Install dependencies
+        run: dart pub get
+      - name: Validate dependencies
+        run: dart pub global activate dependency_validator && dart pub global run dependency_validator
+      - name: Analysis
+        run: dart analyze
+      - name: Formatting
+        if: ${{ matrix.sdk == 'stable' && matrix.os == 'ubuntu' }}
+        run: dart format --set-exit-if-changed -o none lib test example
+      - name: Tests
+        run: dart test
+      - name: SBOM
+        if: ${{ matrix.sdk == '2.19.6' && matrix.os == 'ubuntu' }}
+        uses: anchore/sbom-action@v0
+        with:
+          path: ./  # Assuming actions/checkout default location
+          format: cyclonedx-json
