@@ -35,7 +35,7 @@ jobs:
       - name: Analysis
         run: dart analyze
       - name: Formatting
-        if: ${{ matrix.sdk == 'stable' && matrix.os == 'ubuntu' }}
+        if: ${{ matrix.sdk == '2.19.6' && matrix.os == 'ubuntu' }}
         run: dart format --set-exit-if-changed -o none lib test example
       - name: Tests
         run: dart test
