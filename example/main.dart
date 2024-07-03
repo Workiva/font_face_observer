@@ -97,7 +97,7 @@ final List<_FontConfig> _fonts = <_FontConfig>[]
 
 void _drawTextToCanvas(String text, String fontName, CanvasElement canvas) {
   // ignore: avoid_as
-  canvas.getContext('2d') as CanvasRenderingContext2D
+  canvas.getContext('2d')! as CanvasRenderingContext2D
     ..setFillColorRgb(255, 255, 255)
     ..fillRect(0, 0, canvas.width!, canvas.height!)
     ..setFillColorRgb(0, 0, 0)
