@@ -91,6 +91,7 @@ class _FontConfig {
       {required this.family,
       required this.url,
       this.group = FontFaceObserver.defaultGroup,
+      // ignore: unused_element_parameter
       this.key = ''});
 }
 

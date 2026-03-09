@@ -77,6 +77,7 @@ class _FontConfig {
       {required this.family,
       required this.url,
       this.testString = _successMessage,
+      // ignore: unused_element_parameter
       this.expectLoad = true});
 }
 
