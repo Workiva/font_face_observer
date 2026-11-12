@@ -62,8 +62,8 @@ Copyright © [YEAR] W3C® (MIT, ERCIM, Keio, Beihang)."
 https://www.w3.org/Consortium/Legal/2015/copyright-software-and-document
 */
 @TestOn('browser')
-
 import 'dart:typed_data';
+
 import 'package:test/test.dart';
 import 'package:font_face_observer/data_uri.dart';
 
@@ -77,12 +77,16 @@ void main() {
         ..data = DataUri.base64EncodeString('test')
         ..mimeType = 'text/plain'
         ..encoding = 'utf-8';
-      expect(di.toString(),
-          equals('data:text/plain;charset=utf-8;base64,dGVzdA=='));
+      expect(
+        di.toString(),
+        equals('data:text/plain;charset=utf-8;base64,dGVzdA=='),
+      );
 
       di.data = DataUri.base64EncodeByteBuffer(Uint8List(8).buffer);
-      expect(di.toString(),
-          equals('data:text/plain;charset=utf-8;base64,AAAAAAAAAAA='));
+      expect(
+        di.toString(),
+        equals('data:text/plain;charset=utf-8;base64,AAAAAAAAAAA='),
+      );
 
       di
         ..data = ''
