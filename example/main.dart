@@ -63,6 +63,7 @@ https://www.w3.org/Consortium/Legal/2015/copyright-software-and-document
 */
 import 'dart:async';
 import 'dart:html';
+
 import 'package:font_face_observer/font_face_observer.dart';
 import 'package:font_face_observer/support.dart';
 
@@ -73,28 +74,38 @@ class _FontConfig {
   String family;
   String testString;
   bool expectLoad;
-  _FontConfig(
-      {required this.family,
-      required this.url,
-      this.testString = _successMessage,
-      // ignore: unused_element_parameter
-      this.expectLoad = true});
+  _FontConfig({
+    required this.family,
+    required this.url,
+    this.testString = _successMessage,
+    // ignore: unused_element_parameter
+    this.expectLoad = true,
+  });
 }
 
 final List<_FontConfig> _fonts = <_FontConfig>[]
   ..add(_FontConfig(family: 'Roboto', url: '/fonts/Roboto.ttf'))
-  ..add(_FontConfig(
+  ..add(
+    _FontConfig(
       family: 'Wdesk_Icons',
       url: '/fonts/Wdesk_Icons.ttf',
-      testString: '\uE600 \uE601'))
-  ..add(_FontConfig(
+      testString: '\uE600 \uE601',
+    ),
+  )
+  ..add(
+    _FontConfig(
       family: 'Wdesk_Doctype-Icons',
       url: '/fonts/Wdesk_Doctype-Icons.ttf',
-      testString: '\uE6D9 \uE026'))
-  ..add(_FontConfig(
+      testString: '\uE6D9 \uE026',
+    ),
+  )
+  ..add(
+    _FontConfig(
       family: 'Subset',
       url: '/fonts/subset.ttf',
-      testString: '\u25FC \u4E2D \u56FD'));
+      testString: '\u25FC \u4E2D \u56FD',
+    ),
+  );
 
 void _drawTextToCanvas(String text, String fontName, CanvasElement canvas) {
   // ignore: avoid_as
@@ -107,7 +118,8 @@ void _drawTextToCanvas(String text, String fontName, CanvasElement canvas) {
 }
 
 void _writeSupport() {
-  final String supportString = '''
+  final String supportString =
+      '''
 supportsStretch: $supportsStretch
 supportsNativeFontLoading: $supportsNativeFontLoading
   ''';
@@ -133,14 +145,19 @@ Future<Null> _loadFont(_FontConfig cfg) async {
     ..append(TableCellElement()..text = uniqFamily)
     ..append(TableCellElement()..text = 'FontFace')
     ..append(TableCellElement()..text = result.isLoaded ? 'Yes' : 'No')
-    ..append(TableCellElement()
-      ..text = pass ? 'Yes' : 'No'
-      ..style.backgroundColor = pass ? 'green' : 'red')
-    ..append(TableCellElement()
-      ..append(DivElement()
-        ..text = message
-        ..style.fontFamily = uniqFamily
-        ..style.fontSize = '18px'))
+    ..append(
+      TableCellElement()
+        ..text = pass ? 'Yes' : 'No'
+        ..style.backgroundColor = pass ? 'green' : 'red',
+    )
+    ..append(
+      TableCellElement()..append(
+        DivElement()
+          ..text = message
+          ..style.fontFamily = uniqFamily
+          ..style.fontSize = '18px',
+      ),
+    )
     ..append(TableCellElement()..append(canvas));
   table.append(row);
 

@@ -20,7 +20,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ ubuntu, windows ]
-        sdk: [ 2.19.6, stable ]
+        sdk: [ 3.13.5 ]
     name: Dart ${{ matrix.sdk }} on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}-latest
     steps:
@@ -35,12 +35,12 @@ jobs:
       - name: Analysis
         run: dart analyze
       - name: Formatting
-        if: ${{ matrix.sdk == '2.19.6' && matrix.os == 'ubuntu' }}
+        if: ${{ matrix.sdk == '3.13.5' && matrix.os == 'ubuntu' }}
         run: dart format --set-exit-if-changed -o none lib test example
       - name: Tests
         run: dart test
       - name: SBOM
-        if: ${{ matrix.sdk == '2.19.6' && matrix.os == 'ubuntu' }}
+        if: ${{ matrix.sdk == '3.13.5' && matrix.os == 'ubuntu' }}
         uses: anchore/sbom-action@v0
         with:
           path: ./  # Assuming actions/checkout default location

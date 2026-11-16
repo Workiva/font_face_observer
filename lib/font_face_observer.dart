@@ -63,6 +63,7 @@ https://www.w3.org/Consortium/Legal/2015/copyright-software-and-document
 */
 import 'dart:async';
 import 'dart:html';
+
 import 'package:font_face_observer/support.dart';
 
 /// The CSS class name to add to temporary DOM nodes when detecting font load.
@@ -191,7 +192,8 @@ class FontFaceObserver {
 
   /// This option is always false now that simulated font load event support is removed
   @Deprecated(
-      'This option is always false now that simulated font load event support is removed')
+    'This option is always false now that simulated font load event support is removed',
+  )
   final bool useSimulatedLoadEvents = false;
 
   /// The internal group name
@@ -214,18 +216,21 @@ class FontFaceObserver {
   /// ```
 
   FontFaceObserver(
-      this.family,
-      {this.style = _normal,
-      this.weight = _normal,
-      this.stretch = _normal,
-      String testString = _defaultTestString,
-      this.timeout = _defaultTimeout,
-      @Deprecated('This option does nothing now that simulated font load event support is removed')
-          useSimulatedLoadEvents = false,
-      String group = defaultGroup})
-      : _testString =
-            _isWhitespace(testString) ? _defaultTestString : testString,
-        _group = _isWhitespace(group) ? defaultGroup : group {
+    this.family, {
+    this.style = _normal,
+    this.weight = _normal,
+    this.stretch = _normal,
+    String testString = _defaultTestString,
+    this.timeout = _defaultTimeout,
+    @Deprecated(
+      'This option does nothing now that simulated font load event support is removed',
+    )
+    useSimulatedLoadEvents = false,
+    String group = defaultGroup,
+  }) : _testString = _isWhitespace(testString)
+           ? _defaultTestString
+           : testString,
+       _group = _isWhitespace(group) ? defaultGroup : group {
     _group = _isWhitespace(group) ? defaultGroup : group;
     family = family.trim();
     final bool hasStartQuote = family.startsWith('"') || family.startsWith("'");
@@ -337,8 +342,9 @@ class FontFaceObserver {
   /// If [newTestString] is null or only whitespace, the default test string
   /// will be used.
   set testString(String newTestString) {
-    _testString =
-        _isWhitespace(newTestString) ? _defaultTestString : newTestString;
+    _testString = _isWhitespace(newTestString)
+        ? _defaultTestString
+        : newTestString;
   }
 
   /// Wait for the font face represented by this FontFaceObserver to become
@@ -372,8 +378,9 @@ class FontFaceObserver {
     // Assume the browser supports FontFace API
     // set up an interval to check if the font is loaded
     t = Timer.periodic(
-        const Duration(milliseconds: _nativeFontLoadingCheckInterval),
-        _periodicallyCheckDocumentFonts);
+      const Duration(milliseconds: _nativeFontLoadingCheckInterval),
+      _periodicallyCheckDocumentFonts,
+    );
 
     // Start a timeout timer that will cancel everything and complete
     // our _loaded future with false if it isn't already completed
@@ -399,7 +406,7 @@ class FontFaceObserver {
     try {
       final FontLoadResult flr = await check();
       if (flr.isLoaded) {
-        return _result.future;
+        return await _result.future;
       }
     } on Exception {
       // On errors, make sure the font is unloaded
@@ -424,7 +431,8 @@ class FontFaceObserver {
     if (_loadedFonts.containsKey(_key) && _loadedFonts[_key] != null) {
       record = _loadedFonts[_key]!;
     } else {
-      final String rule = '''
+      final String rule =
+          '''
       @font-face {
         font-family: "${family}";
         font-style: ${style};
@@ -438,7 +446,9 @@ class FontFaceObserver {
         ..dataset['key'] = _key;
 
       record = _FontRecord(
-          styleElement: styleElement, futureLoadResult: _result.future);
+        styleElement: styleElement,
+        futureLoadResult: _result.future,
+      );
 
       _loadedFonts[_key] = record;
       document.head!.append(styleElement);
